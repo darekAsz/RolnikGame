@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/gen/app_localizations.dart';
 import '../models/resource_type.dart';
 import '../models/season.dart';
 import '../services/board_style_storage.dart';
@@ -63,6 +64,7 @@ class BossBattleScreen extends StatefulWidget {
 enum _Phase { intro, fighting, summary }
 
 class _BossBattleScreenState extends State<BossBattleScreen> {
+  static const _stageCount = 3;
   static const _totalMoves = 30;
   static const _stage1WoodTarget = 30;
   static const _stage1StoneTarget = 20;
@@ -90,7 +92,6 @@ class _BossBattleScreenState extends State<BossBattleScreen> {
 
   late final int _stage2BombTarget;
   late final int _stage3SwordTarget;
-  late final List<_StageInfo> _stages;
 
   int _stageIndex = 0;
   _Phase _phase = _Phase.intro;
@@ -108,26 +109,27 @@ class _BossBattleScreenState extends State<BossBattleScreen> {
     _stage2BombTarget =
         (6 - widget.soldierCount - (widget.palisadeBuilt ? 1 : 0)).clamp(2, 6);
     _stage3SwordTarget = (20 - widget.soldierCount * 3).clamp(5, 20);
-    _stages = [
-      const _StageInfo(
-        title: 'Etap 1: Umocnienia',
-        introText: 'Wróg nadciąga. Zbuduj zasieki i wykop doły, zanim dotrze do wioski.',
-        iconAssets: ['assets/icons/wood.png', 'assets/icons/stone.png'],
-      ),
-      _StageInfo(
-        title: 'Etap 2: Pułapki',
-        introText: 'Grot i jego ludzie już przy bramie - połącz dłuższe ścieżki, żeby '
-            'stworzyć bomby, i zdetonuj ${_stage2BombTarget == 1 ? 'jedną z nich' : '$_stage2BombTarget z nich'}.',
-        iconAssets: const ['assets/icons/bomb.png'],
-      ),
-      _StageInfo(
-        title: 'Etap 3: Starcie',
-        introText: 'Ostatnia szarża - wśród zamieszania walki wyławiaj miecze ($_stage3SwordTarget), '
-            'drewno i kamień tylko zawadzają pod ręką.',
-        iconAssets: const ['assets/icons/sword.png', 'assets/icons/wood.png', 'assets/icons/stone.png'],
-      ),
-    ];
   }
+
+  List<_StageInfo> _buildStages(AppLocalizations l10n) => [
+        _StageInfo(
+          title: l10n.bossStage1Title,
+          introText: l10n.bossStage1Intro,
+          iconAssets: const ['assets/icons/wood.png', 'assets/icons/stone.png'],
+        ),
+        _StageInfo(
+          title: l10n.bossStage2Title,
+          introText: _stage2BombTarget == 1
+              ? l10n.bossStage2IntroOne
+              : l10n.bossStage2IntroMany(_stage2BombTarget),
+          iconAssets: const ['assets/icons/bomb.png'],
+        ),
+        _StageInfo(
+          title: l10n.bossStage3Title,
+          introText: l10n.bossStage3Intro(_stage3SwordTarget),
+          iconAssets: const ['assets/icons/sword.png', 'assets/icons/wood.png', 'assets/icons/stone.png'],
+        ),
+      ];
 
   Season get _season => seasonForWeek(widget.week);
 
@@ -143,7 +145,7 @@ class _BossBattleScreenState extends State<BossBattleScreen> {
   void _clearStage() {
     setState(() {
       _stagesCleared++;
-      if (_stageIndex >= _stages.length - 1) {
+      if (_stageIndex >= _stageCount - 1) {
         _phase = _Phase.summary;
       } else {
         _stageIndex++;
@@ -195,17 +197,18 @@ class _BossBattleScreenState extends State<BossBattleScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return PopScope(
       canPop: _phase == _Phase.summary,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Starcie z Grotem - Tydzień ${widget.week}'),
+          title: Text(l10n.bossAppBarTitle(widget.week)),
           automaticallyImplyLeading: false,
           actions: [
             if (_phase == _Phase.fighting)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Center(child: Text('Ruchy: $_movesLeft')),
+                child: Center(child: Text(l10n.bossMovesLabel(_movesLeft))),
               ),
           ],
         ),
@@ -219,7 +222,8 @@ class _BossBattleScreenState extends State<BossBattleScreen> {
   }
 
   Widget _buildIntro(BuildContext context) {
-    final stage = _stages[_stageIndex];
+    final l10n = AppLocalizations.of(context)!;
+    final stage = _buildStages(l10n)[_stageIndex];
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -246,9 +250,9 @@ class _BossBattleScreenState extends State<BossBattleScreen> {
             const SizedBox(height: 28),
             FilledButton(
               onPressed: () => setState(() => _phase = _Phase.fighting),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                child: Text('Rozpocznij'),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                child: Text(l10n.bossStartButton),
               ),
             ),
           ],
@@ -258,6 +262,8 @@ class _BossBattleScreenState extends State<BossBattleScreen> {
   }
 
   Widget _buildFight(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final stages = _buildStages(l10n);
     return SafeArea(
       top: false,
       child: Column(
@@ -267,7 +273,7 @@ class _BossBattleScreenState extends State<BossBattleScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(_stages[_stageIndex].title, style: Theme.of(context).textTheme.titleMedium),
+              Text(stages[_stageIndex].title, style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 8),
               _buildProgress(context),
             ],
@@ -343,12 +349,13 @@ class _BossBattleScreenState extends State<BossBattleScreen> {
   }
 
   Widget _buildProgress(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     final (current, target, label) = switch (_stageIndex) {
       0 => (_stage1Wood + _stage1Stone, _stage1WoodTarget + _stage1StoneTarget,
-          'Drewno $_stage1Wood/$_stage1WoodTarget - Kamień $_stage1Stone/$_stage1StoneTarget'),
-      1 => (_stage2Bombs, _stage2BombTarget, 'Zdetonowane bomby: $_stage2Bombs/$_stage2BombTarget'),
-      _ => (_stage3Swords, _stage3SwordTarget, 'Miecze: $_stage3Swords/$_stage3SwordTarget'),
+          l10n.bossProgressStage1(_stage1Wood, _stage1WoodTarget, _stage1Stone, _stage1StoneTarget)),
+      1 => (_stage2Bombs, _stage2BombTarget, l10n.bossProgressStage2(_stage2Bombs, _stage2BombTarget)),
+      _ => (_stage3Swords, _stage3SwordTarget, l10n.bossProgressStage3(_stage3Swords, _stage3SwordTarget)),
     };
     final ratio = target == 0 ? 1.0 : (current / target).clamp(0.0, 1.0);
     return Column(
@@ -370,10 +377,11 @@ class _BossBattleScreenState extends State<BossBattleScreen> {
   }
 
   Widget _buildSummary(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final (title, text) = switch (_stagesCleared) {
-      3 => ('🎉 Pełne zwycięstwo!', 'Grot pada na kolano, pokonany. Wioska obroniła się bez strat.'),
-      2 => ('⚔️ Zwycięstwo okupione stratami', 'Grot się wycofuje, ale starcie kosztowało wioskę część zapasów.'),
-      _ => ('💀 Porażka', 'Grot przełamał obronę wioski i splądrował zapasy.'),
+      3 => (l10n.bossSummaryFullVictoryTitle, l10n.bossSummaryFullVictoryText),
+      2 => (l10n.bossSummaryPartialVictoryTitle, l10n.bossSummaryPartialVictoryText),
+      _ => (l10n.bossSummaryDefeatTitle, l10n.bossSummaryDefeatText),
     };
     return Center(
       child: Padding(
@@ -386,15 +394,15 @@ class _BossBattleScreenState extends State<BossBattleScreen> {
             Text(text, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyLarge),
             const SizedBox(height: 8),
             Text(
-              'Ukończone etapy: $_stagesCleared/3',
+              l10n.bossSummaryStagesCleared(_stagesCleared),
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 28),
             FilledButton(
               onPressed: () => Navigator.of(context).pop(BossBattleResult(_stagesCleared)),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                child: Text('Wróć do wioski'),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                child: Text(l10n.bossReturnButton),
               ),
             ),
           ],

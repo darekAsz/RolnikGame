@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../l10n/gen/app_localizations.dart';
 import '../models/area_kind.dart';
 import '../models/comic.dart';
 import '../models/discovery.dart';
@@ -444,10 +445,11 @@ class _HomeShellState extends State<HomeShell> {
   /// budynek daje ile) - używane w rozwijanym wierszu w Statystykach/
   /// Surowcach, żeby gracz widział, co dokładnie produkuje dany surowiec.
   Map<ResourceType, List<(String, int)>> get _weeklyProductionSourcesByType {
+    final l10n = AppLocalizations.of(context)!;
     final result = <ResourceType, List<(String, int)>>{};
     if (_ratuszBuilt) {
       for (final type in kGoalEligibleTypes.where(_unlockedTypes.contains)) {
-        (result[type] ??= []).add(('Ratusz', _ratuszWeeklyBonusValue));
+        (result[type] ??= []).add((l10n.homeBuildingNameRatusz, _ratuszWeeklyBonusValue));
       }
     }
     for (final entry in _productionBuildings.entries) {
@@ -488,14 +490,15 @@ class _HomeShellState extends State<HomeShell> {
 
   /// To samo co _weeklyConsumptionByType, ale z rozbiciem na źródła.
   Map<ResourceType, List<(String, int)>> get _weeklyConsumptionSourcesByType {
+    final l10n = AppLocalizations.of(context)!;
     final result = <ResourceType, List<(String, int)>>{};
     final totalSoldiers = _soldierCounts.values.fold(0, (a, b) => a + b);
     if (totalSoldiers > 0) {
-      result[ResourceType.apple] = [('Żołnierze', totalSoldiers * _foodPerSoldierWeekly)];
+      result[ResourceType.apple] = [(l10n.homeSourceSoldiers, totalSoldiers * _foodPerSoldierWeekly)];
     }
     final populationFood = _populationFoodConsumption;
     if (populationFood > 0) {
-      result[ResourceType.grain] = [('Mieszkańcy', populationFood)];
+      result[ResourceType.grain] = [(l10n.homeSourceResidents, populationFood)];
     }
     return result;
   }
@@ -538,47 +541,38 @@ class _HomeShellState extends State<HomeShell> {
   }
 
   String _villageBonusTextFor(BuildingKind kind) {
+    final l10n = AppLocalizations.of(context)!;
     switch (kind) {
       case BuildingKind.sklep:
-        return 'Odblokowuje zakładkę "Sklep" w dolnym pasku nawigacji.';
+        return l10n.homeBonusSklep;
       case BuildingKind.karczma:
-        return 'Zwiększa limit populacji o $_karczmaPopulationBonus (widoczne w Statystykach).';
+        return l10n.homeBonusPopulation(_karczmaPopulationBonus);
       case BuildingKind.dom:
-        return 'Zwiększa limit populacji o $_housePopulationBonus (widoczne w Statystykach).';
+        return l10n.homeBonusPopulation(_housePopulationBonus);
       case BuildingKind.kuznia:
-        return 'Co tydzień: +$_kuzniaWeeklyGoldBonus złota.';
+        return l10n.homeBonusKuznia(_kuzniaWeeklyGoldBonus);
       case BuildingKind.spichlerz:
-        return 'Co tydzień: +$_weeklyProductionBonus do produkcji jabłek. Zmniejsza ryzyko '
-            'głodu (utraty zbiorów) o ${_pct(_hungerRiskReductionPerLevel)}.';
+        return l10n.homeBonusSpichlerz(_weeklyProductionBonus, _pct(_hungerRiskReductionPerLevel));
       case BuildingKind.piekarnia:
-        return 'Co tydzień: +$_weeklyProductionBonus do produkcji zboża.';
+        return l10n.homeBonusPiekarnia(_weeklyProductionBonus);
       case BuildingKind.tartak:
-        return 'Co tydzień: +$_weeklyProductionBonus do produkcji drewna.';
+        return l10n.homeBonusTartak(_weeklyProductionBonus);
       case BuildingKind.studnia:
-        return 'Co tydzień: +$_weeklyProductionBonus do produkcji wody. Zmniejsza ryzyko '
-            'pożaru (spalenia zbiorów) o ${_pct(_fireRiskReductionPerLevel)}.';
+        return l10n.homeBonusStudnia(_weeklyProductionBonus, _pct(_fireRiskReductionPerLevel));
       case BuildingKind.browar:
-        return 'Zwiększa morale wioski o $_breweryMoraleBonus (widoczne w Statystykach).';
+        return l10n.homeBonusMorale(_breweryMoraleBonus);
       case BuildingKind.kaplica:
-        return 'Zmniejsza ogólną szansę zepsucia sezonowego surowca o '
-            '${_pct(_kaplicaRiskReductionPerLevel)}. Zwiększa morale wioski o $_kaplicaMoraleBonus.';
+        return l10n.homeBonusKaplica(_pct(_kaplicaRiskReductionPerLevel), _kaplicaMoraleBonus);
       case BuildingKind.szkola:
-        return 'Odblokowuje odkrycia w Uczelni (panel poniżej) - m.in. +1 do bazowej '
-            'liczby ruchów i możliwość przydzielania pracowników do budynków.';
+        return l10n.homeBonusSzkola;
       case BuildingKind.rynek:
-        return 'Odblokowuje handel surowcami w zakładce Surowce (kurs '
-            '$_marketGiveAmountBase→$_marketReceiveAmount, poprawia się z rozbudową, '
-            'odkryciem Dyplomacji i pracownikami - najlepszy możliwy to '
-            '$_marketGiveAmountBest→$_marketReceiveAmount).';
+        return l10n.homeBonusRynek(_marketGiveAmountBase, _marketReceiveAmount, _marketGiveAmountBest);
       case BuildingKind.magazyn:
-        return 'Zwiększa maksymalną ilość każdego przechowywanego surowca o '
-            '$_warehouseStorageBonus.';
+        return l10n.homeBonusMagazyn(_warehouseStorageBonus);
       case BuildingKind.kamieniarz:
-        return 'Co tydzień: +$_weeklyProductionBonus do produkcji kamienia.';
+        return l10n.homeBonusKamieniarz(_weeklyProductionBonus);
       case BuildingKind.koszary:
-        return 'Zwiększa bezpieczeństwo wioski o $_koszarySecurityBonusPerLevel. Odblokowuje '
-            'rekrutację żołnierzy (wymaga zbudowanej Kuźni) - panel poniżej. Każdy żołnierz '
-            'zużywa $_foodPerSoldierWeekly jabłko/tydzień - przy braku jabłek część zdezerteruje.';
+        return l10n.homeBonusKoszary(_koszarySecurityBonusPerLevel, _foodPerSoldierWeekly);
       default:
         return '';
     }
@@ -589,145 +583,139 @@ class _HomeShellState extends State<HomeShell> {
   /// Opis premii poziomu 2 (rozbudowy) - wyświetlany w oknie budynku obok
   /// (lub zamiast) premii poziomu 1, analogicznie do _showAreaDialog.
   String _villageUpgradeTextFor(BuildingKind kind) {
+    final l10n = AppLocalizations.of(context)!;
     switch (kind) {
       case BuildingKind.ratusz:
-        return 'Podwaja premię tygodniową do +${_ratuszWeeklyBonus * 2} każdego surowca.';
+        return l10n.homeUpgradeRatusz(_ratuszWeeklyBonus * 2);
       case BuildingKind.palisade:
-        return 'Zwiększa limit populacji o kolejne $_palisadePopulationBonus '
-            '(razem +${_palisadePopulationBonus * 2}) i bezpieczeństwo wioski o kolejne '
-            '$_palisadeSecurityBonus (razem +${_palisadeSecurityBonus * 2}).';
+        return l10n.homeUpgradePalisade(_palisadePopulationBonus, _palisadePopulationBonus * 2,
+            _palisadeSecurityBonus, _palisadeSecurityBonus * 2);
       case BuildingKind.sklep:
-        return 'Zwiększa maksymalną liczbę ruchów możliwych do wykupienia w sklepie o '
-            '$_sklepMovesCapBonus (niezależnie od bonusu za przydzielonych pracowników).';
+        return l10n.homeUpgradeSklep(_sklepMovesCapBonus);
       case BuildingKind.karczma:
-        return 'Zwiększa limit populacji o kolejne $_karczmaPopulationBonus '
-            '(razem +${_karczmaPopulationBonus * 2}).';
+        return l10n.homeUpgradePopulation(_karczmaPopulationBonus, _karczmaPopulationBonus * 2);
       case BuildingKind.dom:
-        return 'Zwiększa limit populacji o kolejne $_housePopulationBonus '
-            '(razem +${_housePopulationBonus * 2}).';
+        return l10n.homeUpgradePopulation(_housePopulationBonus, _housePopulationBonus * 2);
       case BuildingKind.kuznia:
-        return 'Zwiększa premię tygodniową o kolejne $_kuzniaWeeklyGoldBonus złota '
-            '(razem +${_kuzniaWeeklyGoldBonus * 2}/tydz.).';
+        return l10n.homeUpgradeKuznia(_kuzniaWeeklyGoldBonus, _kuzniaWeeklyGoldBonus * 2);
       case BuildingKind.spichlerz:
-        return 'Dalej zmniejsza ryzyko głodu o kolejne ${_pct(_hungerRiskReductionPerLevel)} '
-            '(razem -${_pct(_hungerRiskReductionPerLevel * 2)}). Produkcja jabłek bez zmian.';
+        return l10n.homeUpgradeSpichlerz(
+            _pct(_hungerRiskReductionPerLevel), _pct(_hungerRiskReductionPerLevel * 2));
       case BuildingKind.piekarnia:
-        return 'Zwiększa produkcję zboża o kolejne $_weeklyProductionBonus '
-            '(razem +${_weeklyProductionBonus * 2}/tydz.).';
+        return l10n.homeUpgradePiekarnia(_weeklyProductionBonus, _weeklyProductionBonus * 2);
       case BuildingKind.tartak:
-        return 'Zwiększa produkcję drewna o kolejne $_weeklyProductionBonus '
-            '(razem +${_weeklyProductionBonus * 2}/tydz.).';
+        return l10n.homeUpgradeTartak(_weeklyProductionBonus, _weeklyProductionBonus * 2);
       case BuildingKind.studnia:
-        return 'Dalej zmniejsza ryzyko pożaru o kolejne ${_pct(_fireRiskReductionPerLevel)} '
-            '(razem -${_pct(_fireRiskReductionPerLevel * 2)}). Produkcja wody bez zmian.';
+        return l10n.homeUpgradeStudnia(
+            _pct(_fireRiskReductionPerLevel), _pct(_fireRiskReductionPerLevel * 2));
       case BuildingKind.browar:
-        return 'Zwiększa morale wioski o kolejne $_breweryMoraleBonus '
-            '(razem +${_breweryMoraleBonus * 2}).';
+        return l10n.homeUpgradeBrowar(_breweryMoraleBonus, _breweryMoraleBonus * 2);
       case BuildingKind.kaplica:
-        return 'Całkowicie usuwa ogólną szansę zepsucia (od tego budynku) i zwiększa morale '
-            'wioski o kolejne $_kaplicaMoraleBonus (razem +${_kaplicaMoraleBonus * 2}).';
+        return l10n.homeUpgradeKaplica(_kaplicaMoraleBonus, _kaplicaMoraleBonus * 2);
       case BuildingKind.szkola:
-        return 'Odblokowuje zaawansowane odkrycia - m.in. kolejne +1 do bazowej liczby '
-            'ruchów (razem +2) i limit 2 pracowników na budynek.';
+        return l10n.homeUpgradeSzkola;
       case BuildingKind.rynek:
         final afterUpgrade = (_marketGiveAmount - _marketRynekLevelReduction)
             .clamp(_marketGiveAmountBest, _marketGiveAmountBase);
-        return 'Poprawia kurs wymiany do $afterUpgrade→$_marketReceiveAmount '
-            '(jeden z 3 niezależnych ulepszeń do najlepszego możliwego kursu '
-            '$_marketGiveAmountBest→$_marketReceiveAmount).';
+        return l10n.homeUpgradeRynek(afterUpgrade, _marketReceiveAmount, _marketGiveAmountBest);
       case BuildingKind.magazyn:
-        return 'Zwiększa limit magazynowania o kolejne $_warehouseStorageBonus '
-            '(razem +${_warehouseStorageBonus * 2}).';
+        return l10n.homeUpgradeMagazyn(_warehouseStorageBonus, _warehouseStorageBonus * 2);
       case BuildingKind.kamieniarz:
-        return 'Zwiększa produkcję kamienia o kolejne $_weeklyProductionBonus '
-            '(razem +${_weeklyProductionBonus * 2}/tydz.).';
+        return l10n.homeUpgradeKamieniarz(_weeklyProductionBonus, _weeklyProductionBonus * 2);
       case BuildingKind.koszary:
-        return 'Zwiększa bezpieczeństwo wioski o kolejne $_koszarySecurityBonusPerLevel '
-            '(razem +${_koszarySecurityBonusPerLevel * 2}) i podwaja siłę każdego żołnierza.';
+        return l10n.homeUpgradeKoszary(_koszarySecurityBonusPerLevel, _koszarySecurityBonusPerLevel * 2);
     }
   }
 
   /// "$label: baza X$unit, pracownicy +Y$unit → premia ogólna Z$unit" (albo
   /// samo "$label: X$unit", jeśli budynek nie ma jeszcze pracowników).
-  String _bonusLine(String label, num base, num total, String unit) {
+  String _bonusLine(AppLocalizations l10n, String label, num base, num total, String unit) {
     final workerBonus = total - base;
-    if (workerBonus == 0) return '$label: $base$unit';
+    if (workerBonus == 0) return l10n.homeBonusLineSimple(label, base, unit);
     final sign = workerBonus > 0 ? '+' : '';
-    return '$label: baza $base$unit, pracownicy $sign$workerBonus$unit → premia ogólna $total$unit';
+    return l10n.homeBonusLineWithWorkers(label, base, unit, sign, workerBonus, total);
   }
 
-  String _bonusPercentLine(String label, double base, double total) {
-    if (base == total) return '$label: ${_pct(base)}';
-    return '$label: baza ${_pct(base)}, z pracownikami → premia ogólna ${_pct(total)}';
+  String _bonusPercentLine(AppLocalizations l10n, String label, double base, double total) {
+    if (base == total) return l10n.homeBonusPercentSimple(label, _pct(base));
+    return l10n.homeBonusPercentWithWorkers(label, _pct(base), _pct(total));
   }
 
   /// Rozbicie premii budynku na "co produkuje sam budynek" / "ile dają
   /// pracownicy" / "premia ogólna razem" - pokazywane w oknie budynku, żywo
   /// aktualizowane przy zmianie liczby przydzielonych pracowników.
   List<String> _bonusBreakdownFor(BuildingKind kind) {
+    final l10n = AppLocalizations.of(context)!;
     switch (kind) {
       case BuildingKind.ratusz:
         final base = _ratuszWeeklyBonus * (_upgradedL2(kind) ? 2 : 1);
-        return [_bonusLine('Produkcja każdego surowca', base, _ratuszWeeklyBonusValue, '/tydz.')];
+        return [_bonusLine(l10n, l10n.homeLabelResourceProduction, base, _ratuszWeeklyBonusValue, '/tydz.')];
       case BuildingKind.palisade:
         return [
-          _bonusLine('Limit populacji', _tieredBaseAmount(kind, _palisadePopulationBonus),
+          _bonusLine(l10n, l10n.homeLabelPopulationLimit, _tieredBaseAmount(kind, _palisadePopulationBonus),
               _tieredBonus(kind, _palisadePopulationBonus), ''),
-          _bonusLine('Bezpieczeństwo', _tieredBaseAmount(kind, _palisadeSecurityBonus),
+          _bonusLine(l10n, l10n.homeLabelSecurity, _tieredBaseAmount(kind, _palisadeSecurityBonus),
               _tieredBonus(kind, _palisadeSecurityBonus), ''),
         ];
       case BuildingKind.sklep:
         if (!_upgradedL2(kind)) {
-          return ['Odblokowuje zakładkę Sklep (liczbowa premia dopiero po rozbudowie).'];
+          return [l10n.homeSklepLockedBonusNote];
         }
         return [
-          'Maks. liczba ruchów do wykupienia: $_maxExtraMoves '
-              '(w tym +${_workersFor(kind).clamp(0, _maxWorkersPerBuilding)} od pracowników).',
+          l10n.homeSklepMovesBonusText(
+              _maxExtraMoves, _workersFor(kind).clamp(0, _maxWorkersPerBuilding)),
         ];
       case BuildingKind.karczma:
         return [
-          _bonusLine('Limit populacji', _tieredBaseAmount(kind, _karczmaPopulationBonus),
+          _bonusLine(l10n, l10n.homeLabelPopulationLimit, _tieredBaseAmount(kind, _karczmaPopulationBonus),
               _tieredBonus(kind, _karczmaPopulationBonus), ''),
         ];
       case BuildingKind.dom:
         return [
-          _bonusLine('Limit populacji', _tieredBaseAmount(kind, _housePopulationBonus),
+          _bonusLine(l10n, l10n.homeLabelPopulationLimit, _tieredBaseAmount(kind, _housePopulationBonus),
               _tieredBonus(kind, _housePopulationBonus), ''),
         ];
       case BuildingKind.kuznia:
         return [
-          _bonusLine('Złoto/tydz.', _productionBaseAmountFor(kind), _productionAmountFor(kind), ''),
+          _bonusLine(l10n, l10n.homeLabelGoldPerWeek, _productionBaseAmountFor(kind), _productionAmountFor(kind), ''),
         ];
       case BuildingKind.spichlerz:
         return [
-          _bonusLine('Produkcja jabłek/tydz.', _productionBaseAmountFor(kind), _productionAmountFor(kind), ''),
-          _bonusPercentLine('Redukcja ryzyka głodu', _tieredBaseFraction(kind, _hungerRiskReductionPerLevel),
+          _bonusLine(l10n, l10n.homeLabelAppleProductionPerWeek, _productionBaseAmountFor(kind),
+              _productionAmountFor(kind), ''),
+          _bonusPercentLine(l10n, l10n.homeLabelHungerRiskReduction,
+              _tieredBaseFraction(kind, _hungerRiskReductionPerLevel),
               _tieredFraction(kind, _hungerRiskReductionPerLevel)),
         ];
       case BuildingKind.piekarnia:
         return [
-          _bonusLine('Produkcja zboża/tydz.', _productionBaseAmountFor(kind), _productionAmountFor(kind), ''),
+          _bonusLine(l10n, l10n.homeLabelGrainProductionPerWeek, _productionBaseAmountFor(kind),
+              _productionAmountFor(kind), ''),
         ];
       case BuildingKind.tartak:
         return [
-          _bonusLine('Produkcja drewna/tydz.', _productionBaseAmountFor(kind), _productionAmountFor(kind), ''),
+          _bonusLine(l10n, l10n.homeLabelWoodProductionPerWeek, _productionBaseAmountFor(kind),
+              _productionAmountFor(kind), ''),
         ];
       case BuildingKind.studnia:
         return [
-          _bonusLine('Produkcja wody/tydz.', _productionBaseAmountFor(kind), _productionAmountFor(kind), ''),
-          _bonusPercentLine('Redukcja ryzyka pożaru', _tieredBaseFraction(kind, _fireRiskReductionPerLevel),
+          _bonusLine(l10n, l10n.homeLabelWaterProductionPerWeek, _productionBaseAmountFor(kind),
+              _productionAmountFor(kind), ''),
+          _bonusPercentLine(l10n, l10n.homeLabelFireRiskReduction,
+              _tieredBaseFraction(kind, _fireRiskReductionPerLevel),
               _tieredFraction(kind, _fireRiskReductionPerLevel)),
         ];
       case BuildingKind.browar:
         return [
-          _bonusLine('Morale wioski', _tieredBaseAmount(kind, _breweryMoraleBonus),
+          _bonusLine(l10n, l10n.homeLabelVillageMorale, _tieredBaseAmount(kind, _breweryMoraleBonus),
               _tieredBonus(kind, _breweryMoraleBonus), ''),
         ];
       case BuildingKind.kaplica:
         return [
-          _bonusPercentLine('Redukcja ogólnej szansy zepsucia', _tieredBaseFraction(kind, _kaplicaRiskReductionPerLevel),
+          _bonusPercentLine(l10n, l10n.homeLabelSpoilRiskReduction,
+              _tieredBaseFraction(kind, _kaplicaRiskReductionPerLevel),
               _tieredFraction(kind, _kaplicaRiskReductionPerLevel)),
-          _bonusLine('Morale wioski', _tieredBaseAmount(kind, _kaplicaMoraleBonus),
+          _bonusLine(l10n, l10n.homeLabelVillageMorale, _tieredBaseAmount(kind, _kaplicaMoraleBonus),
               _tieredBonus(kind, _kaplicaMoraleBonus), ''),
         ];
       case BuildingKind.szkola:
@@ -740,21 +728,21 @@ class _HomeShellState extends State<HomeShell> {
         // czynników naraz (poziom Rynku, Dyplomacja, pracownicy), nie tylko
         // od pracowników - patrz komentarz przy _marketGiveAmount.
         return [
-          'Kurs wymiany: $_marketGiveAmount→$_marketReceiveAmount '
-              '(najlepszy możliwy: $_marketGiveAmountBest→$_marketReceiveAmount = 2:1)',
+          l10n.homeMarketRateBonus(_marketGiveAmount, _marketReceiveAmount, _marketGiveAmountBest),
         ];
       case BuildingKind.magazyn:
         return [
-          _bonusLine('Limit magazynu', _tieredBaseAmount(kind, _warehouseStorageBonus),
+          _bonusLine(l10n, l10n.homeLabelWarehouseLimit, _tieredBaseAmount(kind, _warehouseStorageBonus),
               _tieredBonus(kind, _warehouseStorageBonus), ''),
         ];
       case BuildingKind.kamieniarz:
         return [
-          _bonusLine('Produkcja kamienia/tydz.', _productionBaseAmountFor(kind), _productionAmountFor(kind), ''),
+          _bonusLine(l10n, l10n.homeLabelStoneProductionPerWeek, _productionBaseAmountFor(kind),
+              _productionAmountFor(kind), ''),
         ];
       case BuildingKind.koszary:
         return [
-          _bonusLine('Bezpieczeństwo', _tieredBaseAmount(kind, _koszarySecurityBonusPerLevel),
+          _bonusLine(l10n, l10n.homeLabelSecurity, _tieredBaseAmount(kind, _koszarySecurityBonusPerLevel),
               _tieredBonus(kind, _koszarySecurityBonusPerLevel), ''),
         ];
     }
@@ -813,8 +801,8 @@ class _HomeShellState extends State<HomeShell> {
   bool get _allResourcesUnlocked =>
       _unlockedTypes.length == ResourceType.values.length - kBattleOnlyResourceTypes.length;
 
-  static const _resourcesNotUnlockedMessage =
-      'Najpierw odkryj wszystkie surowce w Okolicach (zbuduj Sad, Łąkę i Pole).';
+  String get _resourcesNotUnlockedMessage =>
+      AppLocalizations.of(context)!.homeResourcesNotUnlockedMessage;
 
   @override
   void initState() {
@@ -844,63 +832,31 @@ class _HomeShellState extends State<HomeShell> {
     });
   }
 
-  static const _villageTutorialSteps = [
-    (
-      Icons.home_work,
-      'Wioska',
-      'Dotknij pustej działki, żeby zbudować budynek, albo gotowego budynku, żeby go '
-          'rozbudować lub zobaczyć szczegóły. Ratusz buduje się jako pierwszy i odblokowuje resztę.',
-    ),
-    (
-      Icons.terrain,
-      'Okolice',
-      'Tereny wokół wioski (rzeka, las, góry...) - ich zabudowa powiększa planszę zbiorów '
-          'i daje premie do surowców.',
-    ),
-    (
-      Icons.inventory_2,
-      'Surowce',
-      'Podgląd zapasów, produkcji i zużycia tygodniowego każdego surowca, a stąd też '
-          'wymiana na targu, gdy Rynek jest gotowy.',
-    ),
-    (
-      Icons.storefront,
-      'Sklep',
-      'Kupuj dodatkowe ruchy na planszy zbiorów i ulepszenia automatycznego dopasowywania '
-          '(odblokowuje się w trakcie gry).',
-    ),
-    (
-      Icons.bar_chart,
-      'Statystyki',
-      'Rekordy, populacja, morale, bezpieczeństwo, armia i komiksy fabularne, a także '
-          'wybór wyglądu planszy zbiorów.',
-    ),
-    (
-      Icons.flag,
-      'Cele',
-      'Cele bieżącego aktu fabuły i questy poboczne - realizuj je, żeby zdobywać '
-          'doświadczenie.',
-    ),
-    (
-      Icons.arrow_forward,
-      'Przycisk "→"',
-      'Kończy tydzień i przenosi do planszy zbiorów (albo starcia z bossem, jeśli akurat wypada).',
-    ),
-  ];
+  List<(IconData, String, String)> _villageTutorialSteps(AppLocalizations l10n) => [
+        (Icons.home_work, l10n.homeTabVillage, l10n.homeTutorialVillageDesc),
+        (Icons.terrain, l10n.homeTabSurroundings, l10n.homeTutorialSurroundingsDesc),
+        (Icons.inventory_2, l10n.homeTabResources, l10n.homeTutorialResourcesDesc),
+        (Icons.storefront, l10n.homeTabShop, l10n.homeTutorialShopDesc),
+        (Icons.bar_chart, l10n.homeTabStats, l10n.homeTutorialStatsDesc),
+        (Icons.flag, l10n.homeTabGoals, l10n.homeTutorialGoalsDesc),
+        (Icons.arrow_forward, l10n.homeTutorialArrowTitle, l10n.homeTutorialArrowDesc),
+      ];
 
   void _showVillageTutorialDialog() {
+    final l10n = AppLocalizations.of(context)!;
+    final steps = _villageTutorialSteps(l10n);
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Witaj w wiosce'),
+        title: Text(l10n.homeVillageTutorialTitle),
         content: SizedBox(
           width: 360,
           height: 420,
           child: ListView.separated(
-            itemCount: _villageTutorialSteps.length,
+            itemCount: steps.length,
             separatorBuilder: (context, index) => const SizedBox(height: 16),
             itemBuilder: (context, index) {
-              final (icon, title, description) = _villageTutorialSteps[index];
+              final (icon, title, description) = steps[index];
               return Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -927,7 +883,7 @@ class _HomeShellState extends State<HomeShell> {
         actions: [
           FilledButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Rozumiem'),
+            child: Text(l10n.homeVillageTutorialGotIt),
           ),
         ],
       ),
@@ -1093,20 +1049,21 @@ class _HomeShellState extends State<HomeShell> {
   /// Dodatkowe potwierdzenie przed faktycznym zburzeniem - "Zburz" w oknie
   /// budynku otwiera to okno zamiast od razu wykonywać akcję.
   Future<bool> _confirmDemolish(BuildContext dialogContext, String name) async {
+    final l10n = AppLocalizations.of(dialogContext)!;
     final confirmed = await showDialog<bool>(
       context: dialogContext,
       builder: (context) => AlertDialog(
-        title: const Text('Zburzyć budynek?'),
-        content: Text('Na pewno chcesz zburzyć: $name?\nOdzyskasz połowę zainwestowanych surowców.'),
+        title: Text(l10n.homeConfirmDemolishTitle),
+        content: Text(l10n.homeConfirmDemolishMessage(name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Anuluj'),
+            child: Text(l10n.homeCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: FilledButton.styleFrom(backgroundColor: const Color(0xFFC0392B)),
-            child: const Text('Zburz'),
+            child: Text(l10n.homeDemolish),
           ),
         ],
       ),
@@ -1115,23 +1072,20 @@ class _HomeShellState extends State<HomeShell> {
   }
 
   Future<void> _onTapRatusz() async {
+    final l10n = AppLocalizations.of(context)!;
     if (!_ratuszBuilt && !_allResourcesUnlocked) {
       _showSnack(_resourcesNotUnlockedMessage);
       return;
     }
     final level2 = _upgradedL2(BuildingKind.ratusz);
     final action = await _showBuildingDialog(
-      title: 'Ratusz',
+      title: l10n.homeBuildingNameRatusz,
       kind: BuildingKind.ratusz,
       level1: _ratuszBuilt,
       level2: level2,
       cost: _ratuszCost,
       upgradeCost: _villageUpgradeCost,
-      bonusText: 'Co tydzień: +$_ratuszWeeklyBonus każdego surowca.\n'
-          'Złoto zebrane w ścieżce daje dodatkowo +1 (np. 4 w ścieżce = 5).\n'
-          'Wymaga odblokowania wszystkich surowców w Okolicach. Musi zostać '
-          'zbudowany jako pierwszy budynek wioski - odblokowuje budowę '
-          'pozostałych, a jego rozbudowa (poziom 2) odblokowuje ich rozbudowę.',
+      bonusText: l10n.homeRatuszBonusText(_ratuszWeeklyBonus),
       upgradeText: _villageUpgradeTextFor(BuildingKind.ratusz),
       demolishable: false,
     );
@@ -1154,25 +1108,25 @@ class _HomeShellState extends State<HomeShell> {
       });
       await ResourceStorage.save(_stockpile);
       await VillageBuildingStorage.setUpgraded(BuildingKind.ratusz, true);
-      _showSnack('Ratusz rozbudowany!');
+      _showSnack(l10n.homeRatuszUpgradedSnack);
     }
   }
 
   Future<void> _onTapPalisade() async {
+    final l10n = AppLocalizations.of(context)!;
     if (!_palisadeBuilt && !_allResourcesUnlocked) {
       _showSnack(_resourcesNotUnlockedMessage);
       return;
     }
     final level2 = _upgradedL2(BuildingKind.palisade);
     final action = await _showBuildingDialog(
-      title: 'Palisada',
+      title: l10n.homeBuildingNamePalisade,
       kind: BuildingKind.palisade,
       level1: _palisadeBuilt,
       level2: level2,
       cost: _palisadeCost,
       upgradeCost: _villageUpgradeCost,
-      bonusText: 'Zwiększa limit populacji o $_palisadePopulationBonus i bezpieczeństwo '
-          'wioski o $_palisadeSecurityBonus (widoczne w Statystykach).',
+      bonusText: l10n.homePalisadeBonusText(_palisadePopulationBonus, _palisadeSecurityBonus),
       upgradeText: _villageUpgradeTextFor(BuildingKind.palisade),
     );
 
@@ -1194,7 +1148,7 @@ class _HomeShellState extends State<HomeShell> {
       });
       await ResourceStorage.save(_stockpile);
       await VillageBuildingStorage.setUpgraded(BuildingKind.palisade, true);
-      _showSnack('Palisada rozbudowana!');
+      _showSnack(l10n.homePalisadeUpgradedSnack);
     } else if (action == 'demolish' && _palisadeBuilt) {
       setState(() {
         for (final entry in _palisadeCost.entries) {
@@ -1213,7 +1167,7 @@ class _HomeShellState extends State<HomeShell> {
       await GameProgressStorage.setPalisadeBuilt(false);
       await VillageBuildingStorage.setUpgraded(BuildingKind.palisade, false);
       await VillageBuildingStorage.setWorkers(BuildingKind.palisade, 0);
-      _showSnack('Palisada zburzona - odzyskano połowę surowców.');
+      _showSnack(l10n.homePalisadeDemolishedSnack);
     }
   }
 
@@ -1246,28 +1200,29 @@ class _HomeShellState extends State<HomeShell> {
   }
 
   Widget _koszaryRecruitPanel(BuildContext context, StateSetter setDialogState) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('Wojsko', style: Theme.of(context).textTheme.labelLarge),
+        Text(l10n.homeMilitaryTitle, style: Theme.of(context).textTheme.labelLarge),
         const SizedBox(height: 4),
-        Text('Łączna siła armii: $_totalArmyStrength'),
+        Text(l10n.homeMilitaryTotalStrength(_totalArmyStrength)),
         Text(
-          'Dostępni mieszkańcy: $_population (każda rekrutacja zabiera jednego z wioski).',
+          l10n.homeMilitaryAvailableResidents(_population),
           style: Theme.of(context).textTheme.bodySmall,
         ),
         if (!_kuzniaBuilt) ...[
           const SizedBox(height: 8),
-          const Text(
-            'Rekrutacja wymaga zbudowanej Kuźni (broń dla żołnierzy).',
-            style: TextStyle(fontStyle: FontStyle.italic),
+          Text(
+            l10n.homeMilitaryRequiresForge,
+            style: const TextStyle(fontStyle: FontStyle.italic),
           ),
         ] else ...[
           if (_population < _soldierRecruitCostPopulation) ...[
             const SizedBox(height: 8),
-            const Text(
-              'Za mało mieszkańców, żeby rekrutować kolejnego żołnierza.',
-              style: TextStyle(fontStyle: FontStyle.italic),
+            Text(
+              l10n.homeMilitaryNotEnoughResidents,
+              style: const TextStyle(fontStyle: FontStyle.italic),
             ),
           ],
           for (final type in UnitType.values) ...[
@@ -1282,8 +1237,8 @@ class _HomeShellState extends State<HomeShell> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${type.label}: ${_soldierCounts[type] ?? 0} '
-                        '(siła każdego: ${_strengthFor(type)})',
+                        l10n.homeMilitaryUnitLine(
+                            type.label, _soldierCounts[type] ?? 0, _strengthFor(type)),
                       ),
                       const SizedBox(height: 4),
                       FilledButton(
@@ -1294,9 +1249,13 @@ class _HomeShellState extends State<HomeShell> {
                               }
                             : null,
                         child: Text(
-                          'Rekrutuj (-$_soldierRecruitCostPopulation mieszkaniec, '
-                          '-$_soldierRecruitCostGold złota'
-                          '${type.recruitCost.entries.map((e) => ', -${e.value} ${e.key.label.toLowerCase()}').join()})',
+                          l10n.homeMilitaryRecruitButton(
+                            _soldierRecruitCostPopulation,
+                            _soldierRecruitCostGold,
+                            type.recruitCost.entries
+                                .map((e) => ', -${e.value} ${e.key.label.toLowerCase()}')
+                                .join(),
+                          ),
                         ),
                       ),
                     ],
@@ -1328,11 +1287,12 @@ class _HomeShellState extends State<HomeShell> {
   }
 
   Widget _uczelniaDiscoveryPanel(BuildContext context, StateSetter setDialogState) {
+    final l10n = AppLocalizations.of(context)!;
     final uczelniaLevel = _upgradedL2(BuildingKind.szkola) ? 2 : 1;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('Odkrycia', style: Theme.of(context).textTheme.labelLarge),
+        Text(l10n.homeDiscoveriesTitle, style: Theme.of(context).textTheme.labelLarge),
         for (final discovery in kDiscoveries) ...[
           const SizedBox(height: 10),
           _discoveryRow(context, setDialogState, discovery, uczelniaLevel),
@@ -1347,6 +1307,7 @@ class _HomeShellState extends State<HomeShell> {
     Discovery discovery,
     int uczelniaLevel,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     final unlocked = _hasDiscovery(discovery.id);
     final locked = discovery.requiredBuildingLevel > uczelniaLevel;
     return Container(
@@ -1358,18 +1319,18 @@ class _HomeShellState extends State<HomeShell> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(discovery.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(discovery.localizedName, style: const TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 2),
-          Text(discovery.description, style: Theme.of(context).textTheme.bodySmall),
+          Text(discovery.localizedDescription, style: Theme.of(context).textTheme.bodySmall),
           const SizedBox(height: 6),
           if (unlocked)
-            const Text(
-              'Odkryto',
-              style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2F9E57)),
+            Text(
+              l10n.homeDiscoveryUnlocked,
+              style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2F9E57)),
             )
           else if (locked)
             Text(
-              'Wymaga Uczelni na poziomie ${discovery.requiredBuildingLevel}.',
+              l10n.homeDiscoveryRequiresLevel(discovery.requiredBuildingLevel),
               style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFC0392B)),
             )
           else
@@ -1381,8 +1342,9 @@ class _HomeShellState extends State<HomeShell> {
                     }
                   : null,
               child: Text(
-                'Odkryj ('
-                '${discovery.cost.entries.map((e) => '-${e.value} ${e.key.label.toLowerCase()}').join(', ')})',
+                l10n.homeDiscoveryUnlockButton(
+                  discovery.cost.entries.map((e) => '-${e.value} ${e.key.label.toLowerCase()}').join(', '),
+                ),
               ),
             ),
         ],
@@ -1391,6 +1353,7 @@ class _HomeShellState extends State<HomeShell> {
   }
 
   Future<void> _onTapVillageBuilding(BuildingKind kind) async {
+    final l10n = AppLocalizations.of(context)!;
     final builtNow = _villageBuilt[kind] ?? false;
     if (!builtNow && !_allResourcesUnlocked) {
       _showSnack(_resourcesNotUnlockedMessage);
@@ -1435,7 +1398,7 @@ class _HomeShellState extends State<HomeShell> {
       });
       await ResourceStorage.save(_stockpile);
       await VillageBuildingStorage.setUpgraded(kind, true);
-      _showSnack('${kind.label} rozbudowany!');
+      _showSnack(l10n.homeBuildingUpgradedSnack(kind.label));
     } else if (action == 'demolish' && builtNow) {
       setState(() {
         for (final entry in cost.entries) {
@@ -1454,7 +1417,7 @@ class _HomeShellState extends State<HomeShell> {
       await VillageBuildingStorage.setBuilt(kind, false);
       await VillageBuildingStorage.setUpgraded(kind, false);
       await VillageBuildingStorage.setWorkers(kind, 0);
-      _showSnack('${kind.label}: budynek zburzony - odzyskano połowę surowców.');
+      _showSnack(l10n.homeBuildingDemolishedSnack(kind.label));
     }
   }
 
@@ -1465,6 +1428,7 @@ class _HomeShellState extends State<HomeShell> {
   /// najpierw odbudować (osobny, wcześniejszy krok niżej), zanim staną się w
   /// pełni aktywne i będzie można je rozbudować do prawdziwego poziomu 2.
   Future<void> _onTapExtraHouse(int index) async {
+    final l10n = AppLocalizations.of(context)!;
     final builtNow = _extraHousesBuilt[index];
     final activeNow = _extraHousesActive[index];
     final decrepit = builtNow && !activeNow;
@@ -1476,7 +1440,7 @@ class _HomeShellState extends State<HomeShell> {
 
     if (decrepit) {
       final action = await _showBuildingDialog(
-        title: 'Dom',
+        title: l10n.homeBuildingNameDom,
         kind: BuildingKind.dom,
         level1: true,
         level2: false,
@@ -1484,11 +1448,11 @@ class _HomeShellState extends State<HomeShell> {
         upgradeCost: _villageUpgradeCost,
         showWorkers: false,
         demolishable: false,
-        levelLabel: 'Poziom 0',
-        upgradeSectionLabel: 'Odbuduj do poziomu 1',
-        notDemolishableText: 'Opuszczonego domu nie można zburzyć - w środku wciąż mieszkają ludzie.',
-        bonusText: 'Dom stoi opuszczony i zaniedbany od lat - obecnie nie daje żadnego bonusu do populacji.',
-        upgradeText: 'Odbuduj dom, żeby zaczął dawać +$_housePopulationBonus do limitu populacji.',
+        levelLabel: l10n.homeLevel0,
+        upgradeSectionLabel: l10n.homeRebuildToLevel1,
+        notDemolishableText: l10n.homeDecrepitHouseNotDemolishable,
+        bonusText: l10n.homeDecrepitHouseBonusText,
+        upgradeText: l10n.homeDecrepitHouseUpgradeText(_housePopulationBonus),
       );
       if (action == 'upgrade') {
         setState(() {
@@ -1499,14 +1463,14 @@ class _HomeShellState extends State<HomeShell> {
         });
         await ResourceStorage.save(_stockpile);
         await VillageBuildingStorage.setExtraHouseActive(index, true);
-        _showSnack('Dom odbudowany - znów daje bonus do populacji!');
+        _showSnack(l10n.homeHouseRebuiltSnack);
       }
       return;
     }
 
     final upgradedNow = builtNow && _extraHousesUpgraded[index];
     final action = await _showBuildingDialog(
-      title: 'Dom',
+      title: l10n.homeBuildingNameDom,
       kind: BuildingKind.dom,
       level1: builtNow,
       level2: upgradedNow,
@@ -1535,7 +1499,7 @@ class _HomeShellState extends State<HomeShell> {
       });
       await ResourceStorage.save(_stockpile);
       await VillageBuildingStorage.setExtraHouseUpgraded(index, true);
-      _showSnack('Dom rozbudowany!');
+      _showSnack(l10n.homeBuildingUpgradedSnack(l10n.homeBuildingNameDom));
     } else if (action == 'demolish' && builtNow) {
       setState(() {
         for (final entry in cost.entries) {
@@ -1554,11 +1518,12 @@ class _HomeShellState extends State<HomeShell> {
       await VillageBuildingStorage.setExtraHouseBuilt(index, false);
       await VillageBuildingStorage.setExtraHouseActive(index, true);
       await VillageBuildingStorage.setExtraHouseUpgraded(index, false);
-      _showSnack('Dom zburzony - odzyskano połowę surowców.');
+      _showSnack(l10n.homeHouseDemolishedSnack);
     }
   }
 
   Future<void> _showTradeDialog() async {
+    final l10n = AppLocalizations.of(context)!;
     final types = _unlockedTypes.toList();
     if (types.length < 2) return;
     final giveAmount = _marketGiveAmount;
@@ -1580,12 +1545,12 @@ class _HomeShellState extends State<HomeShell> {
           final totalGive = giveAmount * multiplier;
           final totalReceive = receiveAmount * multiplier;
           return AlertDialog(
-            title: const Text('Rynek - handel'),
+            title: Text(l10n.homeMarketTradeTitle),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text('Kurs: $giveAmount surowca za $receiveAmount innego.'),
+                Text(l10n.homeMarketRateLine(giveAmount, receiveAmount)),
                 const SizedBox(height: 12),
                 DropdownButton<ResourceType>(
                   isExpanded: true,
@@ -1594,7 +1559,7 @@ class _HomeShellState extends State<HomeShell> {
                     for (final t in types)
                       DropdownMenuItem(
                         value: t,
-                        child: Text('Daj: ${t.label} (masz ${_stockpile[t] ?? 0})'),
+                        child: Text(l10n.homeMarketGiveOption(t.label, _stockpile[t] ?? 0)),
                       ),
                   ],
                   onChanged: (value) {
@@ -1614,7 +1579,7 @@ class _HomeShellState extends State<HomeShell> {
                   value: receive,
                   items: [
                     for (final t in receiveOptions)
-                      DropdownMenuItem(value: t, child: Text('Otrzymaj: ${t.label}')),
+                      DropdownMenuItem(value: t, child: Text(l10n.homeMarketReceiveOption(t.label))),
                   ],
                   onChanged: (value) {
                     if (value == null) return;
@@ -1647,15 +1612,15 @@ class _HomeShellState extends State<HomeShell> {
                       onPressed: maxMultiplier > 0
                           ? () => setDialogState(() => multiplier = maxMultiplier)
                           : null,
-                      child: const Text('Maks.'),
+                      child: Text(l10n.homeMax),
                     ),
                   ],
                 ),
                 const SizedBox(height: 6),
                 Text(
                   maxMultiplier > 0
-                      ? 'Razem: oddajesz $totalGive ${give.label}, dostajesz $totalReceive ${receive.label}.'
-                      : 'Za mało ${give.label}, żeby wymienić choć raz.',
+                      ? l10n.homeMarketSummaryLine(totalGive, give.label, totalReceive, receive.label)
+                      : l10n.homeMarketNotEnough(give.label),
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
@@ -1664,7 +1629,7 @@ class _HomeShellState extends State<HomeShell> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Zamknij'),
+                child: Text(l10n.homeClose),
               ),
               FilledButton(
                 onPressed: canTrade
@@ -1677,11 +1642,11 @@ class _HomeShellState extends State<HomeShell> {
                         ResourceStorage.save(_stockpile);
                         Navigator.of(context).pop();
                         _showSnack(
-                          'Wymieniono $totalGive ${give.label} na $totalReceive ${receive.label}.',
+                          l10n.homeMarketTradeSnack(totalGive, give.label, totalReceive, receive.label),
                         );
                       }
                     : null,
-                child: const Text('Wymień'),
+                child: Text(l10n.homeExchangeButton),
               ),
             ],
           );
@@ -1692,6 +1657,7 @@ class _HomeShellState extends State<HomeShell> {
 
   Future<void> _buyMove() async {
     if (_extraMoves >= _maxExtraMoves) return;
+    final l10n = AppLocalizations.of(context)!;
     final cost = _nextMoveCost;
     if ((_stockpile[ResourceType.coin] ?? 0) < cost) return;
     setState(() {
@@ -1700,11 +1666,12 @@ class _HomeShellState extends State<HomeShell> {
     });
     await ResourceStorage.save(_stockpile);
     await ShopStorage.saveExtraMoves(_extraMoves);
-    _showSnack('Kupiono +1 ruch na tydzień! Teraz: $_totalMoves ruchów.');
+    _showSnack(l10n.homeMoveBoughtSnack(_totalMoves));
   }
 
   Future<void> _buyAutoMatchTier1() async {
     if (_autoMatchTier >= 1) return;
+    final l10n = AppLocalizations.of(context)!;
     if ((_stockpile[ResourceType.coin] ?? 0) < _autoMatchTier1Cost) return;
     setState(() {
       _stockpile[ResourceType.coin] = (_stockpile[ResourceType.coin] ?? 0) - _autoMatchTier1Cost;
@@ -1712,11 +1679,12 @@ class _HomeShellState extends State<HomeShell> {
     });
     await ResourceStorage.save(_stockpile);
     await ShopStorage.saveAutoMatchTier(1);
-    _showSnack('Odblokowano automatyczne usuwanie czwórek!');
+    _showSnack(l10n.homeAutoMatchTier1Snack);
   }
 
   Future<void> _buyAutoMatchTier2() async {
     if (_autoMatchTier < 1 || _autoMatchTier >= 2) return;
+    final l10n = AppLocalizations.of(context)!;
     if ((_stockpile[ResourceType.coin] ?? 0) < _autoMatchTier2Cost) return;
     setState(() {
       _stockpile[ResourceType.coin] = (_stockpile[ResourceType.coin] ?? 0) - _autoMatchTier2Cost;
@@ -1724,15 +1692,16 @@ class _HomeShellState extends State<HomeShell> {
     });
     await ResourceStorage.save(_stockpile);
     await ShopStorage.saveAutoMatchTier(2);
-    _showSnack('Odblokowano automatyczne usuwanie trójek!');
+    _showSnack(l10n.homeAutoMatchTier2Snack);
   }
 
   Future<void> _onTapArea(AreaKind area) async {
+    final l10n = AppLocalizations.of(context)!;
     final level1 = _areasBuilt[area] ?? false;
     final level2 = _areasUpgraded[area] ?? false;
     final prereq = area.prerequisite;
     if (!level1 && prereq != null && !(_areasBuilt[prereq] ?? false)) {
-      _showSnack('Najpierw zbuduj: ${prereq.label}.');
+      _showSnack(l10n.homeAreaBuildFirst(prereq.label));
       return;
     }
 
@@ -1740,12 +1709,9 @@ class _HomeShellState extends State<HomeShell> {
     final upgradeCost = _upgradeCostFor(area);
     final resource = area.resourceType;
     final bonusText = area.isStarterResource
-        ? '${resource.label} jest już dostępne na planszy zbiorów - ten budynek '
-            'daje dodatkowo +1 do każdej zebranej ścieżki tego surowca.'
-        : 'Odblokowuje ${resource.label.toLowerCase()} jako nowy surowiec do '
-            'zbierania na planszy zbiorów.';
-    final upgradeText = 'Odblokowuje możliwość wyboru ${resource.label.toLowerCase()} jako '
-        '"surowca tygodnia" (10-20% więcej na planszy zbiorów w wybranym tygodniu).';
+        ? l10n.homeAreaBonusStarter(resource.label)
+        : l10n.homeAreaBonusUnlock(resource.label.toLowerCase());
+    final upgradeText = l10n.homeAreaUpgradeText(resource.label.toLowerCase());
 
     final action = await _showAreaDialog(
       area: area,
@@ -1775,10 +1741,7 @@ class _HomeShellState extends State<HomeShell> {
       });
       await ResourceStorage.save(_stockpile);
       await AreaStorage.setUpgraded(area, true);
-      _showSnack(
-        '${area.label} rozbudowany! Możesz teraz wybierać ${resource.label.toLowerCase()} '
-        'jako surowiec tygodnia.',
-      );
+      _showSnack(l10n.homeAreaUpgradedSnack(area.label, resource.label.toLowerCase()));
     } else if (action == 'demolish' && level1) {
       setState(() {
         for (final entry in cost.entries) {
@@ -1795,7 +1758,7 @@ class _HomeShellState extends State<HomeShell> {
       await ResourceStorage.save(_stockpile);
       await AreaStorage.setBuilt(area, false);
       await AreaStorage.setUpgraded(area, false);
-      _showSnack('${area.label}: budynek zburzony - odzyskano połowę surowców.');
+      _showSnack(l10n.homeBuildingDemolishedSnack(area.label));
     }
   }
 
@@ -1808,14 +1771,15 @@ class _HomeShellState extends State<HomeShell> {
     required String bonusText,
     required String upgradeText,
   }) {
+    final l10n = AppLocalizations.of(context)!;
     final canAffordBuild = _canAfford(cost);
     final canAffordUpgrade = _canAfford(upgradeCost);
     final resource = area.resourceType;
     final title = !level1
         ? area.label
         : level2
-            ? '${area.label} (rozbudowany)'
-            : '${area.label} (zbudowany)';
+            ? l10n.homeTitleUpgradedSuffix(area.label)
+            : l10n.homeTitleBuiltSuffix(area.label);
 
     return showDialog<String>(
       context: context,
@@ -1831,34 +1795,34 @@ class _HomeShellState extends State<HomeShell> {
               ),
               const SizedBox(height: 14),
               if (!level1) ...[
-                Text('Koszt budowy (poziom 1)', style: Theme.of(context).textTheme.labelLarge),
+                Text(l10n.homeAreaBuildCostTitle, style: Theme.of(context).textTheme.labelLarge),
                 const SizedBox(height: 6),
                 for (final entry in cost.entries)
                   _CostRow(type: entry.key, have: _stockpile[entry.key] ?? 0, need: entry.value),
                 const SizedBox(height: 12),
-                Text('Efekt', style: Theme.of(context).textTheme.labelLarge),
+                Text(l10n.homeEffectLabel, style: Theme.of(context).textTheme.labelLarge),
                 const SizedBox(height: 4),
                 Text(bonusText),
               ] else ...[
-                Text('Poziom 1', style: Theme.of(context).textTheme.labelLarge),
+                Text(l10n.homeLevel1, style: Theme.of(context).textTheme.labelLarge),
                 const SizedBox(height: 4),
                 Text(bonusText),
                 const SizedBox(height: 14),
                 if (!level2) ...[
-                  Text('Rozbudowa do poziomu 2', style: Theme.of(context).textTheme.labelLarge),
+                  Text(l10n.homeUpgradeToLevel2, style: Theme.of(context).textTheme.labelLarge),
                   const SizedBox(height: 6),
                   for (final entry in upgradeCost.entries)
                     _CostRow(type: entry.key, have: _stockpile[entry.key] ?? 0, need: entry.value),
                   const SizedBox(height: 4),
                   Text(upgradeText),
                 ] else ...[
-                  Text('Poziom 2', style: Theme.of(context).textTheme.labelLarge),
+                  Text(l10n.homeLevel2, style: Theme.of(context).textTheme.labelLarge),
                   const SizedBox(height: 4),
                   Text(upgradeText),
                 ],
                 const SizedBox(height: 14),
                 Text(
-                  'Zburzenie zwróci połowę wszystkich zainwestowanych surowców.',
+                  l10n.homeDemolishRefundNote,
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               ],
@@ -1873,21 +1837,21 @@ class _HomeShellState extends State<HomeShell> {
                 if (confirmed && context.mounted) Navigator.of(context).pop('demolish');
               },
               style: TextButton.styleFrom(foregroundColor: const Color(0xFFC0392B)),
-              child: const Text('Zburz'),
+              child: Text(l10n.homeDemolish),
             ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text(level1 && level2 ? 'Zamknij' : 'Anuluj'),
+            child: Text(level1 && level2 ? l10n.homeClose : l10n.homeCancel),
           ),
           if (!level1)
             FilledButton(
               onPressed: canAffordBuild ? () => Navigator.of(context).pop('build') : null,
-              child: const Text('Zbuduj'),
+              child: Text(l10n.homeBuild),
             ),
           if (level1 && !level2)
             FilledButton(
               onPressed: canAffordUpgrade ? () => Navigator.of(context).pop('upgrade') : null,
-              child: const Text('Rozbuduj'),
+              child: Text(l10n.homeUpgrade),
             ),
         ],
       ),
@@ -1910,11 +1874,15 @@ class _HomeShellState extends State<HomeShell> {
     bool upgradable = true,
     bool showWorkers = true,
     bool demolishable = true,
-    String levelLabel = 'Poziom 1',
-    String upgradeSectionLabel = 'Rozbudowa do poziomu 2',
-    String notDemolishableText = 'Głównego budynku wioski nie można zburzyć.',
+    String? levelLabel,
+    String? upgradeSectionLabel,
+    String? notDemolishableText,
     Widget Function(BuildContext, StateSetter)? extraContentBuilder,
   }) {
+    final l10n = AppLocalizations.of(context)!;
+    final effectiveLevelLabel = levelLabel ?? l10n.homeLevel1;
+    final effectiveUpgradeSectionLabel = upgradeSectionLabel ?? l10n.homeUpgradeToLevel2;
+    final effectiveNotDemolishableText = notDemolishableText ?? l10n.homeMainBuildingNotDemolishable;
     // Ratusz to "główny budynek" wioski: musi być zbudowany, zanim można
     // zbudować cokolwiek innego, a jego rozbudowa (poziom 2) odblokowuje
     // rozbudowę pozostałych budynków. Nie dotyczy to samego Ratusza.
@@ -1925,8 +1893,8 @@ class _HomeShellState extends State<HomeShell> {
     final dialogTitle = !level1
         ? title
         : (upgradable && level2)
-            ? '$title (rozbudowany)'
-            : '$title (zbudowany)';
+            ? l10n.homeTitleUpgradedSuffix(title)
+            : l10n.homeTitleBuiltSuffix(title);
 
     return showDialog<String>(
       context: context,
@@ -1942,43 +1910,43 @@ class _HomeShellState extends State<HomeShell> {
                 const SizedBox(height: 14),
                 if (!level1) ...[
                   if (buildLocked) ...[
-                    const Text(
-                      'Zablokowane',
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFC0392B)),
+                    Text(
+                      l10n.homeLocked,
+                      style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFC0392B)),
                     ),
                     const SizedBox(height: 6),
-                    const Text('Najpierw zbuduj Ratusz (główny budynek wioski).'),
+                    Text(l10n.homeBuildRatuszFirst),
                   ] else ...[
-                    Text('Koszt budowy', style: Theme.of(context).textTheme.labelLarge),
+                    Text(l10n.homeBuildCostTitle, style: Theme.of(context).textTheme.labelLarge),
                     const SizedBox(height: 6),
                     for (final entry in cost.entries)
                       _CostRow(type: entry.key, have: _stockpile[entry.key] ?? 0, need: entry.value),
                     const SizedBox(height: 12),
-                    Text('Premie', style: Theme.of(context).textTheme.labelLarge),
+                    Text(l10n.homePerksLabel, style: Theme.of(context).textTheme.labelLarge),
                     const SizedBox(height: 4),
                     Text(bonusText),
                   ],
                 ] else if (!upgradable) ...[
-                  Text('Odzysk przy zburzeniu (50%)', style: Theme.of(context).textTheme.labelLarge),
+                  Text(l10n.homeDemolishRefund50Title, style: Theme.of(context).textTheme.labelLarge),
                   const SizedBox(height: 6),
                   for (final entry in cost.entries)
                     _RefundRow(type: entry.key, refund: entry.value ~/ 2),
                   const SizedBox(height: 12),
-                  Text('Premie', style: Theme.of(context).textTheme.labelLarge),
+                  Text(l10n.homePerksLabel, style: Theme.of(context).textTheme.labelLarge),
                   const SizedBox(height: 4),
                   Text(bonusText),
                 ] else ...[
-                  Text(levelLabel, style: Theme.of(context).textTheme.labelLarge),
+                  Text(effectiveLevelLabel, style: Theme.of(context).textTheme.labelLarge),
                   const SizedBox(height: 4),
                   Text(bonusText),
                   const SizedBox(height: 14),
                   if (!level2) ...[
-                    Text(upgradeSectionLabel, style: Theme.of(context).textTheme.labelLarge),
+                    Text(effectiveUpgradeSectionLabel, style: Theme.of(context).textTheme.labelLarge),
                     const SizedBox(height: 6),
                     if (upgradeLocked) ...[
-                      const Text(
-                        'Wymaga rozbudowanego (poziom 2) Ratusza.',
-                        style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFC0392B)),
+                      Text(
+                        l10n.homeRequiresUpgradedRatusz,
+                        style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFC0392B)),
                       ),
                     ] else ...[
                       for (final entry in upgradeCost.entries)
@@ -1987,21 +1955,19 @@ class _HomeShellState extends State<HomeShell> {
                       Text(upgradeText),
                     ],
                   ] else ...[
-                    Text('Poziom 2', style: Theme.of(context).textTheme.labelLarge),
+                    Text(l10n.homeLevel2, style: Theme.of(context).textTheme.labelLarge),
                     const SizedBox(height: 4),
                     Text(upgradeText),
                   ],
                   const SizedBox(height: 14),
                   Text(
-                    demolishable
-                        ? 'Zburzenie zwróci połowę wszystkich zainwestowanych surowców.'
-                        : notDemolishableText,
+                    demolishable ? l10n.homeDemolishRefundNote : effectiveNotDemolishableText,
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
                 if (level1 && showWorkers) ...[
                   const SizedBox(height: 14),
-                  Text('Premia ogólna', style: Theme.of(context).textTheme.labelLarge),
+                  Text(l10n.homeGeneralBonusTitle, style: Theme.of(context).textTheme.labelLarge),
                   const SizedBox(height: 4),
                   for (final line in _bonusBreakdownFor(kind))
                     Padding(
@@ -2009,18 +1975,17 @@ class _HomeShellState extends State<HomeShell> {
                       child: Text(line),
                     ),
                   const SizedBox(height: 14),
-                  Text('Pracownicy', style: Theme.of(context).textTheme.labelLarge),
+                  Text(l10n.homeWorkersTitle, style: Theme.of(context).textTheme.labelLarge),
                   const SizedBox(height: 2),
                   if (_maxWorkersPerBuilding == 0) ...[
-                    const Text(
-                      'Wymaga odkrycia "Zarządzanie pracownikami" w Uczelni.',
-                      style: TextStyle(fontStyle: FontStyle.italic),
+                    Text(
+                      l10n.homeWorkersRequiresDiscovery,
+                      style: const TextStyle(fontStyle: FontStyle.italic),
                     ),
                   ] else ...[
                     Text(
-                      'Każdy przydzielony mieszkaniec zwiększa premię budynku o +50% '
-                      '(maks. $_maxWorkersPerBuilding = '
-                      '${_maxWorkersPerBuilding == 2 ? "podwójna" : "+50%"} premia).',
+                      l10n.homeWorkerBonusExplanation(_maxWorkersPerBuilding,
+                          _maxWorkersPerBuilding == 2 ? l10n.homeWorkerMultiplierDouble : '+50%'),
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                     const SizedBox(height: 6),
@@ -2052,7 +2017,7 @@ class _HomeShellState extends State<HomeShell> {
                       ],
                     ),
                     Text(
-                      'Wolni mieszkańcy: $_availableWorkers',
+                      l10n.homeAvailableResidents(_availableWorkers),
                       style: Theme.of(context).textTheme.bodySmall,
                       textAlign: TextAlign.center,
                     ),
@@ -2073,21 +2038,21 @@ class _HomeShellState extends State<HomeShell> {
                   if (confirmed && context.mounted) Navigator.of(context).pop('demolish');
                 },
                 style: TextButton.styleFrom(foregroundColor: const Color(0xFFC0392B)),
-                child: const Text('Zburz'),
+                child: Text(l10n.homeDemolish),
               ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text(level1 && (!upgradable || level2) ? 'Zamknij' : 'Anuluj'),
+              child: Text(level1 && (!upgradable || level2) ? l10n.homeClose : l10n.homeCancel),
             ),
             if (!level1)
               FilledButton(
                 onPressed: canAffordBuild ? () => Navigator.of(context).pop('build') : null,
-                child: const Text('Zbuduj'),
+                child: Text(l10n.homeBuild),
               ),
             if (level1 && upgradable && !level2)
               FilledButton(
                 onPressed: canAffordUpgrade ? () => Navigator.of(context).pop('upgrade') : null,
-                child: const Text('Rozbuduj'),
+                child: Text(l10n.homeUpgrade),
               ),
           ],
         ),
@@ -2096,18 +2061,16 @@ class _HomeShellState extends State<HomeShell> {
   }
 
   Future<ResourceType?> _showWeeklyBoostPicker(List<ResourceType> options) {
+    final l10n = AppLocalizations.of(context)!;
     return showDialog<ResourceType>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Surowiec tygodnia'),
+        title: Text(l10n.homeWeeklyBoostTitle),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
-              'Dzięki rozbudowanym (poziom 2) okolicom wioski możesz wybrać '
-              'surowiec, który w tym tygodniu będzie pojawiał się częściej (+10-20%).',
-            ),
+            Text(l10n.homeWeeklyBoostDescription),
             const SizedBox(height: 10),
             for (final type in options)
               ListTile(
@@ -2118,7 +2081,7 @@ class _HomeShellState extends State<HomeShell> {
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Pomiń')),
+          TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.homeSkipButton)),
         ],
       ),
     );
@@ -2153,6 +2116,7 @@ class _HomeShellState extends State<HomeShell> {
 
   Future<void> _resolveWeeklyEvent() async {
     if (_random.nextDouble() > _eventChance) return;
+    final l10n = AppLocalizations.of(context)!;
 
     final season = seasonForWeek(_week);
     final VillageEventKind kind;
@@ -2172,13 +2136,13 @@ class _HomeShellState extends State<HomeShell> {
     final event = eligible[_random.nextInt(eligible.length)];
 
     if (event.kind == VillageEventKind.choice) {
-      final options = event.options!;
+      final options = event.localizedOptions!;
       final choiceIndex = await showDialog<int>(
         context: context,
         barrierDismissible: false,
         builder: (context) => AlertDialog(
-          title: Text(event.title),
-          content: Text(event.description),
+          title: Text(event.localizedTitle),
+          content: Text(event.localizedDescription),
           actions: [
             for (var i = 0; i < options.length; i++)
               FilledButton(
@@ -2192,24 +2156,26 @@ class _HomeShellState extends State<HomeShell> {
       final option = options[choiceIndex];
       await _applyEventEffect(option.effect);
       if (!mounted) return;
-      final bonusText = _formatEventEffect(option.effect);
+      final bonusText = _formatEventEffect(l10n, option.effect);
       _showSnack(
-        '${event.title}: ${option.resultText}${bonusText.isEmpty ? '' : ' ($bonusText)'}',
+        l10n.homeEventChoiceResultSnack(
+            event.localizedTitle, option.resultText, bonusText.isEmpty ? '' : ' ($bonusText)'),
       );
     } else {
       await _applyEventEffect(event.effect!);
       if (!mounted) return;
       final icon = event.kind == VillageEventKind.positive ? '✨' : '⚠️';
-      final bonusText = _formatEventEffect(event.effect!);
+      final bonusText = _formatEventEffect(l10n, event.effect!);
       _showSnack(
-        '$icon ${event.title}: ${event.description}${bonusText.isEmpty ? '' : ' ($bonusText)'}',
+        l10n.homeEventResultSnack(
+            icon, event.localizedTitle, event.localizedDescription, bonusText.isEmpty ? '' : ' ($bonusText)'),
       );
     }
   }
 
   // Zamienia efekt wydarzenia na czytelny tekst premii/kar, np.
   // "+5 drewna, -8 morale" - dołączany do opisu wydarzenia w powiadomieniu.
-  String _formatEventEffect(EventEffect effect) {
+  String _formatEventEffect(AppLocalizations l10n, EventEffect effect) {
     final parts = <String>[];
     for (final entry in effect.resourceDelta.entries) {
       if (entry.value == 0) continue;
@@ -2217,19 +2183,21 @@ class _HomeShellState extends State<HomeShell> {
       parts.add('$sign${entry.value} ${entry.key.label.toLowerCase()}');
     }
     if (effect.moraleDelta != 0) {
-      parts.add('${effect.moraleDelta > 0 ? '+' : ''}${effect.moraleDelta} morale');
+      parts.add('${effect.moraleDelta > 0 ? '+' : ''}${effect.moraleDelta} ${l10n.homeEventUnitMorale}');
     }
     if (effect.securityDelta != 0) {
-      parts.add('${effect.securityDelta > 0 ? '+' : ''}${effect.securityDelta} bezpieczeństwa');
+      parts.add(
+          '${effect.securityDelta > 0 ? '+' : ''}${effect.securityDelta} ${l10n.homeEventUnitSecurity}');
     }
     if (effect.populationDelta != 0) {
-      parts.add('${effect.populationDelta > 0 ? '+' : ''}${effect.populationDelta} populacji');
+      parts.add(
+          '${effect.populationDelta > 0 ? '+' : ''}${effect.populationDelta} ${l10n.homeEventUnitPopulation}');
     }
     if (effect.soldierDelta != 0) {
       parts.add(
         effect.soldierDelta > 0
-            ? '+${effect.soldierDelta} żołnierzy'
-            : '${effect.soldierDelta} żołnierzy (straty)',
+            ? '+${effect.soldierDelta} ${l10n.homeEventUnitSoldiers}'
+            : '${effect.soldierDelta} ${l10n.homeEventUnitSoldiers} ${l10n.homeEventLossesSuffix}',
       );
     }
     return parts.join(', ');
@@ -2281,27 +2249,29 @@ class _HomeShellState extends State<HomeShell> {
 
   /// Wynik starcia z bossem jako pojedyncze wymaganie z postępem - -1 znaczy
   /// "jeszcze nie stoczono", więc to NIE to samo co "0 etapów ukończonych".
-  GoalRequirement _battleRequirement(String label, int stagesCleared, int requiredStages) {
+  GoalRequirement _battleRequirement(
+      AppLocalizations l10n, String label, int stagesCleared, int requiredStages) {
     if (stagesCleared < 0) {
-      return GoalRequirement(label: label, met: false, progress: 'jeszcze nie stoczono');
+      return GoalRequirement(label: label, met: false, progress: l10n.homeGoalNotFoughtYet);
     }
     return GoalRequirement(
       label: label,
       met: stagesCleared >= requiredStages,
-      progress: '$stagesCleared/3 etapów (min. $requiredStages)',
+      progress: l10n.homeGoalBattleProgress(stagesCleared, requiredStages),
     );
   }
 
   /// Szczegółowa, żywa lista wymagań celu głównego danego aktu - pokazywana
   /// w zakładce Cele z aktualnym postępem, nie tylko jako opis tekstowy.
   List<GoalRequirement> _actGoalRequirements(int actNumber) {
+    final l10n = AppLocalizations.of(context)!;
     switch (actNumber) {
       case 0:
         return [
-          GoalRequirement(label: 'Ratusz zbudowany', met: _ratuszBuilt),
-          GoalRequirement(label: 'Sad rozwinięty', met: _areasBuilt[AreaKind.orchard] ?? false),
-          GoalRequirement(label: 'Łąka rozwinięta', met: _areasBuilt[AreaKind.meadow] ?? false),
-          GoalRequirement(label: 'Pole rozwinięte', met: _areasBuilt[AreaKind.field] ?? false),
+          GoalRequirement(label: l10n.homeGoalRatuszBuilt, met: _ratuszBuilt),
+          GoalRequirement(label: l10n.homeGoalOrchardDeveloped, met: _areasBuilt[AreaKind.orchard] ?? false),
+          GoalRequirement(label: l10n.homeGoalMeadowDeveloped, met: _areasBuilt[AreaKind.meadow] ?? false),
+          GoalRequirement(label: l10n.homeGoalFieldDeveloped, met: _areasBuilt[AreaKind.field] ?? false),
           _resourceRequirement(ResourceType.wood, 30),
           _resourceRequirement(ResourceType.stone, 20),
           _resourceRequirement(ResourceType.coin, 15),
@@ -2313,24 +2283,27 @@ class _HomeShellState extends State<HomeShell> {
       case 1:
         // Rozstrzygane przez starcie z Grotem (tydzień 26, BossBattleScreen) -
         // 2 lub 3 z 3 ukończonych etapów liczą się jako sukces.
-        return [_battleRequirement('Starcie z Grotem', _bossBattleStagesCleared, 2)];
+        return [_battleRequirement(l10n, l10n.homeGoalBattleGrot, _bossBattleStagesCleared, 2)];
       case 2:
         // Rozstrzygane przez starcie z Martą (tydzień 39, MartaBattleScreen) -
         // 2 lub 3 z 3 ukończonych etapów liczą się jako sukces.
-        return [_battleRequirement('Starcie z Martą', _martaBattleStagesCleared, 2)];
+        return [_battleRequirement(l10n, l10n.homeGoalBattleMarta, _martaBattleStagesCleared, 2)];
       case 3:
         // Rozstrzygane przez starcie z Bogdanem (tydzień 52,
         // BogdanBattleScreen) - trzeba zebrać cały Dowód.
-        return [GoalRequirement(label: 'Pełny Dowód zebrany u Bogdana', met: _bogdanProofComplete == 1)];
+        return [GoalRequirement(label: l10n.homeGoalBogdanProof, met: _bogdanProofComplete == 1)];
       case 4:
         // Leszy budzi się w komiksie #24 ("Przebudzenie", tydzień 58), ale
         // sama walka jest teraz dopiero w środku Aktu V (patrz
         // _leszyBattleWeek) - cel Aktu IV to sprawdzian gotowości wioski na
         // to, co nadchodzi, nie sama walka.
         return [
-          GoalRequirement(label: 'Siła armii', met: _totalArmyStrength >= 20, progress: '$_totalArmyStrength/20'),
           GoalRequirement(
-            label: 'Bezpieczeństwo wioski',
+              label: l10n.homeGoalArmyStrength,
+              met: _totalArmyStrength >= 20,
+              progress: '$_totalArmyStrength/20'),
+          GoalRequirement(
+            label: l10n.homeGoalVillageSecurity,
             met: _securityValue >= 50,
             progress: '$_securityValue/50',
           ),
@@ -2340,13 +2313,13 @@ class _HomeShellState extends State<HomeShell> {
         // (LeszyBattleScreen) - w praktyce zawsze true w tygodniu 65, bo
         // porażka nie pozwala tygodniowi minąć (patrz _startWeek).
         return [
-          GoalRequirement(label: 'Leszy pokonany', met: _leszyVictorious),
+          GoalRequirement(label: l10n.homeGoalLeszyDefeated, met: _leszyVictorious),
           GoalRequirement(
-            label: 'Quest "Ślady w popiele"',
+            label: l10n.homeGoalQuestSladyWPopiele,
             met: _claimedSideQuests.contains(SideQuestId.sladyWPopiele),
           ),
           GoalRequirement(
-            label: 'Quest "Rozmowa z Jadwigą"',
+            label: l10n.homeGoalQuestRozmowaZJadwiga,
             met: _claimedSideQuests.contains(SideQuestId.rozmowaZJadwiga),
           ),
         ];
@@ -2390,15 +2363,18 @@ class _HomeShellState extends State<HomeShell> {
   /// (null dla warunków zero-jedynkowych typu "budynek zbudowany", gdzie
   /// sama ikonka statusu wystarcza).
   String? _sideQuestProgress(SideQuestId id) {
+    final l10n = AppLocalizations.of(context)!;
     switch (id) {
       case SideQuestId.martaIncognito:
-        return '${_moraleValue.round()}/70 morale';
+        return l10n.homeSideQuestMoraleProgress(_moraleValue.round());
       case SideQuestId.ostatniaSzarza:
-        return '$_totalArmyStrength/20 siły armii';
+        return l10n.homeSideQuestArmyStrengthProgress(_totalArmyStrength);
       case SideQuestId.wdowaPoNajemniku:
         final stages = _bossBattleStagesCleared < 0 ? 0 : _bossBattleStagesCleared;
-        final karczma = (_villageBuilt[BuildingKind.karczma] ?? false) ? 'zbudowana' : 'niezbudowana';
-        return 'Grot: $stages/3 etapów (min. 2) • Karczma: $karczma';
+        final karczma = (_villageBuilt[BuildingKind.karczma] ?? false)
+            ? l10n.homeBuilt
+            : l10n.homeNotBuilt;
+        return l10n.homeSideQuestGrotKarczmaProgress(stages, karczma);
       case SideQuestId.ostatniaLekcja:
       case SideQuestId.dobrySasiad:
       case SideQuestId.milczenieJadwigi:
@@ -2416,6 +2392,7 @@ class _HomeShellState extends State<HomeShell> {
   /// tę nakłada automatycznie generyczny mechanizm końca aktu niżej w
   /// _startWeek, bo _actGoalMet(1) zwróci false.
   Future<void> _resolveBossBattleResult(BossBattleResult result) async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() => _bossBattleStagesCleared = result.stagesCleared);
     await StoryProgressStorage.saveBossBattleStagesCleared(result.stagesCleared);
     if (result.stagesCleared == 3) {
@@ -2424,16 +2401,16 @@ class _HomeShellState extends State<HomeShell> {
         _stockpile[ResourceType.wood] = ((_stockpile[ResourceType.wood] ?? 0) + 15).clamp(0, _storageCap);
       });
       await ResourceStorage.save(_stockpile);
-      _showSnack('Grot pokonany bez strat! Łup: +15 złota, +15 drewna.');
+      _showSnack(l10n.homeGrotVictoryFullSnack);
     } else if (result.stagesCleared == 2) {
       setState(() {
         _stockpile[ResourceType.wood] = ((_stockpile[ResourceType.wood] ?? 0) * 0.9).round();
         _stockpile[ResourceType.coin] = ((_stockpile[ResourceType.coin] ?? 0) * 0.9).round();
       });
       await ResourceStorage.save(_stockpile);
-      _showSnack('Grot odparty, ale starcie kosztowało wioskę: -10% drewna i złota.');
+      _showSnack(l10n.homeGrotVictoryPartialSnack);
     } else {
-      _showSnack('Grot przełamał obronę wioski - ukończono tylko ${result.stagesCleared}/3 etapów starcia.');
+      _showSnack(l10n.homeGrotDefeatSnack(result.stagesCleared));
     }
   }
 
@@ -2442,6 +2419,7 @@ class _HomeShellState extends State<HomeShell> {
   /// tę nakłada automatycznie generyczny mechanizm końca aktu niżej w
   /// _startWeek, bo _actGoalMet(2) zwróci false.
   Future<void> _resolveMartaBattleResult(MartaBattleResult result) async {
+    final l10n = AppLocalizations.of(context)!;
     final fullTrust = result.stagesCleared == 3 && result.fullTrustBonus;
     setState(() {
       _martaBattleStagesCleared = result.stagesCleared;
@@ -2454,15 +2432,12 @@ class _HomeShellState extends State<HomeShell> {
       setState(() => _eventMoraleBonus = (_eventMoraleBonus + bonus).clamp(-100, 100));
       await VillageEventStorage.saveMoraleBonus(_eventMoraleBonus);
       _showSnack(
-        result.fullTrustBonus
-            ? 'Marta w pełni Ci zaufała, dając sobie czas na rozmowę: +15 morale.'
-            : 'Marta przełamana - staje się sojuszniczką: +10 morale.',
+        result.fullTrustBonus ? l10n.homeMartaVictoryFullTrustSnack : l10n.homeMartaVictoryTrustSnack,
       );
     } else if (result.stagesCleared == 2) {
-      _showSnack('Marta częściowo Ci zaufała, ale wciąż coś ukrywa.');
+      _showSnack(l10n.homeMartaVictoryPartialSnack);
     } else {
-      _showSnack('Marta wycofała się, nie zdradzając niczego więcej - ukończono tylko '
-          '${result.stagesCleared}/3 etapów starcia.');
+      _showSnack(l10n.homeMartaDefeatSnack(result.stagesCleared));
     }
   }
 
@@ -2474,6 +2449,7 @@ class _HomeShellState extends State<HomeShell> {
   /// dodatkowej kary poza już zadanymi spaleniami - kara z sekcji 5 nakłada
   /// się automatycznie niżej w _startWeek, bo _actGoalMet(3) zwróci false.
   Future<void> _resolveBogdanBattleResult(BogdanBattleResult result) async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() => _bogdanProofComplete = result.proofComplete ? 1 : 0);
     await StoryProgressStorage.saveBogdanProofComplete(result.proofComplete);
     if (result.totalBurns > 0) {
@@ -2490,13 +2466,11 @@ class _HomeShellState extends State<HomeShell> {
       await ResourceStorage.save(_stockpile);
     }
     if (result.proofComplete && result.totalBurns == 0) {
-      _showSnack('Bogdan pęka całkowicie pod ciężarem dowodów i ucieka bez zemsty.');
+      _showSnack(l10n.homeBogdanVictoryFullSnack);
     } else if (result.proofComplete) {
-      _showSnack('Bogdan ucieka, ale zdążył podpalić część magazynu '
-          '(${result.totalBurns} raz(y)) po drodze.');
+      _showSnack(l10n.homeBogdanVictoryPartialSnack(result.totalBurns));
     } else {
-      _showSnack('Nie udało się przełamać Bogdana - magazyn ucierpiał '
-          '${result.totalBurns} raz(y), a on wciąż jest przekonany o swojej racji.');
+      _showSnack(l10n.homeBogdanDefeatSnack(result.totalBurns));
     }
   }
 
@@ -2525,8 +2499,7 @@ class _HomeShellState extends State<HomeShell> {
       ),
     );
     if (!mounted || result == null) return;
-    _showSnack('Debug: starcie z Grotem zakończone - ${result.stagesCleared}/3 etapów '
-        '(bez wpływu na zapis gry).');
+    _showSnack(AppLocalizations.of(context)!.homeDebugGrotResultSnack(result.stagesCleared));
   }
 
   Future<void> _debugFightMarta() async {
@@ -2544,8 +2517,9 @@ class _HomeShellState extends State<HomeShell> {
       ),
     );
     if (!mounted || result == null) return;
-    _showSnack('Debug: starcie z Martą zakończone - ${result.stagesCleared}/3 etapów'
-        '${result.fullTrustBonus ? ' (pełne zaufanie)' : ''} (bez wpływu na zapis gry).');
+    final l10n = AppLocalizations.of(context)!;
+    _showSnack(l10n.homeDebugMartaResultSnack(
+        result.stagesCleared, result.fullTrustBonus ? l10n.homeDebugMartaFullTrustSuffix : ''));
   }
 
   Future<void> _debugFightBogdan() async {
@@ -2563,8 +2537,10 @@ class _HomeShellState extends State<HomeShell> {
       ),
     );
     if (!mounted || result == null) return;
-    _showSnack('Debug: starcie z Bogdanem zakończone - Dowód ${result.proofComplete ? "zebrany" : "niepełny"}, '
-        '${result.totalBurns} spalenie(a) (bez wpływu na zapis gry).');
+    final l10n = AppLocalizations.of(context)!;
+    _showSnack(l10n.homeDebugBogdanResultSnack(
+        result.proofComplete ? l10n.homeDebugProofGathered : l10n.homeDebugProofIncomplete,
+        result.totalBurns));
   }
 
   Future<void> _debugFightLeszy() async {
@@ -2581,8 +2557,9 @@ class _HomeShellState extends State<HomeShell> {
       ),
     );
     if (!mounted || result == null) return;
-    _showSnack('Debug: starcie z Leszym zakończone - '
-        '${result.victory ? "zwycięstwo" : "porażka"} (bez wpływu na zapis gry).');
+    final l10n = AppLocalizations.of(context)!;
+    _showSnack(l10n.homeDebugLeszyResultSnack(
+        result.victory ? l10n.homeDebugVictory : l10n.homeDebugDefeat));
   }
 
   // Tekst wyjaśniający, co poszło nie tak, pokazywany na ActFailureScreen -
@@ -2590,21 +2567,22 @@ class _HomeShellState extends State<HomeShell> {
   // porażki + wczytanie checkpointu), nie "miękka" kara pozwalająca grać
   // dalej, dlatego te opisy już nie mutują żadnego stanu gry.
   String _actFailureFlavorText(int actNumber) {
+    final l10n = AppLocalizations.of(context)!;
     switch (actNumber) {
       case 0:
-        return 'Wioska nie zdążyła przygotować się na czas - dziedzictwo Antoniego zostało zaprzepaszczone.';
+        return l10n.homeActFailure0;
       case 1:
-        return 'Grot przełamał obronę nieprzygotowanej wioski.';
+        return l10n.homeActFailure1;
       case 2:
-        return 'Marta nie zdradziła kluczowej prawdy, a wioska straciła nadzieję.';
+        return l10n.homeActFailure2;
       case 3:
-        return 'Osłabiona głodem i słabą obroną wioska nie przetrwała konfrontacji z Bogdanem.';
+        return l10n.homeActFailure3;
       case 4:
-        return 'Wioska nie zdążyła się przygotować - armia zbyt słaba, mury zbyt kruche na to, co nadchodzi z lasu.';
+        return l10n.homeActFailure4;
       case 5:
-        return 'Leszy został pokonany, ale niektóre wątki pozostają niedomknięte - historia kończy się bez pełnej odpowiedzi.';
+        return l10n.homeActFailure5;
       default:
-        return 'Cel tego aktu nie został osiągnięty.';
+        return l10n.homeActFailureDefault;
     }
   }
 
@@ -2795,6 +2773,7 @@ class _HomeShellState extends State<HomeShell> {
       MaterialPageRoute(builder: (_) => WeekTransitionScreen(week: _week)),
     );
     if (!mounted) return;
+    final l10n = AppLocalizations.of(context)!;
 
     if (_week == _grotBattleWeek) {
       await Navigator.of(context).push(
@@ -2802,7 +2781,7 @@ class _HomeShellState extends State<HomeShell> {
           builder: (_) => BossIntroScreen(
             week: _week,
             bossName: 'Grot',
-            message: 'Grot i jego zbrojni zbliżają się do wioski. Czas przygotować obronę.',
+            message: l10n.homeBossIntroGrotMessage,
             portraitKey: 'grot',
           ),
         ),
@@ -2833,7 +2812,7 @@ class _HomeShellState extends State<HomeShell> {
           builder: (_) => BossIntroScreen(
             week: _week,
             bossName: 'Marta',
-            message: 'Marta staje naprzeciw Ciebie, uzbrojona, wysłana przez ojca. Nie ma odwrotu.',
+            message: l10n.homeBossIntroMartaMessage,
             portraitKey: 'marta',
           ),
         ),
@@ -2863,7 +2842,7 @@ class _HomeShellState extends State<HomeShell> {
           builder: (_) => BossIntroScreen(
             week: _week,
             bossName: 'Bogdan Kruk',
-            message: 'Bogdan Kruk przybywa osobiście, żądając prawdy. Konfrontacja jest nieunikniona.',
+            message: l10n.homeBossIntroBogdanMessage,
             portraitKey: 'bogdan',
           ),
         ),
@@ -2893,7 +2872,7 @@ class _HomeShellState extends State<HomeShell> {
           builder: (_) => BossIntroScreen(
             week: _week,
             bossName: 'Leszy',
-            message: 'Mroczny cień lasu budzi się w pełni. Ostateczne starcie o los wioski zaczyna się teraz.',
+            message: l10n.homeBossIntroLeszyMessage,
             portraitKey: 'leszy',
           ),
         ),
@@ -2920,7 +2899,7 @@ class _HomeShellState extends State<HomeShell> {
       }
       setState(() => _leszyVictorious = true);
       await StoryProgressStorage.saveLeszyVictorious(true);
-      _showSnack('Leszy pokonany! Cień cofa się w głąb ziemi.');
+      _showSnack(l10n.homeLeszyVictorySnack);
     } else {
       // Pętla obsługuje "Zagraj tydzień ponownie" z panelu podsumowania
       // rundy (HarvestScreen zwraca true) - checkpoint(_week) to migawka
@@ -3064,7 +3043,8 @@ class _HomeShellState extends State<HomeShell> {
         setState(() => _xp += _mainQuestXpReward);
         await ExperienceStorage.saveXp(_xp);
         _showSnack(
-          'Cel Aktu ${endingAct.actNumber} ("${endingAct.actName}") osiągnięty! (+$_mainQuestXpReward XP)',
+          l10n.homeActGoalReachedSnack(
+              endingAct.actNumber, endingAct.localizedActName, _mainQuestXpReward),
         );
         setState(() => _resolvedActs = {..._resolvedActs, endingAct.actNumber});
         await StoryProgressStorage.saveResolvedActs(_resolvedActs);
@@ -3084,7 +3064,7 @@ class _HomeShellState extends State<HomeShell> {
           MaterialPageRoute(
             builder: (_) => ActFailureScreen(
               actNumber: endingAct.actNumber,
-              actName: endingAct.actName,
+              actName: endingAct.localizedActName,
               flavorText: _actFailureFlavorText(endingAct.actNumber),
               checkpointWeeks: checkpointWeeks,
             ),
@@ -3148,6 +3128,7 @@ class _HomeShellState extends State<HomeShell> {
   // zakładkę "Cele", żeby quest zaliczał się od razu, a nie dopiero po
   // zmianie tygodnia.
   Future<void> _checkSideQuests() async {
+    final l10n = AppLocalizations.of(context)!;
     for (final quest in kSideQuests) {
       if (_claimedSideQuests.contains(quest.id)) continue;
       if (!_sideQuestMet(quest.id)) continue;
@@ -3157,14 +3138,16 @@ class _HomeShellState extends State<HomeShell> {
       });
       await ExperienceStorage.saveXp(_xp);
       await ExperienceStorage.saveClaimedSideQuests(_claimedSideQuests);
-      _showSnack('Quest poboczny ukończony: "${quest.title}" (+${quest.xpReward} XP)');
+      _showSnack(l10n.homeSideQuestCompletedSnack(quest.localizedTitle, quest.xpReward));
     }
   }
 
-  List<_TabSpec> get _tabs => [
+  List<_TabSpec> get _tabs {
+    final l10n = AppLocalizations.of(context)!;
+    return [
         _TabSpec(
           icon: Icons.home_work,
-          label: 'Wioska',
+          label: l10n.homeTabVillage,
           builder: () => VillageView(
             ratuszBuilt: _ratuszBuilt,
             palisadeBuilt: _palisadeBuilt,
@@ -3182,7 +3165,7 @@ class _HomeShellState extends State<HomeShell> {
         ),
         _TabSpec(
           icon: Icons.terrain,
-          label: 'Okolice',
+          label: l10n.homeTabSurroundings,
           builder: () => SurroundingsView(
             built: _areasBuilt,
             upgraded: _areasUpgraded,
@@ -3191,7 +3174,7 @@ class _HomeShellState extends State<HomeShell> {
         ),
         _TabSpec(
           icon: Icons.inventory_2,
-          label: 'Surowce',
+          label: l10n.homeTabResources,
           builder: () => ResourcesView(
             stockpile: _stockpile,
             storageCap: _storageCap,
@@ -3206,7 +3189,7 @@ class _HomeShellState extends State<HomeShell> {
         if (_shopUnlocked)
           _TabSpec(
             icon: Icons.storefront,
-            label: 'Sklep',
+            label: l10n.homeTabShop,
             builder: () => ShopView(
               baseMoves: _baseMoves,
               extraMoves: _extraMoves,
@@ -3223,7 +3206,7 @@ class _HomeShellState extends State<HomeShell> {
           ),
         _TabSpec(
           icon: Icons.bar_chart,
-          label: 'Statystyki',
+          label: l10n.homeTabStats,
           badgeCount: comicsUnlockedThroughWeek(_week)
               .where((c) => !_readComics.contains(c.number) && _isComicRevealed(c.number))
               .length,
@@ -3248,7 +3231,7 @@ class _HomeShellState extends State<HomeShell> {
         ),
         _TabSpec(
           icon: Icons.flag,
-          label: 'Cele',
+          label: l10n.homeTabGoals,
           builder: () => GoalsView(
             week: _week,
             goalMet: (actNumber) => _actGoalMet(actNumber),
@@ -3260,7 +3243,7 @@ class _HomeShellState extends State<HomeShell> {
         ),
         _TabSpec(
           icon: Icons.bug_report,
-          label: 'Debug',
+          label: l10n.homeTabDebug,
           builder: () => DebugView(
             currentWeek: _week,
             onJumpToWeek: _debugJumpToWeek,
@@ -3273,12 +3256,14 @@ class _HomeShellState extends State<HomeShell> {
           ),
         ),
       ];
+  }
 
   void _openComics() {
+    final l10n = AppLocalizations.of(context)!;
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => Scaffold(
-          appBar: AppBar(title: const Text('Komiksy')),
+          appBar: AppBar(title: Text(l10n.comicsTitle)),
           body: ComicsView(
             week: _week,
             readComics: _readComics,
@@ -3294,7 +3279,7 @@ class _HomeShellState extends State<HomeShell> {
     await GameProgressStorage.saveWeek(week);
     await _load();
     if (!mounted) return;
-    _showSnack('Debug: przeniesiono do tygodnia $week.');
+    _showSnack(AppLocalizations.of(context)!.homeDebugJumpedToWeekSnack(week));
   }
 
   Future<void> _debugAddResource(ResourceType type) async {
@@ -3353,7 +3338,7 @@ class _HomeShellState extends State<HomeShell> {
                     selected: safeTab == i,
                     onTap: () {
                       setState(() => _tab = i);
-                      if (tabs[i].label == 'Cele') {
+                      if (tabs[i].icon == Icons.flag) {
                         _checkSideQuests();
                       }
                     },
@@ -3381,19 +3366,20 @@ class _HomeShellState extends State<HomeShell> {
   /// grę, pyta o potwierdzenie (i tylko na potwierdzenie faktycznie wychodzi).
   Future<void> _onBackPressed(bool didPop, Object? result) async {
     if (didPop) return;
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Wyjść z gry?'),
-        content: const Text('Na pewno chcesz zamknąć Rolnika?'),
+        title: Text(l10n.homeExitGameTitle),
+        content: Text(l10n.homeExitGameMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Anuluj'),
+            child: Text(l10n.homeCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Wyjdź'),
+            child: Text(l10n.homeExit),
           ),
         ],
       ),

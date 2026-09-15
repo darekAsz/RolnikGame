@@ -9,6 +9,7 @@ import '../utils/battle_balance.dart';
 import '../widgets/harvest_grid.dart';
 import '../widgets/resource_icon.dart';
 import '../widgets/season_background.dart';
+import '../l10n/gen/app_localizations.dart';
 
 /// Wynik starcia z Leszym - zawsze true, bo w razie porażki gracz dostaje
 /// ekran Game Over z możliwością powtórzenia całej walki od nowa (patrz
@@ -104,31 +105,31 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
   // Jedno źródło opisów zdolności - używane zarówno na planszy wstępnej
   // (_abilityLegend), jak i jako tooltip przycisków na ekranie walki
   // (_abilityButton), żeby koszt/efekt nie rozjechał się w dwóch miejscach.
-  static const _abilities = [
-    (name: 'Kontratak', cost: '-25 wody', effect: '-10 PŻ Leszemu'),
-    (name: 'Osłona', cost: '-25 kamienia', effect: '+10 tarczy (pochłania obrażenia, zeruje się co ruch Leszego)'),
-    (name: 'Uzdrowienie', cost: '-25 drewna', effect: '+10 PŻ Wioski, usuwa zatrucie'),
+  static List<({String name, String cost, String effect})> _abilitiesList(AppLocalizations l10n) => [
+    (name: l10n.leszyAbilityCounterName, cost: l10n.leszyAbilityCounterCost, effect: l10n.leszyAbilityCounterEffect),
+    (name: l10n.leszyAbilityGuardName, cost: l10n.leszyAbilityGuardCost, effect: l10n.leszyAbilityGuardEffect),
+    (name: l10n.leszyAbilityHealName, cost: l10n.leszyAbilityHealCost, effect: l10n.leszyAbilityHealEffect),
     (
-      name: 'Oczyszczenie',
-      cost: '-20 drewna, -20 kamienia',
-      effect: 'zeruje pulę Cienia i usuwa wszystkie kulki Cienia z planszy',
+      name: l10n.leszyAbilityCleanseName,
+      cost: l10n.leszyAbilityCleanseCost,
+      effect: l10n.leszyAbilityCleanseEffect,
     ),
-    (name: 'Modlitwa', cost: '-20 wody, -20 drewna', effect: 'osłabia następny cios Leszego o połowę'),
-    (name: 'Uspokojenie', cost: '-30 wody', effect: '-3 do siły Leszego'),
+    (name: l10n.leszyAbilityPrayerName, cost: l10n.leszyAbilityPrayerCost, effect: l10n.leszyAbilityPrayerEffect),
+    (name: l10n.leszyAbilityCalmName, cost: l10n.leszyAbilityCalmCost, effect: l10n.leszyAbilityCalmEffect),
     (
-      name: 'Wzmocnienie muru',
-      cost: '-15 drewna, -15 kamienia',
-      effect: '+2 do progu wybuchu Cienia (przeciwdziała Zagęszczeniu cienia)',
-    ),
-    (
-      name: 'Rozproszenie furii',
-      cost: '-15 wody',
-      effect: 'natychmiast anuluje aktywną Furię, zanim zdąży podwoić następny cios (dostępne tylko, gdy Furia aktywna)',
+      name: l10n.leszyAbilityWallName,
+      cost: l10n.leszyAbilityWallCost,
+      effect: l10n.leszyAbilityWallEffect,
     ),
     (
-      name: 'Obfitość',
-      cost: '-20 wody, -20 kamienia',
-      effect: 'podwaja kolejne 3 zebrane ścieżki surowców (włącznie z Mieczem i Tarczą, poza Cieniem)',
+      name: l10n.leszyAbilityDispelFuryName,
+      cost: l10n.leszyAbilityDispelFuryCost,
+      effect: l10n.leszyAbilityDispelFuryEffect,
+    ),
+    (
+      name: l10n.leszyAbilityAbundanceName,
+      cost: l10n.leszyAbilityAbundanceCost,
+      effect: l10n.leszyAbilityAbundanceEffect,
     ),
   ];
   // Ikony przycisków paska umiejętności (patrz _abilityButton) - kolejność
@@ -271,39 +272,39 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
     return pool[_random.nextInt(pool.length)];
   }
 
-  String _moveDescription(_LeszyMove move) {
+  String _moveDescription(AppLocalizations l10n, _LeszyMove move) {
     switch (move) {
       case _LeszyMove.strike:
         final base = 10 + _leszyStrength;
         if (_furiaPending) {
-          return 'Szykuje wzmocnione uderzenie w wioskę (2×$base = -${base * 2} PŻ).';
+          return l10n.leszyMoveStrikeFuryDesc(base, base * 2);
         }
-        return 'Szykuje uderzenie w wioskę (-$base PŻ).';
+        return l10n.leszyMoveStrikeDesc(base);
       case _LeszyMove.drain:
-        return 'Chce wyssać najbogatszy zapas surowca i się nim uleczyć (o połowę zabranej ilości).';
+        return l10n.leszyMoveDrainDesc;
       case _LeszyMove.shadow:
-        return 'Zagęszcza cień - trwale obniża próg wybuchu o 1 (obecnie $_corruptionThreshold).';
+        return l10n.leszyMoveShadowDesc(_corruptionThreshold);
       case _LeszyMove.fury:
-        return 'Wpada w furię - następny cios będzie podwojony, a on sam potężniejszy (+1 siły).';
+        return l10n.leszyMoveFuryDesc;
       case _LeszyMove.fog:
-        return 'Ześle mgłę - przetasuje planszę i zamieni część kafelków w cienie.';
+        return l10n.leszyMoveFogDesc;
       case _LeszyMove.poison:
-        return 'Zatruje powietrze - kolejne ruchy zabolą (-5 PŻ), da się to wyleczyć Uzdrowieniem.';
+        return l10n.leszyMovePoisonDesc;
       case _LeszyMove.hunger:
-        return 'Głód pochłonie część zapasów.';
+        return l10n.leszyMoveHungerDesc;
       case _LeszyMove.consume:
-        return 'Chce pochłonąć cień z otoczenia i uleczyć się o tyle, ile go pochłonie.';
+        return l10n.leszyMoveConsumeDesc;
       case _LeszyMove.rend:
         final base = 12 + _leszyStrength;
-        return 'Szykuje rozdzierające cięcie, które przebija połowę Tarczy (-$base PŻ, częściowo mimo osłony).';
+        return l10n.leszyMoveRendDesc(base);
       case _LeszyMove.despair:
-        return 'Ogarnia go rozpacz - zaraz gwałtownie wzmocni swoją siłę (+2).';
+        return l10n.leszyMoveDespairDesc;
       case _LeszyMove.blight:
-        return 'Skazi część planszy, zamieniając kafelki wprost w Cień.';
+        return l10n.leszyMoveBlightDesc;
       case _LeszyMove.otherworld:
-        return 'Wycofuje się częściowo w zaświaty - najbliższe trafienia Mieczem zadadzą tylko połowę obrażeń.';
+        return l10n.leszyMoveOtherworldDesc;
       case _LeszyMove.crumblingResolve:
-        return 'Łamie wolę wioski - jej maksymalne PŻ trwale się skurczy.';
+        return l10n.leszyMoveCrumblingResolveDesc;
     }
   }
 
@@ -408,17 +409,19 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
     // od razu - zostaje widoczny na pełnej wartości przez czas opóźnienia,
     // żeby gracz zdążył zobaczyć, że to właśnie on wywołał wybuch.
     final explosionDamage = _totalCorruption;
+    final l10n = AppLocalizations.of(context)!;
     setState(() {
       _shadowExploding = true;
-      _lastLeszyAction = 'Cień osiąga próg - za chwilę eksploduje!';
+      _lastLeszyAction = l10n.leszyShadowExplosionWarning;
     });
     Future.delayed(const Duration(milliseconds: 700), () {
       if (!mounted || _phase != _Phase.fighting) return;
+      final l10n = AppLocalizations.of(context)!;
       setState(() {
         _corruption = 0;
         _shadowExploding = false;
         _dealDamageToVillage(explosionDamage);
-        _lastLeszyAction = 'Cień eksploduje! (-$explosionDamage PŻ Wioski)';
+        _lastLeszyAction = l10n.leszyShadowExplosionResult(explosionDamage);
       });
       _gridKey.currentState?.explodeType(ResourceType.shadow);
       _afterVillageDamage();
@@ -428,6 +431,7 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
   void _leszyTurn() {
     final move = _nextMove;
     var consumedShadow = 0;
+    final l10n = AppLocalizations.of(context)!;
     setState(() {
       _movesSinceLeszyTurn = 0;
       _nextMove = _rollNextMove();
@@ -443,7 +447,7 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
             _prayerActive = false;
           }
           _dealDamageToVillage(dmg);
-          _lastLeszyAction = 'Leszy uderza! (-$dmg PŻ Wioski)';
+          _lastLeszyAction = l10n.leszyActionStrike(dmg);
           // Siła rośnie PO rozstrzygnięciu tego uderzenia (nie przed), więc
           // dopiero KOLEJNE uderzenie jest silniejsze - tylko Uderzenie
           // rozwija siłę, w przeciwieństwie do dawnego automatycznego +1 co
@@ -469,27 +473,27 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
             }
             final healed = (richest.value / 2).round();
             _leszyHp = (_leszyHp + healed).clamp(0, _leszyMaxHp);
-            _lastLeszyAction = 'Leszy wysysa ${richest.key.label.toLowerCase()} i leczy się o $healed!';
+            _lastLeszyAction = l10n.leszyActionDrainSuccess(richest.key.label.toLowerCase(), healed);
           } else {
-            _lastLeszyAction = 'Leszy próbuje wyssać surowiec, ale nic nie ma.';
+            _lastLeszyAction = l10n.leszyActionDrainFail;
           }
         case _LeszyMove.shadow:
           _corruptionThreshold = (_corruptionThreshold - 1).clamp(_corruptionThresholdMin, _corruptionThresholdStart);
-          _lastLeszyAction = 'Cień gęstnieje - próg wybuchu spadł do $_corruptionThreshold!';
+          _lastLeszyAction = l10n.leszyActionShadowThicken(_corruptionThreshold);
         case _LeszyMove.fury:
           _furiaPending = true;
           _leszyStrength++;
-          _lastLeszyAction = 'Leszy wpada w furię - następny cios będzie silniejszy, a on sam potężniejszy!';
+          _lastLeszyAction = l10n.leszyActionFury;
         case _LeszyMove.fog:
-          _lastLeszyAction = 'Mgła spowija planszę - kafelki się przetasowują, część zamienia się w cienie!';
+          _lastLeszyAction = l10n.leszyActionFog;
         case _LeszyMove.poison:
           _poisonTicksRemaining = 3;
-          _lastLeszyAction = 'Leszy zatruwa powietrze - kolejne ruchy zabolą mocniej.';
+          _lastLeszyAction = l10n.leszyActionPoison;
         case _LeszyMove.hunger:
           _bankedWood = max(0, _bankedWood - 10);
           _bankedStone = max(0, _bankedStone - 10);
           _bankedWater = max(0, _bankedWater - 10);
-          _lastLeszyAction = 'Głód Leszego pochłania część zapasów.';
+          _lastLeszyAction = l10n.leszyActionHunger;
         case _LeszyMove.consume:
           // Wyłącznie Serce Cienia - odwraca logikę Cienia z fazy 1: zamiast
           // czekać na wybuch (kara dla gracza), Leszy sam zjada to, co leży
@@ -499,9 +503,9 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
           if (consumedShadow > 0) {
             _corruption = 0;
             _leszyHp = (_leszyHp + consumedShadow).clamp(0, _leszyMaxHp);
-            _lastLeszyAction = 'Leszy pochłania cień z otoczenia i leczy się o $consumedShadow!';
+            _lastLeszyAction = l10n.leszyActionConsumeSuccess(consumedShadow);
           } else {
-            _lastLeszyAction = 'Leszy sięga po cień, ale nie ma czego pochłonąć.';
+            _lastLeszyAction = l10n.leszyActionConsumeFail;
           }
         case _LeszyMove.rend:
           // Wyłącznie Serce Cienia - Tarcza chroni tylko w połowie, więc
@@ -511,27 +515,27 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
           final dmg = max(0, base - piercedAbsorb);
           _villageHp = (_villageHp - dmg).clamp(0, _villageMaxHp);
           _lastLeszyAction = _shieldPoints > 0
-              ? 'Leszy rozdziera wioskę, przebijając połowę Tarczy! (-$dmg PŻ Wioski)'
-              : 'Leszy rozdziera wioskę pazurami! (-$dmg PŻ Wioski)';
+              ? l10n.leszyActionRendPierce(dmg)
+              : l10n.leszyActionRendClaws(dmg);
         case _LeszyMove.despair:
           // Wyłącznie Serce Cienia - dwa razy szybszy przyrost siły niż
           // zwykłe Uderzenie, bez zadawania obrażeń tym razem.
           _leszyStrength += 2;
-          _lastLeszyAction = 'Rozpacz ogarnia Leszego - jego siła rośnie gwałtownie (+2)!';
+          _lastLeszyAction = l10n.leszyActionDespair;
         case _LeszyMove.blight:
           // Faktyczne skażenie kafelków dzieje się PO setState (patrz niżej,
           // jak przy mgle) - tu tylko komunikat.
-          _lastLeszyAction = 'Skażenie rozlewa się po planszy - część kafelków zamienia się w Cień!';
+          _lastLeszyAction = l10n.leszyActionBlight;
         case _LeszyMove.otherworld:
           _leszyEvasionCharges = 2;
-          _lastLeszyAction = 'Leszy wycofuje się częściowo w zaświaty - kolejne trafienia Mieczem osłabione.';
+          _lastLeszyAction = l10n.leszyActionOtherworld;
         case _LeszyMove.crumblingResolve:
           // Trwałe skurczenie limitu, nie jednorazowe obrażenia - jeśli
           // aktualne PŻ Wioski przekraczają nowy, niższy limit, też się do
           // niego przycinają (tak samo jak przy spadku limitu populacji).
           _villageMaxHp = max(30, _villageMaxHp - 10);
           _villageHp = _villageHp.clamp(0, _villageMaxHp);
-          _lastLeszyAction = 'Wola wioski pęka pod ciężarem grozy - maks. PŻ Wioski spada do $_villageMaxHp!';
+          _lastLeszyAction = l10n.leszyActionCrumblingResolve(_villageMaxHp);
       }
       // Tarcza chroni przed obrażeniami z TEGO ruchu Leszego (powyżej), ale
       // nie kumuluje się bezterminowo - trzeba ją odbudować przed każdym
@@ -683,17 +687,18 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return PopScope(
       canPop: _phase == _Phase.victory,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Starcie z Leszym - Tydzień ${widget.week}'),
+          title: Text(l10n.leszyAppBarTitle(widget.week)),
           automaticallyImplyLeading: false,
           actions: [
             if (_phase == _Phase.fighting)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Center(child: Text('Ruchy: $_movesUsedInScreen')),
+                child: Center(child: Text(l10n.leszyMovesUsedLabel(_movesUsedInScreen))),
               ),
           ],
         ),
@@ -708,6 +713,7 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
   }
 
   Widget _buildIntro(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isOnslaught = _screen == _Screen.onslaught;
     return Center(
       child: SingleChildScrollView(
@@ -734,23 +740,18 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
               ),
             const SizedBox(height: 24),
             Text(
-              isOnslaught ? 'Nawałnica' : 'Serce Cienia',
+              isOnslaught ? l10n.leszyPhaseOnslaughtTitle : l10n.leszyPhaseHeartOfShadowTitle,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 12),
             Text(
-              isOnslaught
-                  ? 'Leszy uderza na wioskę w pełnej sile. Zbieraj Miecze, żeby go ranić, i Tarcze, '
-                      'żeby przetrwać - a zebrane drewno/kamień/wodę wykorzystaj na zdolności.'
-                  : 'Pierwsza fala pękła, ale z cieni wyłania się jego prawdziwa, głodniejsza forma - '
-                      'silniejsza od pierwszego ruchu i zdolna pożreć sam Cień, żeby się leczyć. '
-                      'To ostatnia próba - Twoje PŻ Wioski nie odnowiły się między starciami.',
+              isOnslaught ? l10n.leszyOnslaughtIntroText : l10n.leszyHeartOfShadowIntroText,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyLarge,
             ),
             const SizedBox(height: 8),
             Text(
-              'PŻ Wioski: $_villageHp/$_villageMaxHp - PŻ Leszego: $_leszyHp/$_leszyMaxHp',
+              l10n.leszyIntroHpSummary(_villageHp, _villageMaxHp, _leszyHp, _leszyMaxHp),
               style: Theme.of(context).textTheme.bodySmall,
             ),
             const SizedBox(height: 24),
@@ -760,9 +761,9 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
             const SizedBox(height: 28),
             FilledButton(
               onPressed: _startFighting,
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                child: Text('Rozpocznij'),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                child: Text(l10n.leszyStartButton),
               ),
             ),
           ],
@@ -775,21 +776,20 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
   /// cień) obok znajomych drewna/kamienia/wody - wyjaśnione zawczasu, zanim
   /// gracz w ogóle dotknie planszy (patrz _boardTypes/_onHarvestBoard).
   Widget _boardLegend(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final rows = [
-      ('assets/icons/sword.png', 'Miecz', '1 kafelek = 1 obrażenie Leszemu'),
-      ('assets/icons/shield.png', 'Tarcza', '1 kafelek = 1 punkt osłony Wioski'),
+      ('assets/icons/sword.png', l10n.leszyBoardLegendSwordLabel, l10n.leszyBoardLegendSwordDesc),
+      ('assets/icons/shield.png', l10n.leszyBoardLegendShieldLabel, l10n.leszyBoardLegendShieldDesc),
       (
         'assets/icons/shadow.png',
-        'Cień',
-        'Zebranie usuwa go z planszy i dodatkowo obniża pulę Cienia o 5 za kafelek - pełna pula '
-            '($_corruptionThreshold, spada z czasem od Zagęszczenia cienia) eksploduje, zadając PŻ '
-            'Wioski dokładnie tyle, ile pula wynosi w tej chwili.',
+        l10n.leszyBoardLegendShadowLabel,
+        l10n.leszyBoardLegendShadowDesc(_corruptionThreshold),
       ),
     ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Nowe surowce na planszy', style: Theme.of(context).textTheme.titleSmall),
+        Text(l10n.leszyBoardLegendTitle, style: Theme.of(context).textTheme.titleSmall),
         const SizedBox(height: 8),
         for (final (asset, label, effect) in rows)
           Padding(
@@ -804,8 +804,7 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
             ),
           ),
         Text(
-          'Drewno, kamień i woda dalej działają jak wcześniej - odkładają się w zapasy, '
-          'które można wydać na zdolności poniżej.',
+          l10n.leszyBoardLegendResourceNote,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(fontStyle: FontStyle.italic),
         ),
       ],
@@ -815,12 +814,13 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
   /// Co robi każda zdolność i ile kosztuje - to samo źródło tekstu, którego
   /// używają tooltipy przycisków na ekranie walki (patrz _abilityButton).
   Widget _abilityLegend(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Zdolności', style: Theme.of(context).textTheme.titleSmall),
+        Text(l10n.leszyAbilitiesTitle, style: Theme.of(context).textTheme.titleSmall),
         const SizedBox(height: 8),
-        for (final ability in _abilities)
+        for (final ability in _abilitiesList(l10n))
           Padding(
             padding: const EdgeInsets.only(bottom: 6),
             child: RichText(
@@ -845,22 +845,23 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
   /// liczby obok siebie (włącz/wyłącz + licznik tur), więc łatwo je przeoczyć
   /// bez własnej ikonki.
   Widget _statusBar(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final chips = <Widget>[
       if (_furiaPending)
         _statusChip(
           context,
           Icons.local_fire_department,
           Colors.deepOrange,
-          'Furia',
-          'Furia aktywna - następny cios Leszego będzie podwojony.',
+          l10n.leszyStatusFuryName,
+          l10n.leszyStatusFuryDesc,
         ),
       if (_poisonTicksRemaining > 0)
         _statusChip(
           context,
           Icons.coronavirus,
           Colors.lightGreen,
-          'Zatrucie',
-          'Zatrucie - kolejne $_poisonTicksRemaining ruch(y) gracza bolą dodatkowo (-5 PŻ Wioski). Da się to wyleczyć Uzdrowieniem.',
+          l10n.leszyStatusPoisonName,
+          l10n.leszyStatusPoisonDesc(_poisonTicksRemaining),
           label: '$_poisonTicksRemaining',
         ),
       if (_prayerActive)
@@ -868,16 +869,16 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
           context,
           Icons.auto_fix_high,
           Colors.lightBlueAccent,
-          'Modlitwa',
-          'Modlitwa aktywna - następny cios Leszego osłabiony o połowę.',
+          l10n.leszyStatusPrayerName,
+          l10n.leszyStatusPrayerDesc,
         ),
       if (_doubleHarvestCharges > 0)
         _statusChip(
           context,
           Icons.auto_awesome,
           Colors.amber,
-          'Obfitość',
-          'Obfitość aktywna - kolejne $_doubleHarvestCharges zebrane ścieżki (Miecz, Tarcza, drewno/kamień/woda) liczą się podwójnie. Nie dotyczy Cienia.',
+          l10n.leszyStatusAbundanceName,
+          l10n.leszyStatusAbundanceDesc(_doubleHarvestCharges),
           label: '$_doubleHarvestCharges',
         ),
       if (_leszyEvasionCharges > 0)
@@ -885,8 +886,8 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
           context,
           Icons.blur_on,
           Colors.deepPurpleAccent,
-          'Zaświat',
-          'Leszy jest częściowo wycofany w zaświaty - kolejne $_leszyEvasionCharges trafienia Mieczem zadadzą tylko połowę obrażeń.',
+          l10n.leszyStatusOtherworldName,
+          l10n.leszyStatusOtherworldDesc(_leszyEvasionCharges),
           label: '$_leszyEvasionCharges',
         ),
     ];
@@ -909,6 +910,7 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
     String description, {
     String? label,
   }) {
+    final l10n = AppLocalizations.of(context)!;
     return Tooltip(
       message: description,
       child: InkWell(
@@ -922,7 +924,7 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(dialogContext).pop(),
-                child: const Text('Zamknij'),
+                child: Text(l10n.leszyCloseButton),
               ),
             ],
           ),
@@ -950,6 +952,7 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
   }
 
   Widget _buildFight(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     return SafeArea(
       top: false,
@@ -963,7 +966,7 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Expanded(child: _hpBar(context, 'Leszy', _leszyHp, _leszyMaxHp, Colors.deepPurple)),
+                  Expanded(child: _hpBar(context, l10n.leszyBossName, _leszyHp, _leszyMaxHp, Colors.deepPurple)),
                   const SizedBox(width: 8),
                   Icon(Icons.bolt, size: 16, color: Theme.of(context).colorScheme.error),
                   Text(' $_leszyStrength', style: Theme.of(context).textTheme.bodySmall),
@@ -976,7 +979,7 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
               Row(
                 children: [
                   Expanded(
-                    child: _hpBar(context, 'Wioska', _villageHp, _villageMaxHp, scheme.primary),
+                    child: _hpBar(context, l10n.leszyVillageLabel, _villageHp, _villageMaxHp, scheme.primary),
                   ),
                   if (_shieldPoints > 0) ...[
                     const SizedBox(width: 8),
@@ -1068,6 +1071,7 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
   }
 
   Widget _hpBar(BuildContext context, String label, int current, int max, Color color) {
+    final l10n = AppLocalizations.of(context)!;
     final ratio = max == 0 ? 0.0 : (current / max).clamp(0.0, 1.0);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1082,21 +1086,22 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
           ),
         ),
         const SizedBox(height: 2),
-        Text('$label: $current/$max PŻ', style: Theme.of(context).textTheme.bodySmall),
+        Text(l10n.leszyHpBarLabel(label, current, max), style: Theme.of(context).textTheme.bodySmall),
       ],
     );
   }
 
-  static String _movesLabel(int n) {
-    if (n == 1) return 'ruch';
-    if (n >= 2 && n <= 4) return 'ruchy';
-    return 'ruchów';
+  static String _movesLabel(AppLocalizations l10n, int n) {
+    if (n == 1) return l10n.leszyMovesUnitOne;
+    if (n >= 2 && n <= 4) return l10n.leszyMovesUnitFew;
+    return l10n.leszyMovesUnitMany;
   }
 
   /// Zapowiedź kolejnego ruchu Leszego - licznik ruchów do jego tury i opis
   /// tego, co zamierza zrobić (_nextMove jest wylosowany z wyprzedzeniem,
   /// patrz _rollNextMove/_leszyTurn), żeby gracz mógł się na to przygotować.
   Widget _nextMoveBanner(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     final movesUntil = (_leszyTurnInterval - _movesSinceLeszyTurn).clamp(0, _leszyTurnInterval);
     return Container(
@@ -1111,12 +1116,12 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
           Icon(Icons.hourglass_bottom, size: 16, color: scheme.error),
           const SizedBox(width: 6),
           Text(
-            'Za $movesUntil ${_movesLabel(movesUntil)}:',
+            l10n.leszyMovesUntilLabel(movesUntil, _movesLabel(l10n, movesUntil)),
             style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(width: 6),
           Expanded(
-            child: Text(_moveDescription(_nextMove), style: Theme.of(context).textTheme.bodySmall),
+            child: Text(_moveDescription(l10n, _nextMove), style: Theme.of(context).textTheme.bodySmall),
           ),
         ],
       ),
@@ -1130,6 +1135,7 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
   /// wartość to punkty z ruchów Leszego PLUS kulki Cienia wciąż leżące na
   /// planszy (_totalCorruption) - patrz komentarz przy tym getterze.
   Widget _resourceCounters(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     final total = _totalCorruption;
     return Row(
@@ -1149,7 +1155,7 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
                 children: [
                   SizedBox(width: 14, height: 14, child: resourceIconAsset('assets/icons/shadow.png', size: 14)),
                   const SizedBox(width: 4),
-                  Text('Cień $total/$_corruptionThreshold', style: Theme.of(context).textTheme.bodySmall),
+                  Text(l10n.leszyShadowCounterLabel(total, _corruptionThreshold), style: Theme.of(context).textTheme.bodySmall),
                 ],
               ),
               const SizedBox(height: 2),
@@ -1245,7 +1251,8 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
     bool enabled,
     VoidCallback onUse,
   ) {
-    final ability = _abilities[abilityIndex];
+    final l10n = AppLocalizations.of(context)!;
+    final ability = _abilitiesList(l10n)[abilityIndex];
     return showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -1255,13 +1262,13 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Koszt: ${ability.cost}'),
+            Text(l10n.leszyAbilityCostLabel(ability.cost)),
             const SizedBox(height: 6),
-            Text('Efekt: ${ability.effect}'),
+            Text(l10n.leszyAbilityEffectLabel(ability.effect)),
             if (!enabled) ...[
               const SizedBox(height: 12),
               Text(
-                'Za mało surowców, żeby teraz użyć tej zdolności.',
+                l10n.leszyNotEnoughResources,
                 style: TextStyle(color: Theme.of(dialogContext).colorScheme.error),
               ),
             ],
@@ -1270,7 +1277,7 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Anuluj'),
+            child: Text(l10n.leszyCancelButton),
           ),
           FilledButton(
             onPressed: enabled
@@ -1279,7 +1286,7 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
                     onUse();
                   }
                 : null,
-            child: const Text('Użyj'),
+            child: Text(l10n.leszyUseButton),
           ),
         ],
       ),
@@ -1287,33 +1294,34 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
   }
 
   Widget _buildGameOver(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('💀 Klęska', style: Theme.of(context).textTheme.headlineSmall),
+            Text(l10n.leszyDefeatTitle, style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 12),
             Text(
-              'Leszy okazał się za silny. Wioska nie wytrzymała naporu Cienia.',
+              l10n.leszyDefeatMessage,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyLarge,
             ),
             const SizedBox(height: 28),
             FilledButton(
               onPressed: _retry,
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                child: Text('Spróbuj ponownie'),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                child: Text(l10n.leszyRetryButton),
               ),
             ),
             const SizedBox(height: 12),
             OutlinedButton(
               onPressed: () => Navigator.of(context).pop(const LeszyBattleResult(false)),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                child: Text('Wróć do wioski, przygotuj się lepiej'),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                child: Text(l10n.leszyReturnPrepareButton),
               ),
             ),
           ],
@@ -1323,30 +1331,31 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
   }
 
   Widget _buildVictory(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('🎉 Leszy pokonany', style: Theme.of(context).textTheme.headlineSmall),
+            Text(l10n.leszyVictoryTitle, style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 12),
             Text(
-              'Cień cofa się w głąb ziemi. Wioska przetrwała najgorszą noc.',
+              l10n.leszyVictoryMessage,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyLarge,
             ),
             const SizedBox(height: 8),
             Text(
-              'PŻ Wioski na koniec: $_villageHp/$_villageMaxHp',
+              l10n.leszyVictoryHpSummary(_villageHp, _villageMaxHp),
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 28),
             FilledButton(
               onPressed: () => Navigator.of(context).pop(const LeszyBattleResult(true)),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                child: Text('Wróć do wioski'),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                child: Text(l10n.leszyReturnToVillageButton),
               ),
             ),
           ],

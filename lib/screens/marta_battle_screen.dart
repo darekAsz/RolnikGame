@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../l10n/gen/app_localizations.dart';
 import '../models/resource_type.dart';
 import '../models/season.dart';
 import '../services/board_style_storage.dart';
@@ -60,6 +61,7 @@ class MartaBattleScreen extends StatefulWidget {
 enum _Phase { intro, fighting, summary }
 
 class _MartaBattleScreenState extends State<MartaBattleScreen> {
+  static const _stageCount = 3;
   static const _totalMoves = 32;
   // Woda w etapie 1 nie liczy się do niczego - to tylko "szum" utrudniający
   // trafianie w drewno/kamień (patrz _onHarvestStage1).
@@ -81,7 +83,6 @@ class _MartaBattleScreenState extends State<MartaBattleScreen> {
   late final int _maxStone;
   late int _stage2Target;
   late final int _stage3Target;
-  late final List<_StageInfo> _stages;
 
   int _stageIndex = 0;
   _Phase _phase = _Phase.intro;
@@ -112,31 +113,27 @@ class _MartaBattleScreenState extends State<MartaBattleScreen> {
     final stage2Base = 8 - kaplica - (widget.morale >= 60 ? 1 : 0);
     _stage2Target = stage2Base.clamp(5, 8);
     _stage3Target = (20 - (widget.morale / 5).floor()).clamp(5, 20);
-    _stages = [
-      _StageInfo(
-        title: 'Etap 1: Poszlaki',
-        introText: 'Zbierasz ślady jej wcześniejszego, niezdarnego sabotażu - i strzępki plotek '
-            'krążących po wiosce. Potrzebujesz dość poszlak, żeby stanąć przed nią z pewnością '
-            'siebie ($_minWood drewna, $_minStone kamienia). Ale jeśli przesadzisz, plotka zacznie '
-            'żyć własnym życiem, zanim zdążysz z nią porozmawiać.',
-        iconAssets: const ['assets/icons/wood.png', 'assets/icons/stone.png'],
-      ),
-      _StageInfo(
-        title: 'Etap 2: Impas',
-        introText: 'Marta broni się półsercem. Wyłap $_stage2Target ${_stage2Target == 1 ? 'chwilę' : 'chwil'} '
-            'wahania w jej ciosach (jokery) - ale unikaj eskalacji, bo agresywne, długie ścieżki '
-            '(bomby) tylko ją spłoszą i wymagać będzie to więcej cierpliwości.',
-        iconAssets: const ['assets/icons/joker.png'],
-      ),
-      const _StageInfo(
-        title: 'Etap 3: Prawda',
-        introText: 'Przełamujesz jej milczenie. Zbieraj Prawdę (drewno/kamień/woda na planszy to '
-            'tylko szum, nie liczą się do niczego) - i nie spiesz się, im więcej ruchów zostanie Ci '
-            'na koniec, tym pełniejsze będzie jej zaufanie.',
-        iconAssets: ['assets/icons/truth.png'],
-      ),
-    ];
   }
+
+  List<_StageInfo> _buildStages(AppLocalizations l10n) => [
+        _StageInfo(
+          title: l10n.martaStage1Title,
+          introText: l10n.martaStage1IntroDefault(_minWood, _minStone),
+          iconAssets: const ['assets/icons/wood.png', 'assets/icons/stone.png'],
+        ),
+        _StageInfo(
+          title: l10n.martaStage2Title,
+          introText: _stage2Target == 1
+              ? l10n.martaStage2IntroOne
+              : l10n.martaStage2IntroMany(_stage2Target),
+          iconAssets: const ['assets/icons/joker.png'],
+        ),
+        _StageInfo(
+          title: l10n.martaStage3Title,
+          introText: l10n.martaStage3Intro,
+          iconAssets: const ['assets/icons/truth.png'],
+        ),
+      ];
 
   Season get _season => seasonForWeek(widget.week);
 
@@ -152,7 +149,7 @@ class _MartaBattleScreenState extends State<MartaBattleScreen> {
   void _advanceStage() {
     setState(() {
       _stagesCleared++;
-      if (_stageIndex >= _stages.length - 1) {
+      if (_stageIndex >= _stageCount - 1) {
         _phase = _Phase.summary;
       } else {
         _stageIndex++;
@@ -230,17 +227,18 @@ class _MartaBattleScreenState extends State<MartaBattleScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return PopScope(
       canPop: _phase == _Phase.summary,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Starcie z Martą - Tydzień ${widget.week}'),
+          title: Text(l10n.martaAppBarTitle(widget.week)),
           automaticallyImplyLeading: false,
           actions: [
             if (_phase == _Phase.fighting)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Center(child: Text('Ruchy: $_movesLeft')),
+                child: Center(child: Text(l10n.martaMovesLabel(_movesLeft))),
               ),
           ],
         ),
@@ -253,27 +251,20 @@ class _MartaBattleScreenState extends State<MartaBattleScreen> {
     );
   }
 
-  String get _stage1IntroText {
+  String _stage1IntroText(AppLocalizations l10n) {
     if (_stage1Overshot) {
-      return 'Przesadziłeś/aś - plotka zaczęła żyć własnym życiem, zanim zdążyłeś/aś z nią '
-          'porozmawiać. Spróbuj ponownie ($_minWood drewna, $_minStone kamienia) - ale Marta '
-          'jest już czujniejsza: etap 2 będzie wymagał o jedną chwilę wahania więcej '
-          '($_stage2Target).';
+      return l10n.martaStage1IntroOvershot(_minWood, _minStone, _stage2Target);
     }
-    return 'Zbierasz ślady jej wcześniejszego, niezdarnego sabotażu - i strzępki plotek krążących '
-        'po wiosce. Potrzebujesz dość poszlak, żeby stanąć przed nią z pewnością siebie '
-        '($_minWood drewna, $_minStone kamienia). Ale jeśli przesadzisz, plotka zacznie żyć '
-        'własnym życiem, zanim zdążysz z nią porozmawiać - trzeba będzie spróbować jeszcze raz, '
-        'a Marta zrobi się czujniejsza w etapie 2.';
+    return l10n.martaStage1IntroDefault(_minWood, _minStone);
   }
 
-  String get _stage2IntroText =>
-      'Marta broni się półsercem. Wyłap $_stage2Target ${_stage2Target == 1 ? 'chwilę' : 'chwil'} '
-      'wahania w jej ciosach (jokery) - ale unikaj eskalacji, bo agresywne, długie ścieżki '
-      '(bomby) tylko ją spłoszą i wymagać będzie to więcej cierpliwości.';
+  String _stage2IntroText(AppLocalizations l10n) => _stage2Target == 1
+      ? l10n.martaStage2IntroOne
+      : l10n.martaStage2IntroMany(_stage2Target);
 
   Widget _buildIntro(BuildContext context) {
-    final stage = _stages[_stageIndex];
+    final l10n = AppLocalizations.of(context)!;
+    final stage = _buildStages(l10n)[_stageIndex];
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(32),
@@ -294,8 +285,8 @@ class _MartaBattleScreenState extends State<MartaBattleScreen> {
             const SizedBox(height: 12),
             Text(
               switch (_stageIndex) {
-                0 => _stage1IntroText,
-                1 => _stage2IntroText,
+                0 => _stage1IntroText(l10n),
+                1 => _stage2IntroText(l10n),
                 _ => stage.introText,
               },
               textAlign: TextAlign.center,
@@ -304,9 +295,9 @@ class _MartaBattleScreenState extends State<MartaBattleScreen> {
             const SizedBox(height: 28),
             FilledButton(
               onPressed: () => setState(() => _phase = _Phase.fighting),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                child: Text('Rozpocznij'),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                child: Text(l10n.martaStartButton),
               ),
             ),
           ],
@@ -316,6 +307,8 @@ class _MartaBattleScreenState extends State<MartaBattleScreen> {
   }
 
   Widget _buildFight(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final stages = _buildStages(l10n);
     return SafeArea(
       top: false,
       child: Column(
@@ -325,7 +318,7 @@ class _MartaBattleScreenState extends State<MartaBattleScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(_stages[_stageIndex].title, style: Theme.of(context).textTheme.titleMedium),
+              Text(stages[_stageIndex].title, style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 8),
               _buildProgress(context),
             ],
@@ -402,16 +395,16 @@ class _MartaBattleScreenState extends State<MartaBattleScreen> {
   }
 
   Widget _buildProgress(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     final (current, target, label) = switch (_stageIndex) {
       0 => (
           _stage1Wood + _stage1Stone,
           _minWood + _minStone,
-          'Drewno $_stage1Wood/$_minWood (limit $_maxWood) - Kamień $_stage1Stone/$_minStone '
-              '(limit $_maxStone)',
+          l10n.martaProgressStage1(_stage1Wood, _minWood, _maxWood, _stage1Stone, _minStone, _maxStone),
         ),
-      1 => (_stage2JokersUsed, _stage2Target, 'Chwile wahania: $_stage2JokersUsed/$_stage2Target'),
-      _ => (_stage3Truth, _stage3Target, 'Prawda: $_stage3Truth/$_stage3Target'),
+      1 => (_stage2JokersUsed, _stage2Target, l10n.martaProgressStage2(_stage2JokersUsed, _stage2Target)),
+      _ => (_stage3Truth, _stage3Target, l10n.martaProgressStage3(_stage3Truth, _stage3Target)),
     };
     final ratio = target == 0 ? 1.0 : (current / target).clamp(0.0, 1.0);
     return Column(
@@ -433,15 +426,14 @@ class _MartaBattleScreenState extends State<MartaBattleScreen> {
   }
 
   Widget _buildSummary(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final (title, text) = switch (_stagesCleared) {
       3 => (
-          _fullTrustBonus ? '🎉 Pełne zaufanie' : '🤝 Przełamanie',
-          _fullTrustBonus
-              ? 'Dałeś/aś jej czas, na jaki czekała. Marta mówi Ci wszystko, bez zastrzeżeń.'
-              : 'Marta w końcu Ci wierzy - staje się sojuszniczką, choć ostrożną.',
+          _fullTrustBonus ? l10n.martaSummaryFullTrustTitle : l10n.martaSummaryPartialTrustTitle,
+          _fullTrustBonus ? l10n.martaSummaryFullTrustText : l10n.martaSummaryPartialTrustText,
         ),
-      2 => ('⚔️ Częściowe przełamanie', 'Marta opuszcza broń, ale wciąż coś ukrywa przed Tobą.'),
-      _ => ('💔 Wycofanie', 'Marta zamyka się w sobie i odchodzi, nie zdradzając niczego więcej.'),
+      2 => (l10n.martaSummaryClashTitle, l10n.martaSummaryClashText),
+      _ => (l10n.martaSummaryWithdrawTitle, l10n.martaSummaryWithdrawText),
     };
     return Center(
       child: Padding(
@@ -454,16 +446,16 @@ class _MartaBattleScreenState extends State<MartaBattleScreen> {
             Text(text, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyLarge),
             const SizedBox(height: 8),
             Text(
-              'Ukończone etapy: $_stagesCleared/3',
+              l10n.martaSummaryStagesCleared(_stagesCleared),
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 28),
             FilledButton(
               onPressed: () => Navigator.of(context)
                   .pop(MartaBattleResult(_stagesCleared, fullTrustBonus: _fullTrustBonus)),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                child: Text('Wróć do wioski'),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                child: Text(l10n.martaReturnButton),
               ),
             ),
           ],

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/gen/app_localizations.dart';
 import '../models/unit_type.dart';
+import '../services/app_locale.dart';
 import '../services/board_style_storage.dart';
 import '../services/resource_icon_style_storage.dart';
 import '../services/stats_storage.dart';
@@ -43,67 +45,64 @@ class StatsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Statystyki', style: Theme.of(context).textTheme.titleLarge),
+          Text(l10n.statsTitle, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 16),
           _StatCard(
             icon: Icons.star,
-            label: 'Doświadczenie',
-            value: '$xp XP',
+            label: l10n.statsXpLabel,
+            value: l10n.statsXpValue(xp),
           ),
           const SizedBox(height: 12),
           _StatCard(
             icon: Icons.all_inclusive,
-            label: 'Łącznie zebrane surowce',
+            label: l10n.statsTotalCollectedLabel,
             value: '${stats.totalCollected}',
           ),
           const SizedBox(height: 12),
           _StatCard(
             icon: Icons.timeline,
-            label: 'Najdłuższa ścieżka',
-            value: '${stats.longestPath} kafelków',
+            label: l10n.statsLongestPathLabel,
+            value: l10n.statsLongestPathValue(stats.longestPath),
           ),
           const SizedBox(height: 12),
           _StatCard(
             icon: Icons.bolt,
-            label: 'Najwięcej zebrane naraz',
+            label: l10n.statsMaxSingleHarvestLabel,
             value: '${stats.maxSingleHarvest}',
           ),
           const SizedBox(height: 12),
           _StatCard(
             icon: Icons.groups,
-            label: 'Populacja',
+            label: l10n.statsPopulationLabel,
             value: '$population / $populationLimit',
-            description: 'Ogranicza, ilu mieszkańców można zwerbować jako żołnierzy albo '
-                'przydzielić jako pracowników do budynków.',
+            description: l10n.statsPopulationDescription,
           ),
           const SizedBox(height: 12),
           _StatCard(
             icon: Icons.sentiment_satisfied,
-            label: 'Morale wioski',
+            label: l10n.statsMoraleLabel,
             value: '${morale.toStringAsFixed(1)}%',
-            description: 'Im wyższe, tym więcej pozytywnych (a mniej negatywnych) wydarzeń '
-                'tygodniowych. Wysokie morale ułatwia też niektóre walki z bossami.',
+            description: l10n.statsMoraleDescription,
           ),
           const SizedBox(height: 12),
           _StatCard(
             icon: Icons.security,
-            label: 'Bezpieczeństwo wioski',
+            label: l10n.statsSecurityLabel,
             value: '$security',
-            description: 'Podnosi PŻ Wioski w finałowym starciu (do +40) i ułatwia niektóre '
-                'walki z bossami.',
+            description: l10n.statsSecurityDescription,
           ),
           const SizedBox(height: 12),
           _StatCard(
             icon: Icons.shield,
-            label: 'Żołnierze (siła armii)',
+            label: l10n.statsSoldiersLabel,
             value: '${stats.totalSoldierCount} ($armyStrength)',
-            description: 'Liczba żołnierzy i siła armii (uwzględnia bonus Koszar poziom 2) '
-                'ułatwiają niektóre walki z bossami.',
+            description: l10n.statsSoldiersDescription,
           ),
           if (stats.totalSoldierCount > 0) ...[
             const SizedBox(height: 8),
@@ -139,6 +138,8 @@ class StatsView extends StatelessWidget {
             const SizedBox(height: 12),
             _ResourceIconStyleCard(value: resourceIconStyle, onChanged: onResourceIconStyleChanged!),
           ],
+          const SizedBox(height: 12),
+          const _LanguageCard(),
         ],
       ),
     );
@@ -153,6 +154,7 @@ class _ComicsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     return Material(
       color: scheme.surfaceContainerHighest,
@@ -170,9 +172,9 @@ class _ComicsCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Komiksy', style: Theme.of(context).textTheme.labelMedium),
+                    Text(l10n.statsComicsLabel, style: Theme.of(context).textTheme.labelMedium),
                     Text(
-                      unreadCount > 0 ? '$unreadCount nieprzeczytanych' : 'Wszystko przeczytane',
+                      unreadCount > 0 ? l10n.statsComicsUnread(unreadCount) : l10n.statsComicsAllRead,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -210,6 +212,7 @@ class _BoardStyleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     return Container(
       width: double.infinity,
@@ -225,21 +228,21 @@ class _BoardStyleCard extends StatelessWidget {
             children: [
               Icon(Icons.grid_view, size: 30, color: scheme.primary),
               const SizedBox(width: 14),
-              Text('Wygląd planszy', style: Theme.of(context).textTheme.labelMedium),
+              Text(l10n.statsBoardStyleLabel, style: Theme.of(context).textTheme.labelMedium),
             ],
           ),
           const SizedBox(height: 10),
           SegmentedButton<BoardStyle>(
-            segments: const [
+            segments: [
               ButtonSegment(
                 value: BoardStyle.photo,
-                label: Text('Nowy'),
-                icon: Icon(Icons.image),
+                label: Text(l10n.statsBoardStyleNew),
+                icon: const Icon(Icons.image),
               ),
               ButtonSegment(
                 value: BoardStyle.classic,
-                label: Text('Starszy'),
-                icon: Icon(Icons.gradient),
+                label: Text(l10n.statsBoardStyleOld),
+                icon: const Icon(Icons.gradient),
               ),
             ],
             selected: {value},
@@ -259,6 +262,7 @@ class _ResourceIconStyleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     return Container(
       width: double.infinity,
@@ -274,26 +278,26 @@ class _ResourceIconStyleCard extends StatelessWidget {
             children: [
               Icon(Icons.circle, size: 30, color: scheme.primary),
               const SizedBox(width: 14),
-              Text('Wygląd ikon surowców', style: Theme.of(context).textTheme.labelMedium),
+              Text(l10n.statsIconStyleLabel, style: Theme.of(context).textTheme.labelMedium),
             ],
           ),
           const SizedBox(height: 10),
           SegmentedButton<ResourceIconStyle>(
-            segments: const [
+            segments: [
               ButtonSegment(
                 value: ResourceIconStyle.orb,
-                label: Text('Nowe'),
-                icon: Icon(Icons.blur_circular),
+                label: Text(l10n.statsIconStyleNew),
+                icon: const Icon(Icons.blur_circular),
               ),
               ButtonSegment(
                 value: ResourceIconStyle.filled,
-                label: Text('Pośrednie'),
-                icon: Icon(Icons.circle),
+                label: Text(l10n.statsIconStyleMid),
+                icon: const Icon(Icons.circle),
               ),
               ButtonSegment(
                 value: ResourceIconStyle.classic,
-                label: Text('Starsze'),
-                icon: Icon(Icons.category),
+                label: Text(l10n.statsIconStyleOld),
+                icon: const Icon(Icons.category),
               ),
             ],
             selected: {value},
@@ -301,6 +305,55 @@ class _ResourceIconStyleCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Przełącznik języka gry (PL/EN) - w przeciwieństwie do `_BoardStyleCard`/
+/// `_ResourceIconStyleCard` nie dostaje stanu przez propsy z `HomeShell`,
+/// tylko czyta i zapisuje globalny singleton `AppLocale` bezpośrednio - to on
+/// (nie ten widget) jest źródłem prawdy, żeby ten sam wybór języka mogły
+/// czytać też miejsca bez `BuildContext` (patrz `AppLocale`).
+class _LanguageCard extends StatelessWidget {
+  const _LanguageCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final scheme = Theme.of(context).colorScheme;
+    return ValueListenableBuilder<Locale>(
+      valueListenable: AppLocale.instance,
+      builder: (context, locale, _) {
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          decoration: BoxDecoration(
+            color: scheme.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.language, size: 30, color: scheme.primary),
+                  const SizedBox(width: 14),
+                  Text(l10n.statsLanguageLabel, style: Theme.of(context).textTheme.labelMedium),
+                ],
+              ),
+              const SizedBox(height: 10),
+              SegmentedButton<String>(
+                segments: [
+                  ButtonSegment(value: 'pl', label: Text(l10n.statsLanguagePolish)),
+                  ButtonSegment(value: 'en', label: Text(l10n.statsLanguageEnglish)),
+                ],
+                selected: {locale.languageCode},
+                onSelectionChanged: (selection) => AppLocale.instance.set(Locale(selection.first)),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

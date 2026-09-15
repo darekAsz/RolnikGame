@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../l10n/gen/app_localizations.dart';
 import '../models/resource_type.dart';
 import '../models/season.dart';
 import '../services/board_style_storage.dart';
@@ -189,17 +190,18 @@ class _BogdanBattleScreenState extends State<BogdanBattleScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return PopScope(
       canPop: _phase == _Phase.summary,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Starcie z Bogdanem - Tydzień ${widget.week}'),
+          title: Text(l10n.bogdanAppBarTitle(widget.week)),
           automaticallyImplyLeading: false,
           actions: [
             if (_phase == _Phase.fighting)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Center(child: Text('Ruchy: $_totalMovesLeft')),
+                child: Center(child: Text(l10n.bogdanMovesLabel(_totalMovesLeft))),
               ),
           ],
         ),
@@ -212,38 +214,33 @@ class _BogdanBattleScreenState extends State<BogdanBattleScreen> {
     );
   }
 
-  (String, String, List<String>) _introContent() {
+  (String, String, List<String>) _introContent(AppLocalizations l10n) {
     if (_subPhase == _SubPhase.peknicie) {
       return (
-        'Pęknięcie',
-        'Bogdan się waha, sięga po dziennik... Masz $_peknicieLimit ruchów, żeby zebrać jak '
-            'najwięcej Dowodu, zanim znów się zamknie w gniewie.',
+        l10n.bogdanPeknicieTitle,
+        l10n.bogdanPeknicieIntro(_peknicieLimit),
         ['assets/icons/evidence.png'],
       );
     }
     return switch (_introReason) {
       _IntroReason.start => (
-          'Furia',
-          'Bogdan przyjeżdża osobiście, w gniewie. Uspokój go - zbierz $_calmTarget wody, zanim '
-              'skończą się ruchy ($_furiaLimit), bo inaczej podpali część magazynu.',
+          l10n.bogdanFuriaTitle,
+          l10n.bogdanFuriaStartIntro(_calmTarget, _furiaLimit),
           ['assets/icons/water.png'],
         ),
       _IntroReason.furiaRetry => (
-          'Furia (ponownie)',
-          'Bogdan zdążył podpalić część spichlerza! (-15% zboża i jabłek) Spróbuj ponownie - masz '
-              '$_furiaLimit ruchów.',
+          l10n.bogdanFuriaRetryTitle,
+          l10n.bogdanFuriaRetryIntro(_furiaLimit),
           ['assets/icons/water.png'],
         ),
       _IntroReason.furiaRetryDiscounted => (
-          'Furia (ponownie)',
-          'Marta wbiegła i powstrzymała ojca! Zdążył podpalić tylko trochę (-5%). Spróbuj ponownie '
-              '- masz $_furiaLimit ruchów.',
+          l10n.bogdanFuriaRetryTitle,
+          l10n.bogdanFuriaRetryDiscountedIntro(_furiaLimit),
           ['assets/icons/water.png'],
         ),
       _IntroReason.furiaAfterPeknicie => (
-          'Furia',
-          'Bogdan znów wpada w gniew. Uspokój go raz jeszcze - $_calmTarget wody, $_furiaLimit '
-              'ruchów.',
+          l10n.bogdanFuriaTitle,
+          l10n.bogdanFuriaAfterPeknicieIntro(_calmTarget, _furiaLimit),
           ['assets/icons/water.png'],
         ),
       _IntroReason.peknicieStart => ('', '', const []),
@@ -251,7 +248,8 @@ class _BogdanBattleScreenState extends State<BogdanBattleScreen> {
   }
 
   Widget _buildIntro(BuildContext context) {
-    final (title, text, icons) = _introContent();
+    final l10n = AppLocalizations.of(context)!;
+    final (title, text, icons) = _introContent(l10n);
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(32),
@@ -274,16 +272,16 @@ class _BogdanBattleScreenState extends State<BogdanBattleScreen> {
             if (_totalDowod > 0) ...[
               const SizedBox(height: 8),
               Text(
-                'Zebrany dotąd Dowód: $_totalDowod/$_dowodTarget',
+                l10n.bogdanCollectedProofLabel(_totalDowod, _dowodTarget),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
             const SizedBox(height: 28),
             FilledButton(
               onPressed: () => setState(() => _phase = _Phase.fighting),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                child: Text('Rozpocznij'),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                child: Text(l10n.bogdanStartButton),
               ),
             ),
           ],
@@ -293,6 +291,7 @@ class _BogdanBattleScreenState extends State<BogdanBattleScreen> {
   }
 
   Widget _buildFight(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isFuria = _subPhase == _SubPhase.furia;
     return SafeArea(
       top: false,
@@ -304,7 +303,7 @@ class _BogdanBattleScreenState extends State<BogdanBattleScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                isFuria ? 'Furia' : 'Pęknięcie',
+                isFuria ? l10n.bogdanFuriaTitle : l10n.bogdanPeknicieTitle,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
@@ -368,14 +367,14 @@ class _BogdanBattleScreenState extends State<BogdanBattleScreen> {
   }
 
   Widget _buildProgress(BuildContext context, bool isFuria) {
+    final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     final current = isFuria ? _calmProgress : _totalDowod;
     final target = isFuria ? _calmTarget : _dowodTarget;
     final label = isFuria
-        ? 'Opanowanie: $_calmProgress/$_calmTarget (pozostało ${_furiaMovesLeft.clamp(0, _furiaLimit)} '
-            'ruchów tej próby)'
-        : 'Dowód: $_totalDowod/$_dowodTarget (pozostało ${_peknicieMovesLeft.clamp(0, _peknicieLimit)} '
-            'ruchów okna)';
+        ? l10n.bogdanProgressFuria(_calmProgress, _calmTarget, _furiaMovesLeft.clamp(0, _furiaLimit))
+        : l10n.bogdanProgressPeknicie(
+            _totalDowod, _dowodTarget, _peknicieMovesLeft.clamp(0, _peknicieLimit));
     final ratio = target == 0 ? 1.0 : (current / target).clamp(0.0, 1.0);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -396,23 +395,14 @@ class _BogdanBattleScreenState extends State<BogdanBattleScreen> {
   }
 
   Widget _buildSummary(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final proofComplete = _totalDowod >= _dowodTarget;
     final totalBurns = _fullBurns + _discountedBurns;
     final (title, text) = proofComplete
         ? (totalBurns == 0
-            ? (
-                '🎉 Pełne zwycięstwo',
-                'Bogdan pęka całkowicie pod ciężarem dowodów. Ucieka w las bez zemsty.',
-              )
-            : (
-                '⚔️ Zwycięstwo okupione stratami',
-                'Bogdan w końcu ucieka, ale zdążył zaszkodzić wiosce po drodze.',
-              ))
-        : (
-            '💀 Porażka',
-            'Ruchy się skończyły, zanim udało się go przełamać. Bogdan odjeżdża, nadal '
-                'przekonany o swojej racji.',
-          );
+            ? (l10n.bogdanSummaryFullVictoryTitle, l10n.bogdanSummaryFullVictoryText)
+            : (l10n.bogdanSummaryPartialVictoryTitle, l10n.bogdanSummaryPartialVictoryText))
+        : (l10n.bogdanSummaryDefeatTitle, l10n.bogdanSummaryDefeatText);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -424,7 +414,7 @@ class _BogdanBattleScreenState extends State<BogdanBattleScreen> {
             Text(text, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyLarge),
             const SizedBox(height: 8),
             Text(
-              'Dowód: $_totalDowod/$_dowodTarget - Spalenia magazynu: $totalBurns',
+              l10n.bogdanSummaryStats(_totalDowod, _dowodTarget, totalBurns),
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 28),
@@ -436,9 +426,9 @@ class _BogdanBattleScreenState extends State<BogdanBattleScreen> {
                   discountedBurns: _discountedBurns,
                 ),
               ),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                child: Text('Wróć do wioski'),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                child: Text(l10n.bogdanReturnButton),
               ),
             ),
           ],

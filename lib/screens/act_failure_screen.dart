@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/gen/app_localizations.dart';
+
 /// Ekran porażki na koniec aktu - cel główny danego aktu nie został
 /// osiągnięty na czas. W odróżnieniu od dawnego "miękkiego" systemu kar
 /// (gra leciała dalej z gorszymi surowcami), to jest prawdziwy koniec
@@ -24,6 +26,7 @@ class ActFailureScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final sortedWeeks = [...checkpointWeeks]..sort((a, b) => b.compareTo(a));
     return PopScope(
       canPop: false,
@@ -38,7 +41,7 @@ class ActFailureScreen extends StatelessWidget {
                 const Icon(Icons.close_rounded, color: Color(0xFFC0392B), size: 56),
                 const SizedBox(height: 12),
                 Text(
-                  'Porażka',
+                  l10n.actFailureTitle,
                   style: Theme.of(context).textTheme.displaySmall?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -46,7 +49,7 @@ class ActFailureScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Akt $actNumber: "$actName" się nie powiódł.',
+                  l10n.actFailureSubtitle(actNumber, actName),
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.white70),
                   textAlign: TextAlign.center,
                 ),
@@ -58,7 +61,7 @@ class ActFailureScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'Wczytaj zapis i spróbuj ponownie',
+                  l10n.actFailureLoadSaveHeader,
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.white),
                 ),
                 const SizedBox(height: 10),
@@ -66,7 +69,7 @@ class ActFailureScreen extends StatelessWidget {
                   child: sortedWeeks.isEmpty
                       ? Center(
                           child: Text(
-                            'Brak zapisanych tygodni.',
+                            l10n.actFailureNoSavedWeeks,
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white54),
                           ),
                         )
@@ -81,7 +84,10 @@ class ActFailureScreen extends StatelessWidget {
                               child: ListTile(
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                 leading: const Icon(Icons.restore, color: Colors.white70),
-                                title: Text('Tydzień $week', style: const TextStyle(color: Colors.white)),
+                                title: Text(
+                                  l10n.actFailureWeekLabel(week),
+                                  style: const TextStyle(color: Colors.white),
+                                ),
                                 onTap: () => Navigator.of(context).pop(week),
                               ),
                             );
@@ -97,9 +103,9 @@ class ActFailureScreen extends StatelessWidget {
                       side: const BorderSide(color: Colors.white30),
                     ),
                     onPressed: () => Navigator.of(context).pop(-1),
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      child: Text('Zacznij nową grę'),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Text(l10n.actFailureNewGameButton),
                     ),
                   ),
                 ),

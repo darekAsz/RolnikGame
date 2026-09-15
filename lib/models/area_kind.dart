@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../services/app_locale.dart';
 import 'resource_type.dart';
 
 /// Sześć terenów w okolicach wioski, osobnych od planszy wioski samej w
@@ -26,6 +27,22 @@ extension AreaKindStyle on AreaKind {
   }
 
   String get label {
+    if (AppLocale.instance.isEnglish) {
+      switch (this) {
+        case AreaKind.river:
+          return 'River';
+        case AreaKind.mountains:
+          return 'Mountains';
+        case AreaKind.forest:
+          return 'Forest';
+        case AreaKind.meadow:
+          return 'Meadow';
+        case AreaKind.orchard:
+          return 'Orchard';
+        case AreaKind.field:
+          return 'Field';
+      }
+    }
     switch (this) {
       case AreaKind.river:
         return 'Rzeka';

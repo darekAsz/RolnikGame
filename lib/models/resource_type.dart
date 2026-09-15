@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../services/app_locale.dart';
 import '../services/resource_icon_style_storage.dart';
 
 enum ResourceType {
@@ -183,6 +184,34 @@ extension ResourceTypeStyle on ResourceType {
   }
 
   String get label {
+    if (AppLocale.instance.isEnglish) {
+      switch (this) {
+        case ResourceType.grass:
+          return 'Grass';
+        case ResourceType.grain:
+          return 'Grain';
+        case ResourceType.wood:
+          return 'Wood';
+        case ResourceType.stone:
+          return 'Stone';
+        case ResourceType.water:
+          return 'Water';
+        case ResourceType.coin:
+          return 'Gold';
+        case ResourceType.apple:
+          return 'Apple';
+        case ResourceType.sword:
+          return 'Sword';
+        case ResourceType.truth:
+          return 'Truth';
+        case ResourceType.evidence:
+          return 'Evidence';
+        case ResourceType.shield:
+          return 'Shield';
+        case ResourceType.shadow:
+          return 'Shadow';
+      }
+    }
     switch (this) {
       case ResourceType.grass:
         return 'Trawa';

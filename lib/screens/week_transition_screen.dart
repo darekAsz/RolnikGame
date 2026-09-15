@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/gen/app_localizations.dart';
 import '../models/season.dart';
 
 /// Krótki, samoznikający ekran "Tydzień N" pokazywany przed każdą planszą
@@ -45,6 +46,7 @@ class _WeekTransitionScreenState extends State<WeekTransitionScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final season = seasonForWeek(widget.week);
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primary,
@@ -55,7 +57,7 @@ class _WeekTransitionScreenState extends State<WeekTransitionScreen>
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Tydzień ${widget.week}',
+                l10n.weekTransitionWeekLabel(widget.week),
                 style: Theme.of(context).textTheme.displayMedium?.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,

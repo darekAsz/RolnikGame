@@ -1,5 +1,7 @@
+import '../services/app_locale.dart';
 import 'resource_type.dart';
 import 'season.dart';
+import 'village_event_translations_en.dart';
 
 /// Losowe wydarzenia tygodniowe - część zależy od morale wioski (wyższe
 /// morale = większa szansa na wylosowanie wydarzenia pozytywnego zamiast
@@ -56,6 +58,32 @@ class VillageEvent {
     this.effect,
     this.options,
   });
+}
+
+extension VillageEventLocalization on VillageEvent {
+  String get localizedTitle =>
+      AppLocale.instance.isEnglish ? (kVillageEventsEn[id]?.title ?? title) : title;
+
+  String get localizedDescription =>
+      AppLocale.instance.isEnglish ? (kVillageEventsEn[id]?.description ?? description) : description;
+
+  /// Odpowiednik `options`, ale z przetłumaczonymi `label`/`resultText` -
+  /// `effect` (dane niezależne od języka) zostaje bez zmian. Spada na
+  /// oryginał, jeśli brakuje tłumaczenia albo liczba opcji się nie zgadza
+  /// (nie powinno się zdarzyć, ale bezpieczniej niż rzucić wyjątkiem).
+  List<EventOption>? get localizedOptions {
+    if (!AppLocale.instance.isEnglish || options == null) return options;
+    final translated = kVillageEventsEn[id]?.options;
+    if (translated == null || translated.length != options!.length) return options;
+    return [
+      for (var i = 0; i < options!.length; i++)
+        EventOption(
+          label: translated[i].label,
+          resultText: translated[i].resultText,
+          effect: options![i].effect,
+        ),
+    ];
+  }
 }
 
 const List<VillageEvent> kVillageEvents = [

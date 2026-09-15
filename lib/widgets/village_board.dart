@@ -4,6 +4,8 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
+import '../services/app_locale.dart';
+
 enum BuildingKind {
   ratusz,
   palisade,
@@ -194,6 +196,44 @@ class _DecrepitHouseImageCache {
 
 extension BuildingKindStyle on BuildingKind {
   String get label {
+    if (AppLocale.instance.isEnglish) {
+      switch (this) {
+        case BuildingKind.ratusz:
+          return 'Town Hall';
+        case BuildingKind.palisade:
+          return 'Palisade';
+        case BuildingKind.sklep:
+          return 'Shop';
+        case BuildingKind.karczma:
+          return 'Tavern';
+        case BuildingKind.dom:
+          return 'House';
+        case BuildingKind.kuznia:
+          return 'Forge';
+        case BuildingKind.spichlerz:
+          return 'Granary';
+        case BuildingKind.piekarnia:
+          return 'Bakery';
+        case BuildingKind.tartak:
+          return 'Sawmill';
+        case BuildingKind.studnia:
+          return 'Well';
+        case BuildingKind.browar:
+          return 'Brewery';
+        case BuildingKind.kaplica:
+          return 'Chapel';
+        case BuildingKind.szkola:
+          return 'Academy';
+        case BuildingKind.rynek:
+          return 'Market';
+        case BuildingKind.magazyn:
+          return 'Warehouse';
+        case BuildingKind.kamieniarz:
+          return 'Stonemason';
+        case BuildingKind.koszary:
+          return 'Barracks';
+      }
+    }
     switch (this) {
       case BuildingKind.ratusz:
         return 'Ratusz';
@@ -989,7 +1029,7 @@ class _VillagePainter extends CustomPainter {
         if ((pos - topGate).distance < gateHalf || (pos - bottomGate).distance < gateHalf) continue;
         _drawLog(canvas, pos, 34 * s, s);
       }
-      _drawBuildingLabel(canvas, topGate, s, 'Palisada', workers: workers[BuildingKind.palisade] ?? 0);
+      _drawBuildingLabel(canvas, topGate, s, BuildingKind.palisade.label, workers: workers[BuildingKind.palisade] ?? 0);
     } else {
       canvas.drawRRect(
         RRect.fromRectAndRadius(wallRect, Radius.circular(_VillageLayout.cornerRadius * s)),
@@ -998,7 +1038,14 @@ class _VillagePainter extends CustomPainter {
           ..style = PaintingStyle.stroke
           ..strokeWidth = 3 * s,
       );
-      _drawEmptyPlot(canvas, layout.topGate, s, highlighted: true, sizeFactor: 0.8, label: 'Zbuduj Palisadę');
+      _drawEmptyPlot(
+        canvas,
+        layout.topGate,
+        s,
+        highlighted: true,
+        sizeFactor: 0.8,
+        label: AppLocale.instance.isEnglish ? 'Build the Palisade' : 'Zbuduj Palisadę',
+      );
     }
 
     // ---- standardowe działki (przy końcach odgałęzień ścieżki) ----
@@ -1048,12 +1095,12 @@ class _VillagePainter extends CustomPainter {
         final decrepitImage = decrepit ? _DecrepitHouseImageCache.image : null;
         if (decrepitImage != null) {
           _drawBuildingImage(canvas, decrepitImage, pos, s, sizeFactor: 0.75);
-          _drawBuildingLabel(canvas, pos, s, 'Dom', sizeFactor: 0.75);
+          _drawBuildingLabel(canvas, pos, s, BuildingKind.dom.label, sizeFactor: 0.75);
         } else {
           _drawBuiltBuilding(canvas, pos, s, BuildingKind.dom, sizeFactor: 0.75);
         }
       } else {
-        _drawEmptyPlot(canvas, pos, s, sizeFactor: 0.55, label: 'Dom');
+        _drawEmptyPlot(canvas, pos, s, sizeFactor: 0.55, label: BuildingKind.dom.label);
       }
     }
 
@@ -1067,7 +1114,7 @@ class _VillagePainter extends CustomPainter {
       } else {
         _drawRatusz(canvas, layout.ratuszCenter, s);
       }
-      _drawBuildingLabel(canvas, layout.ratuszCenter, s, 'Ratusz', workers: workers[BuildingKind.ratusz] ?? 0);
+      _drawBuildingLabel(canvas, layout.ratuszCenter, s, BuildingKind.ratusz.label, workers: workers[BuildingKind.ratusz] ?? 0);
     } else {
       // Zanim Ratusz zostanie zbudowany, na jego miejscu stoi zwyczajny,
       // odziedziczony dom - nic nie daje, ale to na tej samej działce gracz
@@ -1079,7 +1126,7 @@ class _VillagePainter extends CustomPainter {
         s,
         BuildingKind.dom,
         sizeFactor: 0.9,
-        labelOverride: 'Ratusz',
+        labelOverride: BuildingKind.ratusz.label,
       );
     }
   }

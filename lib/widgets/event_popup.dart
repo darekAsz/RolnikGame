@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/gen/app_localizations.dart';
+
 /// Pokazuje komunikat wioski jako małe, samodzielne okienko u góry ekranu.
 /// W odróżnieniu od zwykłego SnackBara nie znika samo - trzeba je zamknąć
 /// krzyżykiem. Kolejne komunikaty (np. cała seria z jednego przejścia
@@ -132,7 +134,7 @@ class _EventPopupCard extends StatelessWidget {
                         onPressed: queue.close,
                         icon: const Icon(Icons.close, size: 18),
                         visualDensity: VisualDensity.compact,
-                        tooltip: 'Zamknij',
+                        tooltip: AppLocalizations.of(context)!.commonClose,
                       ),
                     ],
                   ),

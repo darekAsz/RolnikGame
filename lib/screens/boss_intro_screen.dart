@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/gen/app_localizations.dart';
+
 /// Plansza ostrzegawcza pokazywana tuż przed każdym starciem z bossem,
 /// zaraz po WeekTransitionScreen - zamiast wchodzić w walkę bez zapowiedzi,
 /// gracz najpierw widzi krótki komunikat "coś/ktoś się zbliża, przygotuj
@@ -24,6 +26,7 @@ class BossIntroScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: const Color(0xFF1A1410),
       body: Stack(
@@ -55,7 +58,7 @@ class BossIntroScreen extends StatelessWidget {
                       const SizedBox(height: 20),
                     ],
                     Text(
-                      'Tydzień $week',
+                      l10n.bossIntroWeekLabel(week),
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.white70),
                     ),
                     const SizedBox(height: 8),
@@ -76,9 +79,9 @@ class BossIntroScreen extends StatelessWidget {
                     const SizedBox(height: 32),
                     FilledButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-                        child: Text('Przygotuj się do walki'),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                        child: Text(l10n.bossIntroPrepareButton),
                       ),
                     ),
                   ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/gen/app_localizations.dart';
 import '../models/resource_type.dart';
 import '../widgets/resource_icon.dart';
 
@@ -35,6 +36,7 @@ class ShopView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final totalMoves = baseMoves + extraMoves;
     final atMax = totalMoves >= maxTotalMoves;
     final canAfford = !atMax && goldAvailable >= nextCost;
@@ -43,10 +45,10 @@ class ShopView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Sklep', style: Theme.of(context).textTheme.titleLarge),
+          Text(l10n.shopTitle, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 4),
           Text(
-            'Wydaj złoto, żeby na stałe zwiększyć liczbę ruchów na planszy zbiorów.',
+            l10n.shopSubtitle,
             style: Theme.of(context).textTheme.bodySmall,
           ),
           const SizedBox(height: 16),
@@ -65,14 +67,14 @@ class ShopView extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Ruchy na tydzień', style: Theme.of(context).textTheme.labelMedium),
+                      Text(l10n.shopMovesPerWeekLabel, style: Theme.of(context).textTheme.labelMedium),
                       Text(
                         '$totalMoves / $maxTotalMoves',
                         style: Theme.of(context).textTheme.headlineSmall
                             ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        'Baza $baseMoves + dokupione $extraMoves',
+                        l10n.shopMovesBreakdown(baseMoves, extraMoves),
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ],
@@ -102,22 +104,22 @@ class ShopView extends StatelessWidget {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        '+1 ruch na tydzień (na stałe)',
+                        l10n.shopBuyMoveTitle,
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 10),
-                Text('Masz: $goldAvailable złota'),
+                Text(l10n.shopGoldAvailable(goldAvailable)),
                 if (atMax)
-                  const Text(
-                    'Osiągnięto maksymalną liczbę ruchów.',
-                    style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFC0392B)),
+                  Text(
+                    l10n.shopMaxMovesReached,
+                    style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFC0392B)),
                   )
                 else
                   Text(
-                    'Koszt: $nextCost złota',
+                    l10n.shopCost(nextCost),
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: canAfford ? const Color(0xFF2F9E57) : const Color(0xFFC0392B),
@@ -128,7 +130,7 @@ class ShopView extends StatelessWidget {
                   width: double.infinity,
                   child: FilledButton(
                     onPressed: canAfford ? onBuy : null,
-                    child: const Text('Kup'),
+                    child: Text(l10n.shopBuyButton),
                   ),
                 ),
               ],
@@ -137,11 +139,8 @@ class ShopView extends StatelessWidget {
           const SizedBox(height: 16),
           _AutoMatchTierCard(
             icon: Icons.auto_awesome,
-            title: 'Automatyczne usuwanie czwórek',
-            description: 'Domyślnie kafelki ułożone w ciąg zostają na planszy, dopóki '
-                'nie zbierzesz ich ręcznie. To ulepszenie sprawia, że ciągi 4+ znikają '
-                'automatycznie. Nie działa w starciach z bossami - tam liczenie zawsze '
-                'zostaje ręczne.',
+            title: l10n.shopAutoMatchTier1Title,
+            description: l10n.shopAutoMatchTier1Description,
             unlocked: autoMatchTier >= 1,
             locked: false,
             lockedText: null,
@@ -152,13 +151,11 @@ class ShopView extends StatelessWidget {
           const SizedBox(height: 16),
           _AutoMatchTierCard(
             icon: Icons.auto_awesome_motion,
-            title: 'Ulepszenie: automatyczne usuwanie trójek',
-            description: 'Kolejny stopień - po tym ulepszeniu automatycznie znikają '
-                'też ciągi złożone tylko z 3 kafelków. Tak samo jak poprzedni stopień, '
-                'nie działa w starciach z bossami.',
+            title: l10n.shopAutoMatchTier2Title,
+            description: l10n.shopAutoMatchTier2Description,
             unlocked: autoMatchTier >= 2,
             locked: autoMatchTier < 1,
-            lockedText: 'Wymaga: automatyczne usuwanie czwórek',
+            lockedText: l10n.shopAutoMatchTier2LockedRequirement,
             goldAvailable: goldAvailable,
             cost: autoMatchTier2Cost,
             onBuy: onBuyAutoMatchTier2,
@@ -197,6 +194,7 @@ class _AutoMatchTierCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final canAfford = !locked && !unlocked && goldAvailable >= cost;
     return Opacity(
       opacity: locked ? 0.6 : 1,
@@ -227,9 +225,9 @@ class _AutoMatchTierCard extends StatelessWidget {
             Text(description, style: Theme.of(context).textTheme.bodySmall),
             const SizedBox(height: 10),
             if (unlocked)
-              const Text(
-                'Odblokowane',
-                style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2F9E57)),
+              Text(
+                l10n.shopUnlockedLabel,
+                style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2F9E57)),
               )
             else if (locked)
               Text(
@@ -237,9 +235,9 @@ class _AutoMatchTierCard extends StatelessWidget {
                 style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFC0392B)),
               )
             else ...[
-              Text('Masz: $goldAvailable złota'),
+              Text(l10n.shopGoldAvailable(goldAvailable)),
               Text(
-                'Koszt: $cost złota',
+                l10n.shopCost(cost),
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: canAfford ? const Color(0xFF2F9E57) : const Color(0xFFC0392B),
@@ -250,7 +248,7 @@ class _AutoMatchTierCard extends StatelessWidget {
                 width: double.infinity,
                 child: FilledButton(
                   onPressed: canAfford ? onBuy : null,
-                  child: const Text('Kup'),
+                  child: Text(l10n.shopBuyButton),
                 ),
               ),
             ],

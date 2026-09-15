@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/gen/app_localizations.dart';
 import '../models/area_kind.dart';
 import '../models/resource_type.dart';
 import '../widgets/resource_icon.dart';
@@ -44,15 +45,16 @@ class SurroundingsView extends StatelessWidget {
     // jak w Surowcach/Statystykach - zamiast dzielić go na osobny, "sztywny"
     // nagłówek i osobno przewijaną listę kart: to drugie podejście na części
     // urządzeń potrafiło powodować nachodzenie przewijanej karty na nagłówek.
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Okolice wioski', style: Theme.of(context).textTheme.titleLarge),
+          Text(l10n.surroundingsTitle, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 4),
           Text(
-            'Ścieżka rozwoju: każdy kolejny etap wymaga ukończenia poprzedniego.',
+            l10n.surroundingsSubtitle,
             style: Theme.of(context).textTheme.bodySmall,
           ),
           const SizedBox(height: 14),
@@ -101,6 +103,7 @@ class _AreaCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final resource = area.resourceType;
     final baseColor = area.terrainColor;
     final topColor = locked ? Color.lerp(baseColor, Colors.black, 0.55)! : baseColor;
@@ -120,14 +123,14 @@ class _AreaCard extends StatelessWidget {
                 : const Icon(Icons.arrow_circle_up, color: Colors.white);
 
     final subtitle = locked
-        ? 'Wymaga: ${area.prerequisite!.label}'
+        ? l10n.surroundingsRequiresLabel(area.prerequisite!.label)
         : !built
             ? (area.isStarterResource
-                ? '+1 do ścieżki ${resource.label.toLowerCase()}'
-                : 'Odblokuj ${resource.label.toLowerCase()}')
+                ? l10n.surroundingsPathBonus(resource.label.toLowerCase())
+                : l10n.surroundingsUnlockResource(resource.label.toLowerCase()))
             : upgraded
-                ? 'Poziom 2/2 - surowiec tygodnia'
-                : 'Poziom 1/2 - można rozbudować';
+                ? l10n.surroundingsLevelMaxLabel
+                : l10n.surroundingsLevelUpgradableLabel;
 
     return InkWell(
       onTap: onTap,

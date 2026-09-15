@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/gen/app_localizations.dart';
 import '../models/goal_requirement.dart';
 import '../models/side_quest.dart';
 import '../models/story_act.dart';
@@ -37,26 +38,29 @@ class GoalsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final act = storyActForWeek(week);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Cele', style: Theme.of(context).textTheme.titleLarge),
+          Text(l10n.goalsTitle, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 4),
           Text(
-            act == null ? 'Tydzień $week' : 'Tydzień $week — Akt ${act.actNumber}: ${act.actName}',
+            act == null
+                ? l10n.goalsWeekOnly(week)
+                : l10n.goalsWeekAct(week, act.actNumber, act.localizedActName),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
           ),
           const SizedBox(height: 16),
           if (act == null)
-            const Expanded(
+            Expanded(
               child: Center(
                 child: Text(
-                  'Historia dobiegła końca. Wioska żyje dalej własnym tempem.',
+                  l10n.goalsStoryOver,
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -67,7 +71,7 @@ class GoalsView extends StatelessWidget {
                 children: [
                   _GoalCard(
                     icon: Icons.flag,
-                    label: 'Cel główny',
+                    label: l10n.goalsMainGoal,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -76,7 +80,7 @@ class GoalsView extends StatelessWidget {
                         // w tygodniu 7, gracz nadal ma widzieć etap "naucz
                         // się gospodarki" obok nowego "zorganizuj pogrzeb",
                         // bo oba są nadal wymagane razem na koniec aktu.
-                        for (final milestone in act.milestones.where((m) => m.fromWeek <= week))
+                        for (final milestone in act.localizedMilestones.where((m) => m.fromWeek <= week))
                           Padding(
                             padding: const EdgeInsets.only(bottom: 10),
                             child: Column(
@@ -95,7 +99,7 @@ class GoalsView extends StatelessWidget {
                           ),
                         if (goalRequirements != null) ...[
                           const SizedBox(height: 4),
-                          Text('Warunki', style: Theme.of(context).textTheme.labelLarge),
+                          Text(l10n.goalsRequirements, style: Theme.of(context).textTheme.labelLarge),
                           const SizedBox(height: 6),
                           for (final req in goalRequirements!(act.actNumber))
                             _RequirementRow(requirement: req),
@@ -110,7 +114,7 @@ class GoalsView extends StatelessWidget {
                   const SizedBox(height: 12),
                   _GoalCard(
                     icon: Icons.checklist,
-                    label: 'Questy poboczne',
+                    label: l10n.goalsSideQuests,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -127,14 +131,14 @@ class GoalsView extends StatelessWidget {
                   const SizedBox(height: 12),
                   _GoalCard(
                     icon: Icons.menu_book,
-                    label: 'Kontekst fabularny',
-                    child: Text(act.context),
+                    label: l10n.goalsStoryContext,
+                    child: Text(act.localizedContext),
                   ),
                   if (resolvedActs.isNotEmpty) ...[
                     const SizedBox(height: 12),
                     _GoalCard(
                       icon: Icons.military_tech,
-                      label: 'Ukończone cele',
+                      label: l10n.goalsCompletedGoals,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -210,6 +214,7 @@ class _ResolvedActRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     const color = Color(0xFF2F9E57);
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -220,7 +225,7 @@ class _ResolvedActRow extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Akt ${act.actNumber}: ${act.actName}',
+              l10n.goalsResolvedActLabel(act.actNumber, act.localizedActName),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: color,
@@ -242,6 +247,7 @@ class _SideQuestRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     final color = claimed ? const Color(0xFF2F9E57) : scheme.onSurfaceVariant;
     return Padding(
@@ -260,14 +266,14 @@ class _SideQuestRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${quest.title} (+${quest.xpReward} XP)',
+                  l10n.goalsQuestXp(quest.localizedTitle, quest.xpReward),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: color,
                         decoration: claimed ? TextDecoration.lineThrough : null,
                       ),
                 ),
-                Text(quest.description, style: Theme.of(context).textTheme.bodySmall),
+                Text(quest.localizedDescription, style: Theme.of(context).textTheme.bodySmall),
                 if (progress != null) ...[
                   const SizedBox(height: 2),
                   Text(
@@ -296,6 +302,7 @@ class _GoalStatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final color = met ? const Color(0xFF2F9E57) : const Color(0xFFC0392B);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -312,7 +319,7 @@ class _GoalStatusChip extends StatelessWidget {
               Icon(met ? Icons.check_circle : Icons.error_outline, size: 16, color: color),
               const SizedBox(width: 6),
               Text(
-                met ? 'Warunki spełnione już teraz' : 'Warunki jeszcze niespełnione',
+                met ? l10n.goalsRequirementsMet : l10n.goalsRequirementsNotMet,
                 style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12),
               ),
             ],
@@ -325,7 +332,7 @@ class _GoalStatusChip extends StatelessWidget {
         // samej Palisady, która tylko ułatwia starcie, a nie jest sama w
         // sobie warunkiem) zamiast całego, ostatecznego wymagania aktu.
         Text(
-          'Powyższe warunki decydują o wyniku dopiero na koniec aktu (tydzień $endWeek).',
+          l10n.goalsDecidedAtEnd(endWeek),
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontStyle: FontStyle.italic,

@@ -1,3 +1,6 @@
+import '../services/app_locale.dart';
+import 'side_quest_translations_en.dart';
+
 /// Questy poboczne - opcjonalne, sprawdzane co tydzień względem realnego
 /// stanu gry (budynki, odkrycia, statystyki, wyniki starć z bossami). Na
 /// razie dają wyłącznie punkty doświadczenia (patrz HomeShell._sideQuestMet/
@@ -30,6 +33,14 @@ class SideQuest {
     required this.description,
     required this.xpReward,
   });
+}
+
+extension SideQuestLocalization on SideQuest {
+  String get localizedTitle =>
+      AppLocale.instance.isEnglish ? (kSideQuestsEn[id]?.title ?? title) : title;
+
+  String get localizedDescription =>
+      AppLocale.instance.isEnglish ? (kSideQuestsEn[id]?.description ?? description) : description;
 }
 
 const List<SideQuest> kSideQuests = [

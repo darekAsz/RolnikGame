@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/gen/app_localizations.dart';
 import '../models/resource_type.dart';
 import '../models/season.dart';
 import '../services/board_style_storage.dart';
@@ -95,46 +96,44 @@ class _HarvestScreenState extends State<HarvestScreen> {
     });
   }
 
-  static const _tutorialSteps = [
-    (
-      Icons.touch_app,
-      'Łącz kulki',
-      'Przeciągnij palcem po sąsiadujących kulkach tego samego surowca '
-          '(również po skosie) i puść, żeby je zebrać. Im dłuższa ścieżka, tym więcej dostajesz.',
-    ),
-    (
-      Icons.style,
-      'Dziki joker',
-      'Ścieżka z 5+ kulek zamienia jedną z nowych kulek w jokera - łączy się '
-          'z każdym surowcem i mnoży zbiory.',
-    ),
-    (
-      Icons.whatshot,
-      'Bomba',
-      'Ścieżka z 6+ kulek zamienia jedną z nowych kulek w bombę - włączona do '
-          'kolejnej ścieżki niszczy wszystkie sąsiednie kafelki.',
-    ),
-    (
-      Icons.repeat,
-      'Ruchy się kończą',
-      'Każde przeciągnięcie to jeden ruch - licznik na górze pokazuje, ile zostało. '
-          'Gdy się skończą, runda zbiorów dobiega końca.',
-    ),
-  ];
+  List<(IconData, String, String)> _tutorialSteps(AppLocalizations l10n) => [
+        (
+          Icons.touch_app,
+          l10n.harvestScreenTutorialStep1Title,
+          l10n.harvestScreenTutorialStep1Description,
+        ),
+        (
+          Icons.style,
+          l10n.harvestScreenTutorialStep2Title,
+          l10n.harvestScreenTutorialStep2Description,
+        ),
+        (
+          Icons.whatshot,
+          l10n.harvestScreenTutorialStep3Title,
+          l10n.harvestScreenTutorialStep3Description,
+        ),
+        (
+          Icons.repeat,
+          l10n.harvestScreenTutorialStep4Title,
+          l10n.harvestScreenTutorialStep4Description,
+        ),
+      ];
 
   void _showTutorialDialog() {
+    final l10n = AppLocalizations.of(context)!;
+    final tutorialSteps = _tutorialSteps(l10n);
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Jak zbierać surowce'),
+        title: Text(l10n.harvestScreenTutorialDialogTitle),
         content: SizedBox(
           width: 360,
           child: ListView.separated(
             shrinkWrap: true,
-            itemCount: _tutorialSteps.length,
+            itemCount: tutorialSteps.length,
             separatorBuilder: (context, index) => const SizedBox(height: 16),
             itemBuilder: (context, index) {
-              final (icon, title, description) = _tutorialSteps[index];
+              final (icon, title, description) = tutorialSteps[index];
               return Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -161,7 +160,7 @@ class _HarvestScreenState extends State<HarvestScreen> {
         actions: [
           FilledButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Rozumiem'),
+            child: Text(l10n.harvestScreenTutorialGotItButton),
           ),
         ],
       ),
@@ -219,6 +218,7 @@ class _HarvestScreenState extends State<HarvestScreen> {
   }
 
   void _showRoundResult() {
+    final l10n = AppLocalizations.of(context)!;
     final collectedTypes = [
       for (final type in ResourceType.values)
         if ((_roundCollected[type] ?? 0) > 0) type,
@@ -227,15 +227,15 @@ class _HarvestScreenState extends State<HarvestScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Text('⏳ Koniec ruchów'),
+        title: Text(l10n.harvestScreenRoundEndTitle),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Zebrane surowce w tym tygodniu:'),
+            Text(l10n.harvestScreenRoundEndCollectedLabel),
             const SizedBox(height: 4),
             if (collectedTypes.isEmpty)
-              const Text('Nic nie zebrano.')
+              Text(l10n.harvestScreenRoundEndNothingCollected)
             else
               for (final type in collectedTypes)
                 Text('${type.label}: +${_roundCollected[type]}'),
@@ -250,14 +250,14 @@ class _HarvestScreenState extends State<HarvestScreen> {
               Navigator.of(context).pop();
               Navigator.of(context).pop(true);
             },
-            child: const Text('Zagraj tydzień ponownie'),
+            child: Text(l10n.harvestScreenRoundEndReplayButton),
           ),
           FilledButton(
             onPressed: () {
               Navigator.of(context).pop();
               Navigator.of(context).pop(false);
             },
-            child: const Text('Wróć do wioski'),
+            child: Text(l10n.harvestScreenRoundEndReturnButton),
           ),
         ],
       ),
@@ -265,17 +265,16 @@ class _HarvestScreenState extends State<HarvestScreen> {
   }
 
   void _confirmManualShuffle() {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Przetasować planszę?'),
-        content: const Text(
-          'Wszystkie kafelki na planszy zostaną losowo przemieszane. Koszt: 1 ruch.',
-        ),
+        title: Text(l10n.harvestScreenShuffleConfirmTitle),
+        content: Text(l10n.harvestScreenShuffleConfirmContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Anuluj'),
+            child: Text(l10n.harvestScreenShuffleCancelButton),
           ),
           FilledButton(
             onPressed: () {
@@ -283,7 +282,7 @@ class _HarvestScreenState extends State<HarvestScreen> {
               _gridKey.currentState?.shuffleNow();
               _useMove();
             },
-            child: const Text('Przetasuj (−1 ruch)'),
+            child: Text(l10n.harvestScreenShuffleConfirmButton),
           ),
         ],
       ),
@@ -291,21 +290,20 @@ class _HarvestScreenState extends State<HarvestScreen> {
   }
 
   Future<void> _confirmGiveUpWeek() async {
+    final l10n = AppLocalizations.of(context)!;
     final giveUp = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Odpuścić ten tydzień zbiorów?'),
-        content: const Text(
-          'Wrócisz do wioski, a bieżące zbiory w tym tygodniu zostaną przerwane.',
-        ),
+        title: Text(l10n.harvestScreenGiveUpTitle),
+        content: Text(l10n.harvestScreenGiveUpContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Zostań'),
+            child: Text(l10n.harvestScreenGiveUpStayButton),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Odpuść tydzień'),
+            child: Text(l10n.harvestScreenGiveUpConfirmButton),
           ),
         ],
       ),
@@ -321,6 +319,7 @@ class _HarvestScreenState extends State<HarvestScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
+    final l10n = AppLocalizations.of(context)!;
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
@@ -333,7 +332,7 @@ class _HarvestScreenState extends State<HarvestScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Zbiory — Tydzień ${widget.week}'),
+              Text(l10n.harvestScreenAppBarTitle(widget.week)),
               Text(
                 '${_season.emoji} ${_season.label} — ${_season.description}',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -347,11 +346,11 @@ class _HarvestScreenState extends State<HarvestScreen> {
             IconButton(
               onPressed: _movesLeft > 0 ? _confirmManualShuffle : null,
               icon: const Icon(Icons.shuffle),
-              tooltip: 'Przetasuj planszę (−1 ruch)',
+              tooltip: l10n.harvestScreenShuffleTooltip,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Center(child: Text('Ruchy: $_movesLeft')),
+              child: Center(child: Text(l10n.harvestScreenMovesLabel(_movesLeft))),
             ),
           ],
         ),

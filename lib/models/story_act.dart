@@ -1,3 +1,6 @@
+import '../services/app_locale.dart';
+import 'story_act_translations_en.dart';
+
 // Fabularna oś gry - 6 aktów rozłożonych na 65 tygodni (5 pór roku po 13
 // tygodni, druga wiosna podzielona między Akt IV i Akt V). Dane treściowe
 // pochodzą z dokumentu fabuły ("Dług Kruka") - patrz zakładka Cele.
@@ -51,6 +54,34 @@ class StoryAct {
       }
     }
     return current;
+  }
+}
+
+extension StoryActLocalization on StoryAct {
+  String get localizedActName =>
+      AppLocale.instance.isEnglish ? (kStoryActsEn[actNumber]?.actName ?? actName) : actName;
+
+  String get localizedContext =>
+      AppLocale.instance.isEnglish ? (kStoryActsEn[actNumber]?.context ?? context) : context;
+
+  /// Odpowiednik `milestones`, ale z przetłumaczonym `goal`/`flavor` na każdym
+  /// elemencie - `fromWeek` (dane niezależne od języka) zostaje bez zmian.
+  /// Dopasowuje tłumaczenia po pozycji na liście (patrz
+  /// `StoryActTranslation.milestones` w `story_act_translations_en.dart`).
+  /// Spada na oryginał w całości, jeśli liczba przetłumaczonych kamieni
+  /// milowych się nie zgadza.
+  List<StoryMilestone> get localizedMilestones {
+    if (!AppLocale.instance.isEnglish) return milestones;
+    final translated = kStoryActsEn[actNumber]?.milestones;
+    if (translated == null || translated.length != milestones.length) return milestones;
+    return [
+      for (var i = 0; i < milestones.length; i++)
+        StoryMilestone(
+          fromWeek: milestones[i].fromWeek,
+          goal: translated[i].goal,
+          flavor: translated[i].flavor,
+        ),
+    ];
   }
 }
 

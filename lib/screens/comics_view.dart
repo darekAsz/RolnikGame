@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/gen/app_localizations.dart';
 import '../models/comic.dart';
 
 /// Zakładka "Komiksy" - lista odblokowanych (wg tygodnia) plansz fabularnych.
@@ -25,6 +26,7 @@ class ComicsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final unlocked = comicsUnlockedThroughWeek(week)
         .where((c) => !hiddenComicNumbers.contains(c.number))
         .toList();
@@ -35,10 +37,10 @@ class ComicsView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Komiksy', style: Theme.of(context).textTheme.titleLarge),
+          Text(l10n.comicsTitle, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 4),
           Text(
-            '${unlocked.length} z ${kComics.length} odblokowanych',
+            l10n.comicsUnlockedCount(unlocked.length, kComics.length),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
@@ -46,7 +48,7 @@ class ComicsView extends StatelessWidget {
           const SizedBox(height: 12),
           Expanded(
             child: unlocked.isEmpty
-                ? const Center(child: Text('Pierwszy komiks pojawi się już wkrótce.'))
+                ? Center(child: Text(l10n.comicsNoneYet))
                 : ListView.separated(
                     itemCount: unlocked.length,
                     separatorBuilder: (_, _) => const SizedBox(height: 10),
@@ -70,7 +72,7 @@ class ComicsView extends StatelessWidget {
           if (nextLocked != null) ...[
             const SizedBox(height: 8),
             Text(
-              'Kolejny komiks odblokuje się w tygodniu ${nextLocked.week}.',
+              l10n.comicsNextUnlocks(nextLocked.week),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                     fontStyle: FontStyle.italic,
@@ -96,6 +98,7 @@ class _ComicListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     return Material(
       color: scheme.surfaceContainerHighest,
@@ -117,10 +120,10 @@ class _ComicListTile extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(comic.title, style: Theme.of(context).textTheme.titleMedium),
+                    Text(comic.localizedTitle, style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 2),
                     Text(
-                      'Tydzień ${comic.week} · Akt ${comic.actNumber}',
+                      l10n.comicsWeekActLabel(comic.week, comic.actNumber),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: scheme.onSurfaceVariant,
                           ),
@@ -136,7 +139,7 @@ class _ComicListTile extends StatelessWidget {
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: Text(
-                    'NOWY',
+                    l10n.comicsNewBadge,
                     style: TextStyle(
                       color: scheme.onError,
                       fontSize: 11,
@@ -175,13 +178,15 @@ class _ComicReaderScreenState extends State<ComicReaderScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final comic = widget.comic;
+    final panels = comic.localizedPanels;
     // Strona 0 to plansza tytułowa (Akt / pora roku / tydzień), potem kolejno
     // wszystkie kadry komiksu - stąd +1 wszędzie, gdzie liczymy strony.
-    final pageCount = comic.panels.length + 1;
+    final pageCount = panels.length + 1;
     return Scaffold(
       appBar: AppBar(
-        title: Text('#${comic.number} ${comic.title}'),
+        title: Text('#${comic.number} ${comic.localizedTitle}'),
       ),
       body: Column(
         children: [
@@ -193,10 +198,10 @@ class _ComicReaderScreenState extends State<ComicReaderScreen> {
               itemBuilder: (context, index) {
                 if (index == 0) return _ActIntroTile(comic: comic);
                 return _PanelTile(
-                  panel: comic.panels[index - 1],
+                  panel: panels[index - 1],
                   comicNumber: comic.number,
                   panelNumber: index,
-                  panelCount: comic.panels.length,
+                  panelCount: panels.length,
                 );
               },
             ),
@@ -239,7 +244,7 @@ class _ComicReaderScreenState extends State<ComicReaderScreen> {
                 },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: Text(_page == pageCount - 1 ? 'OK' : 'Dalej'),
+                  child: Text(_page == pageCount - 1 ? 'OK' : l10n.comicsNext),
                 ),
               ),
             ),
@@ -259,6 +264,7 @@ class _ActIntroTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     final actInfo = kComicActInfo[comic.actNumber];
     return Padding(
@@ -289,13 +295,13 @@ class _ActIntroTile extends StatelessWidget {
               const SizedBox(height: 28),
             ],
             Text(
-              'Tydzień ${comic.week}',
+              l10n.comicsWeekLabel(comic.week),
               style: Theme.of(context).textTheme.titleLarge,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
             Text(
-              comic.title,
+              comic.localizedTitle,
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontStyle: FontStyle.italic),
               textAlign: TextAlign.center,
             ),
@@ -321,6 +327,7 @@ class _PanelTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     final imagePath = 'assets/comics/${comicNumber}_$panelNumber.webp';
     return Padding(
@@ -329,7 +336,7 @@ class _PanelTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Kadr $panelNumber / $panelCount',
+            l10n.comicsPanelLabel(panelNumber, panelCount),
             style: Theme.of(context).textTheme.labelLarge?.copyWith(color: scheme.onSurfaceVariant),
           ),
           const SizedBox(height: 12),

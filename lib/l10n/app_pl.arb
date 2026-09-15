@@ -1,0 +1,994 @@
+{
+  "@@locale": "pl",
+  "appTitle": "Rolnik: Dług Kruka",
+  "@appTitle": {
+    "description": "Nazwa aplikacji (tytuł okna/menedżera zadań)."
+  },
+
+  "commonClose": "Zamknij",
+
+  "statsTitle": "Statystyki",
+  "statsXpLabel": "Doświadczenie",
+  "statsXpValue": "{xp} XP",
+  "@statsXpValue": {
+    "placeholders": {
+      "xp": {"type": "int"}
+    }
+  },
+  "statsTotalCollectedLabel": "Łącznie zebrane surowce",
+  "statsLongestPathLabel": "Najdłuższa ścieżka",
+  "statsLongestPathValue": "{count} kafelków",
+  "@statsLongestPathValue": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "statsMaxSingleHarvestLabel": "Najwięcej zebrane naraz",
+  "statsPopulationLabel": "Populacja",
+  "statsPopulationDescription": "Ogranicza, ilu mieszkańców można zwerbować jako żołnierzy albo przydzielić jako pracowników do budynków.",
+  "statsMoraleLabel": "Morale wioski",
+  "statsMoraleDescription": "Im wyższe, tym więcej pozytywnych (a mniej negatywnych) wydarzeń tygodniowych. Wysokie morale ułatwia też niektóre walki z bossami.",
+  "statsSecurityLabel": "Bezpieczeństwo wioski",
+  "statsSecurityDescription": "Podnosi PŻ Wioski w finałowym starciu (do +40) i ułatwia niektóre walki z bossami.",
+  "statsSoldiersLabel": "Żołnierze (siła armii)",
+  "statsSoldiersDescription": "Liczba żołnierzy i siła armii (uwzględnia bonus Koszar poziom 2) ułatwiają niektóre walki z bossami.",
+  "statsComicsLabel": "Komiksy",
+  "statsComicsUnread": "{count} nieprzeczytanych",
+  "@statsComicsUnread": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "statsComicsAllRead": "Wszystko przeczytane",
+  "statsBoardStyleLabel": "Wygląd planszy",
+  "statsBoardStyleNew": "Nowy",
+  "statsBoardStyleOld": "Starszy",
+  "statsIconStyleLabel": "Wygląd ikon surowców",
+  "statsIconStyleNew": "Nowe",
+  "statsIconStyleMid": "Pośrednie",
+  "statsIconStyleOld": "Starsze",
+  "statsLanguageLabel": "Język",
+  "statsLanguagePolish": "Polski",
+  "statsLanguageEnglish": "English",
+
+  "comicsTitle": "Komiksy",
+  "comicsUnlockedCount": "{unlocked} z {total} odblokowanych",
+  "@comicsUnlockedCount": {
+    "placeholders": {
+      "unlocked": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "comicsNoneYet": "Pierwszy komiks pojawi się już wkrótce.",
+  "comicsNextUnlocks": "Kolejny komiks odblokuje się w tygodniu {week}.",
+  "@comicsNextUnlocks": {
+    "placeholders": {
+      "week": {"type": "int"}
+    }
+  },
+  "comicsWeekActLabel": "Tydzień {week} · Akt {act}",
+  "@comicsWeekActLabel": {
+    "placeholders": {
+      "week": {"type": "int"},
+      "act": {"type": "int"}
+    }
+  },
+  "comicsNewBadge": "NOWY",
+  "comicsWeekLabel": "Tydzień {week}",
+  "@comicsWeekLabel": {
+    "placeholders": {
+      "week": {"type": "int"}
+    }
+  },
+  "comicsPanelLabel": "Kadr {panel} / {count}",
+  "@comicsPanelLabel": {
+    "placeholders": {
+      "panel": {"type": "int"},
+      "count": {"type": "int"}
+    }
+  },
+  "comicsNext": "Dalej",
+
+  "goalsTitle": "Cele",
+  "goalsWeekOnly": "Tydzień {week}",
+  "@goalsWeekOnly": {
+    "placeholders": {
+      "week": {"type": "int"}
+    }
+  },
+  "goalsWeekAct": "Tydzień {week} — Akt {act}: {actName}",
+  "@goalsWeekAct": {
+    "placeholders": {
+      "week": {"type": "int"},
+      "act": {"type": "int"},
+      "actName": {"type": "String"}
+    }
+  },
+  "goalsStoryOver": "Historia dobiegła końca. Wioska żyje dalej własnym tempem.",
+  "goalsMainGoal": "Cel główny",
+  "goalsRequirements": "Warunki",
+  "goalsSideQuests": "Questy poboczne",
+  "goalsStoryContext": "Kontekst fabularny",
+  "goalsCompletedGoals": "Ukończone cele",
+  "goalsResolvedActLabel": "Akt {act}: {name}",
+  "@goalsResolvedActLabel": {
+    "placeholders": {
+      "act": {"type": "int"},
+      "name": {"type": "String"}
+    }
+  },
+  "goalsRequirementsMet": "Warunki spełnione już teraz",
+  "goalsRequirementsNotMet": "Warunki jeszcze niespełnione",
+  "goalsDecidedAtEnd": "Powyższe warunki decydują o wyniku dopiero na koniec aktu (tydzień {endWeek}).",
+  "@goalsDecidedAtEnd": {
+    "placeholders": {
+      "endWeek": {"type": "int"}
+    }
+  },
+  "goalsQuestXp": "{title} (+{xp} XP)",
+  "@goalsQuestXp": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "xp": {"type": "int"}
+    }
+  },
+
+  "harvestGridNoMovesTitle": "Brak dostępnych ruchów",
+  "harvestGridNoMovesMessage": "Na planszy nie ma już żadnego możliwego połączenia. Możesz przetasować planszę (koszt: 1 ruch).",
+  "harvestGridCloseButton": "Zamknij",
+  "harvestGridReshuffleButton": "Przetasuj (−1 ruch)",
+
+  "harvestScreenTutorialStep1Title": "Łącz kulki",
+  "harvestScreenTutorialStep1Description": "Przeciągnij palcem po sąsiadujących kulkach tego samego surowca (również po skosie) i puść, żeby je zebrać. Im dłuższa ścieżka, tym więcej dostajesz.",
+  "harvestScreenTutorialStep2Title": "Dziki joker",
+  "harvestScreenTutorialStep2Description": "Ścieżka z 5+ kulek zamienia jedną z nowych kulek w jokera - łączy się z każdym surowcem i mnoży zbiory.",
+  "harvestScreenTutorialStep3Title": "Bomba",
+  "harvestScreenTutorialStep3Description": "Ścieżka z 6+ kulek zamienia jedną z nowych kulek w bombę - włączona do kolejnej ścieżki niszczy wszystkie sąsiednie kafelki.",
+  "harvestScreenTutorialStep4Title": "Ruchy się kończą",
+  "harvestScreenTutorialStep4Description": "Każde przeciągnięcie to jeden ruch - licznik na górze pokazuje, ile zostało. Gdy się skończą, runda zbiorów dobiega końca.",
+  "harvestScreenTutorialDialogTitle": "Jak zbierać surowce",
+  "harvestScreenTutorialGotItButton": "Rozumiem",
+  "harvestScreenRoundEndTitle": "⏳ Koniec ruchów",
+  "harvestScreenRoundEndCollectedLabel": "Zebrane surowce w tym tygodniu:",
+  "harvestScreenRoundEndNothingCollected": "Nic nie zebrano.",
+  "harvestScreenRoundEndReplayButton": "Zagraj tydzień ponownie",
+  "harvestScreenRoundEndReturnButton": "Wróć do wioski",
+  "harvestScreenShuffleConfirmTitle": "Przetasować planszę?",
+  "harvestScreenShuffleConfirmContent": "Wszystkie kafelki na planszy zostaną losowo przemieszane. Koszt: 1 ruch.",
+  "harvestScreenShuffleCancelButton": "Anuluj",
+  "harvestScreenShuffleConfirmButton": "Przetasuj (−1 ruch)",
+  "harvestScreenGiveUpTitle": "Odpuścić ten tydzień zbiorów?",
+  "harvestScreenGiveUpContent": "Wrócisz do wioski, a bieżące zbiory w tym tygodniu zostaną przerwane.",
+  "harvestScreenGiveUpStayButton": "Zostań",
+  "harvestScreenGiveUpConfirmButton": "Odpuść tydzień",
+  "harvestScreenAppBarTitle": "Zbiory — Tydzień {week}",
+  "@harvestScreenAppBarTitle": {
+    "placeholders": {"week": {"type": "int"}}
+  },
+  "harvestScreenShuffleTooltip": "Przetasuj planszę (−1 ruch)",
+  "harvestScreenMovesLabel": "Ruchy: {moves}",
+  "@harvestScreenMovesLabel": {
+    "placeholders": {"moves": {"type": "int"}}
+  },
+
+  "shopTitle": "Sklep",
+  "shopSubtitle": "Wydaj złoto, żeby na stałe zwiększyć liczbę ruchów na planszy zbiorów.",
+  "shopMovesPerWeekLabel": "Ruchy na tydzień",
+  "shopMovesBreakdown": "Baza {base} + dokupione {extra}",
+  "@shopMovesBreakdown": {
+    "placeholders": {"base": {"type": "int"}, "extra": {"type": "int"}}
+  },
+  "shopBuyMoveTitle": "+1 ruch na tydzień (na stałe)",
+  "shopGoldAvailable": "Masz: {gold} złota",
+  "@shopGoldAvailable": {
+    "placeholders": {"gold": {"type": "int"}}
+  },
+  "shopMaxMovesReached": "Osiągnięto maksymalną liczbę ruchów.",
+  "shopCost": "Koszt: {cost} złota",
+  "@shopCost": {
+    "placeholders": {"cost": {"type": "int"}}
+  },
+  "shopBuyButton": "Kup",
+  "shopAutoMatchTier1Title": "Automatyczne usuwanie czwórek",
+  "shopAutoMatchTier1Description": "Domyślnie kafelki ułożone w ciąg zostają na planszy, dopóki nie zbierzesz ich ręcznie. To ulepszenie sprawia, że ciągi 4+ znikają automatycznie. Nie działa w starciach z bossami - tam liczenie zawsze zostaje ręczne.",
+  "shopAutoMatchTier2Title": "Ulepszenie: automatyczne usuwanie trójek",
+  "shopAutoMatchTier2Description": "Kolejny stopień - po tym ulepszeniu automatycznie znikają też ciągi złożone tylko z 3 kafelków. Tak samo jak poprzedni stopień, nie działa w starciach z bossami.",
+  "shopAutoMatchTier2LockedRequirement": "Wymaga: automatyczne usuwanie czwórek",
+  "shopUnlockedLabel": "Odblokowane",
+
+  "resourcesViewLockedInfoContent": "{resource} nie zostało jeszcze odkryte. Dopóki nie odblokujesz go w Okolicach wioski, wszystkie premie do tego surowca (np. z Ratusza czy budynków produkcyjnych) nie będą działać.",
+  "@resourcesViewLockedInfoContent": {
+    "placeholders": {"resource": {"type": "String"}}
+  },
+  "resourcesViewGotItButton": "Rozumiem",
+  "resourcesViewTitle": "Surowce",
+  "resourcesViewMarketButton": "Rynek",
+  "resourcesViewStorageLimit": "Magazyn: limit {cap} każdego surowca.",
+  "@resourcesViewStorageLimit": {
+    "placeholders": {"cap": {"type": "int"}}
+  },
+  "resourcesViewProductionConsumptionTitle": "Produkcja i zużycie surowców (tygodniowo)",
+
+  "surroundingsTitle": "Okolice wioski",
+  "surroundingsSubtitle": "Ścieżka rozwoju: każdy kolejny etap wymaga ukończenia poprzedniego.",
+  "surroundingsRequiresLabel": "Wymaga: {prerequisite}",
+  "@surroundingsRequiresLabel": {
+    "placeholders": {"prerequisite": {"type": "String"}}
+  },
+  "surroundingsPathBonus": "+1 do ścieżki {resource}",
+  "@surroundingsPathBonus": {
+    "placeholders": {"resource": {"type": "String"}}
+  },
+  "surroundingsUnlockResource": "Odblokuj {resource}",
+  "@surroundingsUnlockResource": {
+    "placeholders": {"resource": {"type": "String"}}
+  },
+  "surroundingsLevelMaxLabel": "Poziom 2/2 - surowiec tygodnia",
+  "surroundingsLevelUpgradableLabel": "Poziom 1/2 - można rozbudować",
+
+  "resourceFlowEmptyState": "Brak zbudowanych źródeł produkcji ani zużycia.",
+  "resourceFlowNetPerWeek": "{net}/tydz.",
+  "@resourceFlowNetPerWeek": {
+    "placeholders": {"net": {"type": "String"}}
+  },
+
+  "splashNewGameDialogTitle": "Zacząć nową grę?",
+  "splashNewGameDialogContent": "To nadpisze i bezpowrotnie usunie obecny zapis gry. Jeśli chcesz kontynuować dotychczasową rozgrywkę, wybierz zamiast tego \"Kontynuuj\".",
+  "splashCancel": "Anuluj",
+  "splashOverwriteAndStart": "Nadpisz i zacznij od nowa",
+  "splashTitle": "Rolnik",
+  "splashSubtitle": "Dług Kruka",
+  "splashNewGame": "Nowa gra",
+  "splashContinue": "Kontynuuj",
+
+  "endingTitle": "Koniec Roku Pierwszego",
+  "endingContinue": "Kontynuuj",
+  "endingStatsCardTitle": "Rok Pierwszy w liczbach",
+  "endingStatPopulationLabel": "Populacja",
+  "endingStatPopulationValue": "{population} / {populationLimit}",
+  "@endingStatPopulationValue": {
+    "placeholders": {"population": {"type": "int"}, "populationLimit": {"type": "int"}}
+  },
+  "endingStatMoraleLabel": "Morale wioski",
+  "endingStatMoraleValue": "{value}%",
+  "@endingStatMoraleValue": {
+    "placeholders": {"value": {"type": "int"}}
+  },
+  "endingStatXpLabel": "Zdobyte doświadczenie",
+  "endingStatXpValue": "{xp} XP",
+  "@endingStatXpValue": {
+    "placeholders": {"xp": {"type": "int"}}
+  },
+  "endingStatGrotLabel": "Starcie z Grotem",
+  "endingStatGrotValue": "{cleared} / 3 etapów",
+  "@endingStatGrotValue": {
+    "placeholders": {"cleared": {"type": "int"}}
+  },
+  "endingStatSideQuestsLabel": "Questy poboczne",
+  "endingStatSideQuestsValue": "{claimed} / {total}",
+  "@endingStatSideQuestsValue": {
+    "placeholders": {"claimed": {"type": "int"}, "total": {"type": "int"}}
+  },
+  "endingStatHungerLabel": "Głód",
+  "endingStatHungerYes": "Wioska go zaznała",
+  "endingStatHungerNo": "Nigdy nie nawiedził wioski",
+  "endingTierGoldenLabel": "Złoty wiek",
+  "endingTierHardWonLabel": "Trudne zwycięstwo",
+  "endingTierScarredLabel": "Blizny, które zostają",
+  "endingTierGoldenEpilogue": "Wioska tętni życiem jak nigdy dotąd. Spichlerze pełne, mury mocne, a ludzie nie boją się już zmierzchu. Kazimierz spłacił dług, którego sam nie zaciągnął - i zrobił to z nawiązką, zamieniając brzemię dziadka w fundament czegoś trwałego. Marta zostaje - nie jako wróg, nie z konieczności, ale jako ktoś, kto wreszcie znalazł dom po drugiej stronie granicy, która przestała cokolwiek dzielić.",
+  "endingTierHardWonEpilogue": "Wioska przetrwała - poobijana, zmęczona, ale wciąż stoi. Nie wszystko poszło gładko: były noce niedostatku i starcia, których wynik ważył się na włosku. Ale dług został spłacony, a Marta i Jadwiga stoją dziś obok Kazimierza jako rodzina, którą sam sobie wybrał - nie tę, którą odziedziczył.",
+  "endingTierScarredEpilogue": "Zwycięstwo smakuje gorzko. Wioska stoi, dług spłacony, Leszy pokonany - ale cena była wysoka: głodne noce, puste spichlerze, sąsiedzi patrzący na Kazimierza inaczej niż kiedyś na Antoniego. Marta zostaje przy nim, a on sam zaczyna rozumieć, dlaczego dziadek dźwigał tę tajemnicę w milczeniu przez dwadzieścia lat - nie każde zwycięstwo da się świętować.",
+
+  "tutorialAppBarTitle": "Jak grać",
+  "tutorialStep1Title": "Łącz surowce",
+  "tutorialStep1Description": "Przeciągnij palcem po sąsiadujących kafelkach tego samego surowca (również po skosie), żeby je zebrać.",
+  "tutorialStep2Title": "Dziki joker",
+  "tutorialStep2Description": "Za dłuższą ścieżkę (5 i więcej kafelków) dostajesz jokera - łączy się z każdym surowcem i mnoży zbiory.",
+  "tutorialStep3Title": "Bomba",
+  "tutorialStep3Description": "Za jeszcze dłuższą ścieżkę (6 i więcej) dostajesz bombę - włączona do ścieżki niszczy sąsiednie kafelki.",
+  "tutorialStep4Title": "Rozbuduj wioskę",
+  "tutorialStep4Description": "Zebrane surowce zostają w wiosce między tygodniami - w przyszłości posłużą do jej rozbudowy.",
+  "tutorialFinishButton": "Rozumiem, zaczynamy!",
+
+  "actFailureTitle": "Porażka",
+  "actFailureSubtitle": "Akt {actNumber}: \"{actName}\" się nie powiódł.",
+  "@actFailureSubtitle": {
+    "placeholders": {"actNumber": {"type": "int"}, "actName": {"type": "String"}}
+  },
+  "actFailureLoadSaveHeader": "Wczytaj zapis i spróbuj ponownie",
+  "actFailureNoSavedWeeks": "Brak zapisanych tygodni.",
+  "actFailureWeekLabel": "Tydzień {week}",
+  "@actFailureWeekLabel": {
+    "placeholders": {"week": {"type": "int"}}
+  },
+  "actFailureNewGameButton": "Zacznij nową grę",
+
+  "weekTransitionWeekLabel": "Tydzień {week}",
+  "@weekTransitionWeekLabel": {
+    "placeholders": {"week": {"type": "int"}}
+  },
+
+  "debugTitle": "Debug",
+  "debugSubtitle": "Narzędzia testowe - nie są częścią normalnej rozgrywki.",
+  "debugJumpToWeekHeader": "Przejdź do tygodnia",
+  "debugWeekNumberLabel": "Numer tygodnia (1-65)",
+  "debugJumpButton": "Przejdź",
+  "debugAddResourcesHeader": "Dodaj surowce",
+  "debugAddAllButton": "+100 wszystkich",
+  "debugAddResourceButton": "+100 {resource}",
+  "@debugAddResourceButton": {
+    "placeholders": {"resource": {"type": "String"}}
+  },
+  "debugBossTrainingHeader": "Walka treningowa z bossem",
+  "debugBossTrainingDescription": "Uruchamia starcie od razu, z aktualnymi statystykami wioski - wynik NIE jest zapisywany ani nie wpływa na fabułę/surowce.",
+  "debugFightGrot": "Grot (tydz. 26)",
+  "debugFightMarta": "Marta (tydz. 39)",
+  "debugFightBogdan": "Bogdan (tydz. 52)",
+  "debugFightLeszy": "Leszy (tydz. 59)",
+
+  "bossIntroWeekLabel": "Tydzień {week}",
+  "@bossIntroWeekLabel": {
+    "placeholders": {"week": {"type": "int"}}
+  },
+  "bossIntroPrepareButton": "Przygotuj się do walki",
+
+  "bossStage1Title": "Etap 1: Umocnienia",
+  "bossStage1Intro": "Wróg nadciąga. Zbuduj zasieki i wykop doły, zanim dotrze do wioski.",
+  "bossStage2Title": "Etap 2: Pułapki",
+  "bossStage2IntroOne": "Grot i jego ludzie już przy bramie - połącz dłuższe ścieżki, żeby stworzyć bomby, i zdetonuj jedną z nich.",
+  "bossStage2IntroMany": "Grot i jego ludzie już przy bramie - połącz dłuższe ścieżki, żeby stworzyć bomby, i zdetonuj {count} z nich.",
+  "@bossStage2IntroMany": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "bossStage3Title": "Etap 3: Starcie",
+  "bossStage3Intro": "Ostatnia szarża - wśród zamieszania walki wyławiaj miecze ({count}), drewno i kamień tylko zawadzają pod ręką.",
+  "@bossStage3Intro": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "bossAppBarTitle": "Starcie z Grotem - Tydzień {week}",
+  "@bossAppBarTitle": {
+    "placeholders": {"week": {"type": "int"}}
+  },
+  "bossMovesLabel": "Ruchy: {moves}",
+  "@bossMovesLabel": {
+    "placeholders": {"moves": {"type": "int"}}
+  },
+  "bossStartButton": "Rozpocznij",
+  "bossProgressStage1": "Drewno {wood}/{woodTarget} - Kamień {stone}/{stoneTarget}",
+  "@bossProgressStage1": {
+    "placeholders": {"wood": {"type": "int"}, "woodTarget": {"type": "int"}, "stone": {"type": "int"}, "stoneTarget": {"type": "int"}}
+  },
+  "bossProgressStage2": "Zdetonowane bomby: {bombs}/{target}",
+  "@bossProgressStage2": {
+    "placeholders": {"bombs": {"type": "int"}, "target": {"type": "int"}}
+  },
+  "bossProgressStage3": "Miecze: {swords}/{target}",
+  "@bossProgressStage3": {
+    "placeholders": {"swords": {"type": "int"}, "target": {"type": "int"}}
+  },
+  "bossSummaryFullVictoryTitle": "🎉 Pełne zwycięstwo!",
+  "bossSummaryFullVictoryText": "Grot pada na kolano, pokonany. Wioska obroniła się bez strat.",
+  "bossSummaryPartialVictoryTitle": "⚔️ Zwycięstwo okupione stratami",
+  "bossSummaryPartialVictoryText": "Grot się wycofuje, ale starcie kosztowało wioskę część zapasów.",
+  "bossSummaryDefeatTitle": "💀 Porażka",
+  "bossSummaryDefeatText": "Grot przełamał obronę wioski i splądrował zapasy.",
+  "bossSummaryStagesCleared": "Ukończone etapy: {cleared}/3",
+  "@bossSummaryStagesCleared": {
+    "placeholders": {"cleared": {"type": "int"}}
+  },
+  "bossReturnButton": "Wróć do wioski",
+
+  "martaStage1Title": "Etap 1: Poszlaki",
+  "martaStage1IntroDefault": "Zbierasz ślady jej wcześniejszego, niezdarnego sabotażu - i strzępki plotek krążących po wiosce. Potrzebujesz dość poszlak, żeby stanąć przed nią z pewnością siebie ({minWood} drewna, {minStone} kamienia). Ale jeśli przesadzisz, plotka zacznie żyć własnym życiem, zanim zdążysz z nią porozmawiać - trzeba będzie spróbować jeszcze raz, a Marta zrobi się czujniejsza w etapie 2.",
+  "@martaStage1IntroDefault": {
+    "placeholders": {"minWood": {"type": "int"}, "minStone": {"type": "int"}}
+  },
+  "martaStage1IntroOvershot": "Przesadziłeś/aś - plotka zaczęła żyć własnym życiem, zanim zdążyłeś/aś z nią porozmawiać. Spróbuj ponownie ({minWood} drewna, {minStone} kamienia) - ale Marta jest już czujniejsza: etap 2 będzie wymagał o jedną chwilę wahania więcej ({stage2Target}).",
+  "@martaStage1IntroOvershot": {
+    "placeholders": {"minWood": {"type": "int"}, "minStone": {"type": "int"}, "stage2Target": {"type": "int"}}
+  },
+  "martaStage2Title": "Etap 2: Impas",
+  "martaStage2IntroOne": "Marta broni się półsercem. Wyłap jedną chwilę wahania w jej ciosach (jokery) - ale unikaj eskalacji, bo agresywne, długie ścieżki (bomby) tylko ją spłoszą i wymagać będzie to więcej cierpliwości.",
+  "martaStage2IntroMany": "Marta broni się półsercem. Wyłap {count} chwil wahania w jej ciosach (jokery) - ale unikaj eskalacji, bo agresywne, długie ścieżki (bomby) tylko ją spłoszą i wymagać będzie to więcej cierpliwości.",
+  "@martaStage2IntroMany": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "martaStage3Title": "Etap 3: Prawda",
+  "martaStage3Intro": "Przełamujesz jej milczenie. Zbieraj Prawdę (drewno/kamień/woda na planszy to tylko szum, nie liczą się do niczego) - i nie spiesz się, im więcej ruchów zostanie Ci na koniec, tym pełniejsze będzie jej zaufanie.",
+  "martaAppBarTitle": "Starcie z Martą - Tydzień {week}",
+  "@martaAppBarTitle": {
+    "placeholders": {"week": {"type": "int"}}
+  },
+  "martaMovesLabel": "Ruchy: {moves}",
+  "@martaMovesLabel": {
+    "placeholders": {"moves": {"type": "int"}}
+  },
+  "martaStartButton": "Rozpocznij",
+  "martaProgressStage1": "Drewno {wood}/{minWood} (limit {maxWood}) - Kamień {stone}/{minStone} (limit {maxStone})",
+  "@martaProgressStage1": {
+    "placeholders": {"wood": {"type": "int"}, "minWood": {"type": "int"}, "maxWood": {"type": "int"}, "stone": {"type": "int"}, "minStone": {"type": "int"}, "maxStone": {"type": "int"}}
+  },
+  "martaProgressStage2": "Chwile wahania: {jokers}/{target}",
+  "@martaProgressStage2": {
+    "placeholders": {"jokers": {"type": "int"}, "target": {"type": "int"}}
+  },
+  "martaProgressStage3": "Prawda: {truth}/{target}",
+  "@martaProgressStage3": {
+    "placeholders": {"truth": {"type": "int"}, "target": {"type": "int"}}
+  },
+  "martaSummaryFullTrustTitle": "🎉 Pełne zaufanie",
+  "martaSummaryFullTrustText": "Dałeś/aś jej czas, na jaki czekała. Marta mówi Ci wszystko, bez zastrzeżeń.",
+  "martaSummaryPartialTrustTitle": "🤝 Przełamanie",
+  "martaSummaryPartialTrustText": "Marta w końcu Ci wierzy - staje się sojuszniczką, choć ostrożną.",
+  "martaSummaryClashTitle": "⚔️ Częściowe przełamanie",
+  "martaSummaryClashText": "Marta opuszcza broń, ale wciąż coś ukrywa przed Tobą.",
+  "martaSummaryWithdrawTitle": "💔 Wycofanie",
+  "martaSummaryWithdrawText": "Marta zamyka się w sobie i odchodzi, nie zdradzając niczego więcej.",
+  "martaSummaryStagesCleared": "Ukończone etapy: {cleared}/3",
+  "@martaSummaryStagesCleared": {
+    "placeholders": {"cleared": {"type": "int"}}
+  },
+  "martaReturnButton": "Wróć do wioski",
+
+  "bogdanAppBarTitle": "Starcie z Bogdanem - Tydzień {week}",
+  "@bogdanAppBarTitle": {
+    "placeholders": {"week": {"type": "int"}}
+  },
+  "bogdanMovesLabel": "Ruchy: {moves}",
+  "@bogdanMovesLabel": {
+    "placeholders": {"moves": {"type": "int"}}
+  },
+  "bogdanPeknicieTitle": "Pęknięcie",
+  "bogdanPeknicieIntro": "Bogdan się waha, sięga po dziennik... Masz {limit} ruchów, żeby zebrać jak najwięcej Dowodu, zanim znów się zamknie w gniewie.",
+  "@bogdanPeknicieIntro": {
+    "placeholders": {"limit": {"type": "int"}}
+  },
+  "bogdanFuriaTitle": "Furia",
+  "bogdanFuriaStartIntro": "Bogdan przyjeżdża osobiście, w gniewie. Uspokój go - zbierz {calmTarget} wody, zanim skończą się ruchy ({furiaLimit}), bo inaczej podpali część magazynu.",
+  "@bogdanFuriaStartIntro": {
+    "placeholders": {"calmTarget": {"type": "int"}, "furiaLimit": {"type": "int"}}
+  },
+  "bogdanFuriaRetryTitle": "Furia (ponownie)",
+  "bogdanFuriaRetryIntro": "Bogdan zdążył podpalić część spichlerza! (-15% zboża i jabłek) Spróbuj ponownie - masz {furiaLimit} ruchów.",
+  "@bogdanFuriaRetryIntro": {
+    "placeholders": {"furiaLimit": {"type": "int"}}
+  },
+  "bogdanFuriaRetryDiscountedIntro": "Marta wbiegła i powstrzymała ojca! Zdążył podpalić tylko trochę (-5%). Spróbuj ponownie - masz {furiaLimit} ruchów.",
+  "@bogdanFuriaRetryDiscountedIntro": {
+    "placeholders": {"furiaLimit": {"type": "int"}}
+  },
+  "bogdanFuriaAfterPeknicieIntro": "Bogdan znów wpada w gniew. Uspokój go raz jeszcze - {calmTarget} wody, {furiaLimit} ruchów.",
+  "@bogdanFuriaAfterPeknicieIntro": {
+    "placeholders": {"calmTarget": {"type": "int"}, "furiaLimit": {"type": "int"}}
+  },
+  "bogdanCollectedProofLabel": "Zebrany dotąd Dowód: {current}/{target}",
+  "@bogdanCollectedProofLabel": {
+    "placeholders": {"current": {"type": "int"}, "target": {"type": "int"}}
+  },
+  "bogdanStartButton": "Rozpocznij",
+  "bogdanProgressFuria": "Opanowanie: {progress}/{target} (pozostało {movesLeft} ruchów tej próby)",
+  "@bogdanProgressFuria": {
+    "placeholders": {"progress": {"type": "int"}, "target": {"type": "int"}, "movesLeft": {"type": "int"}}
+  },
+  "bogdanProgressPeknicie": "Dowód: {current}/{target} (pozostało {movesLeft} ruchów okna)",
+  "@bogdanProgressPeknicie": {
+    "placeholders": {"current": {"type": "int"}, "target": {"type": "int"}, "movesLeft": {"type": "int"}}
+  },
+  "bogdanSummaryFullVictoryTitle": "🎉 Pełne zwycięstwo",
+  "bogdanSummaryFullVictoryText": "Bogdan pęka całkowicie pod ciężarem dowodów. Ucieka w las bez zemsty.",
+  "bogdanSummaryPartialVictoryTitle": "⚔️ Zwycięstwo okupione stratami",
+  "bogdanSummaryPartialVictoryText": "Bogdan w końcu ucieka, ale zdążył zaszkodzić wiosce po drodze.",
+  "bogdanSummaryDefeatTitle": "💀 Porażka",
+  "bogdanSummaryDefeatText": "Ruchy się skończyły, zanim udało się go przełamać. Bogdan odjeżdża, nadal przekonany o swojej racji.",
+  "bogdanSummaryStats": "Dowód: {proof}/{target} - Spalenia magazynu: {burns}",
+  "@bogdanSummaryStats": {
+    "placeholders": {"proof": {"type": "int"}, "target": {"type": "int"}, "burns": {"type": "int"}}
+  },
+  "bogdanReturnButton": "Wróć do wioski",
+
+  "leszyAbilityCounterName": "Kontratak",
+  "leszyAbilityCounterCost": "-25 wody",
+  "leszyAbilityCounterEffect": "-10 PŻ Leszemu",
+  "leszyAbilityGuardName": "Osłona",
+  "leszyAbilityGuardCost": "-25 kamienia",
+  "leszyAbilityGuardEffect": "+10 tarczy (pochłania obrażenia, zeruje się co ruch Leszego)",
+  "leszyAbilityHealName": "Uzdrowienie",
+  "leszyAbilityHealCost": "-25 drewna",
+  "leszyAbilityHealEffect": "+10 PŻ Wioski, usuwa zatrucie",
+  "leszyAbilityCleanseName": "Oczyszczenie",
+  "leszyAbilityCleanseCost": "-20 drewna, -20 kamienia",
+  "leszyAbilityCleanseEffect": "zeruje pulę Cienia i usuwa wszystkie kulki Cienia z planszy",
+  "leszyAbilityPrayerName": "Modlitwa",
+  "leszyAbilityPrayerCost": "-20 wody, -20 drewna",
+  "leszyAbilityPrayerEffect": "osłabia następny cios Leszego o połowę",
+  "leszyAbilityCalmName": "Uspokojenie",
+  "leszyAbilityCalmCost": "-30 wody",
+  "leszyAbilityCalmEffect": "-3 do siły Leszego",
+  "leszyAbilityWallName": "Wzmocnienie muru",
+  "leszyAbilityWallCost": "-15 drewna, -15 kamienia",
+  "leszyAbilityWallEffect": "+2 do progu wybuchu Cienia (przeciwdziała Zagęszczeniu cienia)",
+  "leszyAbilityDispelFuryName": "Rozproszenie furii",
+  "leszyAbilityDispelFuryCost": "-15 wody",
+  "leszyAbilityDispelFuryEffect": "natychmiast anuluje aktywną Furię, zanim zdąży podwoić następny cios (dostępne tylko, gdy Furia aktywna)",
+  "leszyAbilityAbundanceName": "Obfitość",
+  "leszyAbilityAbundanceCost": "-20 wody, -20 kamienia",
+  "leszyAbilityAbundanceEffect": "podwaja kolejne 3 zebrane ścieżki surowców (włącznie z Mieczem i Tarczą, poza Cieniem)",
+
+  "leszyMoveStrikeFuryDesc": "Szykuje wzmocnione uderzenie w wioskę (2×{base} = -{doubled} PŻ).",
+  "@leszyMoveStrikeFuryDesc": {
+    "placeholders": {"base": {"type": "int"}, "doubled": {"type": "int"}}
+  },
+  "leszyMoveStrikeDesc": "Szykuje uderzenie w wioskę (-{base} PŻ).",
+  "@leszyMoveStrikeDesc": {
+    "placeholders": {"base": {"type": "int"}}
+  },
+  "leszyMoveDrainDesc": "Chce wyssać najbogatszy zapas surowca i się nim uleczyć (o połowę zabranej ilości).",
+  "leszyMoveShadowDesc": "Zagęszcza cień - trwale obniża próg wybuchu o 1 (obecnie {threshold}).",
+  "@leszyMoveShadowDesc": {
+    "placeholders": {"threshold": {"type": "int"}}
+  },
+  "leszyMoveFuryDesc": "Wpada w furię - następny cios będzie podwojony, a on sam potężniejszy (+1 siły).",
+  "leszyMoveFogDesc": "Ześle mgłę - przetasuje planszę i zamieni część kafelków w cienie.",
+  "leszyMovePoisonDesc": "Zatruje powietrze - kolejne ruchy zabolą (-5 PŻ), da się to wyleczyć Uzdrowieniem.",
+  "leszyMoveHungerDesc": "Głód pochłonie część zapasów.",
+  "leszyMoveConsumeDesc": "Chce pochłonąć cień z otoczenia i uleczyć się o tyle, ile go pochłonie.",
+  "leszyMoveRendDesc": "Szykuje rozdzierające cięcie, które przebija połowę Tarczy (-{base} PŻ, częściowo mimo osłony).",
+  "@leszyMoveRendDesc": {
+    "placeholders": {"base": {"type": "int"}}
+  },
+  "leszyMoveDespairDesc": "Ogarnia go rozpacz - zaraz gwałtownie wzmocni swoją siłę (+2).",
+  "leszyMoveBlightDesc": "Skazi część planszy, zamieniając kafelki wprost w Cień.",
+  "leszyMoveOtherworldDesc": "Wycofuje się częściowo w zaświaty - najbliższe trafienia Mieczem zadadzą tylko połowę obrażeń.",
+  "leszyMoveCrumblingResolveDesc": "Łamie wolę wioski - jej maksymalne PŻ trwale się skurczy.",
+
+  "leszyShadowExplosionWarning": "Cień osiąga próg - za chwilę eksploduje!",
+  "leszyShadowExplosionResult": "Cień eksploduje! (-{damage} PŻ Wioski)",
+  "@leszyShadowExplosionResult": {
+    "placeholders": {"damage": {"type": "int"}}
+  },
+  "leszyActionStrike": "Leszy uderza! (-{dmg} PŻ Wioski)",
+  "@leszyActionStrike": {
+    "placeholders": {"dmg": {"type": "int"}}
+  },
+  "leszyActionDrainSuccess": "Leszy wysysa {resource} i leczy się o {healed}!",
+  "@leszyActionDrainSuccess": {
+    "placeholders": {"resource": {"type": "String"}, "healed": {"type": "int"}}
+  },
+  "leszyActionDrainFail": "Leszy próbuje wyssać surowiec, ale nic nie ma.",
+  "leszyActionShadowThicken": "Cień gęstnieje - próg wybuchu spadł do {threshold}!",
+  "@leszyActionShadowThicken": {
+    "placeholders": {"threshold": {"type": "int"}}
+  },
+  "leszyActionFury": "Leszy wpada w furię - następny cios będzie silniejszy, a on sam potężniejszy!",
+  "leszyActionFog": "Mgła spowija planszę - kafelki się przetasowują, część zamienia się w cienie!",
+  "leszyActionPoison": "Leszy zatruwa powietrze - kolejne ruchy zabolą mocniej.",
+  "leszyActionHunger": "Głód Leszego pochłania część zapasów.",
+  "leszyActionConsumeSuccess": "Leszy pochłania cień z otoczenia i leczy się o {amount}!",
+  "@leszyActionConsumeSuccess": {
+    "placeholders": {"amount": {"type": "int"}}
+  },
+  "leszyActionConsumeFail": "Leszy sięga po cień, ale nie ma czego pochłonąć.",
+  "leszyActionRendPierce": "Leszy rozdziera wioskę, przebijając połowę Tarczy! (-{dmg} PŻ Wioski)",
+  "@leszyActionRendPierce": {
+    "placeholders": {"dmg": {"type": "int"}}
+  },
+  "leszyActionRendClaws": "Leszy rozdziera wioskę pazurami! (-{dmg} PŻ Wioski)",
+  "@leszyActionRendClaws": {
+    "placeholders": {"dmg": {"type": "int"}}
+  },
+  "leszyActionDespair": "Rozpacz ogarnia Leszego - jego siła rośnie gwałtownie (+2)!",
+  "leszyActionBlight": "Skażenie rozlewa się po planszy - część kafelków zamienia się w Cień!",
+  "leszyActionOtherworld": "Leszy wycofuje się częściowo w zaświaty - kolejne trafienia Mieczem osłabione.",
+  "leszyActionCrumblingResolve": "Wola wioski pęka pod ciężarem grozy - maks. PŻ Wioski spada do {maxHp}!",
+  "@leszyActionCrumblingResolve": {
+    "placeholders": {"maxHp": {"type": "int"}}
+  },
+
+  "leszyAppBarTitle": "Starcie z Leszym - Tydzień {week}",
+  "@leszyAppBarTitle": {
+    "placeholders": {"week": {"type": "int"}}
+  },
+  "leszyMovesUsedLabel": "Ruchy: {count}",
+  "@leszyMovesUsedLabel": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "leszyPhaseOnslaughtTitle": "Nawałnica",
+  "leszyPhaseHeartOfShadowTitle": "Serce Cienia",
+  "leszyOnslaughtIntroText": "Leszy uderza na wioskę w pełnej sile. Zbieraj Miecze, żeby go ranić, i Tarcze, żeby przetrwać - a zebrane drewno/kamień/wodę wykorzystaj na zdolności.",
+  "leszyHeartOfShadowIntroText": "Pierwsza fala pękła, ale z cieni wyłania się jego prawdziwa, głodniejsza forma - silniejsza od pierwszego ruchu i zdolna pożreć sam Cień, żeby się leczyć. To ostatnia próba - Twoje PŻ Wioski nie odnowiły się między starciami.",
+  "leszyIntroHpSummary": "PŻ Wioski: {villageHp}/{villageMaxHp} - PŻ Leszego: {leszyHp}/{leszyMaxHp}",
+  "@leszyIntroHpSummary": {
+    "placeholders": {"villageHp": {"type": "int"}, "villageMaxHp": {"type": "int"}, "leszyHp": {"type": "int"}, "leszyMaxHp": {"type": "int"}}
+  },
+  "leszyStartButton": "Rozpocznij",
+  "leszyBoardLegendSwordLabel": "Miecz",
+  "leszyBoardLegendSwordDesc": "1 kafelek = 1 obrażenie Leszemu",
+  "leszyBoardLegendShieldLabel": "Tarcza",
+  "leszyBoardLegendShieldDesc": "1 kafelek = 1 punkt osłony Wioski",
+  "leszyBoardLegendShadowLabel": "Cień",
+  "leszyBoardLegendShadowDesc": "Zebranie usuwa go z planszy i dodatkowo obniża pulę Cienia o 5 za kafelek - pełna pula ({threshold}, spada z czasem od Zagęszczenia cienia) eksploduje, zadając PŻ Wioski dokładnie tyle, ile pula wynosi w tej chwili.",
+  "@leszyBoardLegendShadowDesc": {
+    "placeholders": {"threshold": {"type": "int"}}
+  },
+  "leszyBoardLegendTitle": "Nowe surowce na planszy",
+  "leszyBoardLegendResourceNote": "Drewno, kamień i woda dalej działają jak wcześniej - odkładają się w zapasy, które można wydać na zdolności poniżej.",
+  "leszyAbilitiesTitle": "Zdolności",
+  "leszyStatusFuryName": "Furia",
+  "leszyStatusFuryDesc": "Furia aktywna - następny cios Leszego będzie podwojony.",
+  "leszyStatusPoisonName": "Zatrucie",
+  "leszyStatusPoisonDesc": "Zatrucie - kolejne {ticks} ruch(y) gracza bolą dodatkowo (-5 PŻ Wioski). Da się to wyleczyć Uzdrowieniem.",
+  "@leszyStatusPoisonDesc": {
+    "placeholders": {"ticks": {"type": "int"}}
+  },
+  "leszyStatusPrayerName": "Modlitwa",
+  "leszyStatusPrayerDesc": "Modlitwa aktywna - następny cios Leszego osłabiony o połowę.",
+  "leszyStatusAbundanceName": "Obfitość",
+  "leszyStatusAbundanceDesc": "Obfitość aktywna - kolejne {charges} zebrane ścieżki (Miecz, Tarcza, drewno/kamień/woda) liczą się podwójnie. Nie dotyczy Cienia.",
+  "@leszyStatusAbundanceDesc": {
+    "placeholders": {"charges": {"type": "int"}}
+  },
+  "leszyStatusOtherworldName": "Zaświat",
+  "leszyStatusOtherworldDesc": "Leszy jest częściowo wycofany w zaświaty - kolejne {charges} trafienia Mieczem zadadzą tylko połowę obrażeń.",
+  "@leszyStatusOtherworldDesc": {
+    "placeholders": {"charges": {"type": "int"}}
+  },
+  "leszyCloseButton": "Zamknij",
+  "leszyBossName": "Leszy",
+  "leszyVillageLabel": "Wioska",
+  "leszyHpBarLabel": "{label}: {current}/{max} PŻ",
+  "@leszyHpBarLabel": {
+    "placeholders": {"label": {"type": "String"}, "current": {"type": "int"}, "max": {"type": "int"}}
+  },
+  "leszyMovesUnitOne": "ruch",
+  "leszyMovesUnitFew": "ruchy",
+  "leszyMovesUnitMany": "ruchów",
+  "leszyMovesUntilLabel": "Za {count} {unit}:",
+  "@leszyMovesUntilLabel": {
+    "placeholders": {"count": {"type": "int"}, "unit": {"type": "String"}}
+  },
+  "leszyShadowCounterLabel": "Cień {current}/{threshold}",
+  "@leszyShadowCounterLabel": {
+    "placeholders": {"current": {"type": "int"}, "threshold": {"type": "int"}}
+  },
+  "leszyAbilityCostLabel": "Koszt: {cost}",
+  "@leszyAbilityCostLabel": {
+    "placeholders": {"cost": {"type": "String"}}
+  },
+  "leszyAbilityEffectLabel": "Efekt: {effect}",
+  "@leszyAbilityEffectLabel": {
+    "placeholders": {"effect": {"type": "String"}}
+  },
+  "leszyNotEnoughResources": "Za mało surowców, żeby teraz użyć tej zdolności.",
+  "leszyCancelButton": "Anuluj",
+  "leszyUseButton": "Użyj",
+  "leszyDefeatTitle": "💀 Klęska",
+  "leszyDefeatMessage": "Leszy okazał się za silny. Wioska nie wytrzymała naporu Cienia.",
+  "leszyRetryButton": "Spróbuj ponownie",
+  "leszyReturnPrepareButton": "Wróć do wioski, przygotuj się lepiej",
+  "leszyVictoryTitle": "🎉 Leszy pokonany",
+  "leszyVictoryMessage": "Cień cofa się w głąb ziemi. Wioska przetrwała najgorszą noc.",
+  "leszyVictoryHpSummary": "PŻ Wioski na koniec: {hp}/{maxHp}",
+  "@leszyVictoryHpSummary": {
+    "placeholders": {"hp": {"type": "int"}, "maxHp": {"type": "int"}}
+  },
+  "leszyReturnToVillageButton": "Wróć do wioski",
+
+  "homeBuildingNameRatusz": "Ratusz",
+  "homeSourceSoldiers": "Żołnierze",
+  "homeSourceResidents": "Mieszkańcy",
+
+  "homeBonusSklep": "Odblokowuje zakładkę \"Sklep\" w dolnym pasku nawigacji.",
+  "homeBonusPopulation": "Zwiększa limit populacji o {n} (widoczne w Statystykach).",
+  "@homeBonusPopulation": {"placeholders": {"n": {"type": "int"}}},
+  "homeBonusKuznia": "Co tydzień: +{n} złota.",
+  "@homeBonusKuznia": {"placeholders": {"n": {"type": "int"}}},
+  "homeBonusSpichlerz": "Co tydzień: +{n} do produkcji jabłek. Zmniejsza ryzyko głodu (utraty zbiorów) o {pct}.",
+  "@homeBonusSpichlerz": {"placeholders": {"n": {"type": "int"}, "pct": {"type": "String"}}},
+  "homeBonusPiekarnia": "Co tydzień: +{n} do produkcji zboża.",
+  "@homeBonusPiekarnia": {"placeholders": {"n": {"type": "int"}}},
+  "homeBonusTartak": "Co tydzień: +{n} do produkcji drewna.",
+  "@homeBonusTartak": {"placeholders": {"n": {"type": "int"}}},
+  "homeBonusStudnia": "Co tydzień: +{n} do produkcji wody. Zmniejsza ryzyko pożaru (spalenia zbiorów) o {pct}.",
+  "@homeBonusStudnia": {"placeholders": {"n": {"type": "int"}, "pct": {"type": "String"}}},
+  "homeBonusMorale": "Zwiększa morale wioski o {n} (widoczne w Statystykach).",
+  "@homeBonusMorale": {"placeholders": {"n": {"type": "int"}}},
+  "homeBonusKaplica": "Zmniejsza ogólną szansę zepsucia sezonowego surowca o {pct}. Zwiększa morale wioski o {n}.",
+  "@homeBonusKaplica": {"placeholders": {"pct": {"type": "String"}, "n": {"type": "int"}}},
+  "homeBonusSzkola": "Odblokowuje odkrycia w Uczelni (panel poniżej) - m.in. +1 do bazowej liczby ruchów i możliwość przydzielania pracowników do budynków.",
+  "homeBonusRynek": "Odblokowuje handel surowcami w zakładce Surowce (kurs {base}→{receive}, poprawia się z rozbudową, odkryciem Dyplomacji i pracownikami - najlepszy możliwy to {best}→{receive}).",
+  "@homeBonusRynek": {"placeholders": {"base": {"type": "int"}, "receive": {"type": "int"}, "best": {"type": "int"}}},
+  "homeBonusMagazyn": "Zwiększa maksymalną ilość każdego przechowywanego surowca o {n}.",
+  "@homeBonusMagazyn": {"placeholders": {"n": {"type": "int"}}},
+  "homeBonusKamieniarz": "Co tydzień: +{n} do produkcji kamienia.",
+  "@homeBonusKamieniarz": {"placeholders": {"n": {"type": "int"}}},
+  "homeBonusKoszary": "Zwiększa bezpieczeństwo wioski o {n}. Odblokowuje rekrutację żołnierzy (wymaga zbudowanej Kuźni) - panel poniżej. Każdy żołnierz zużywa {food} jabłko/tydzień - przy braku jabłek część zdezerteruje.",
+  "@homeBonusKoszary": {"placeholders": {"n": {"type": "int"}, "food": {"type": "int"}}},
+
+  "homeUpgradeRatusz": "Podwaja premię tygodniową do +{n} każdego surowca.",
+  "@homeUpgradeRatusz": {"placeholders": {"n": {"type": "int"}}},
+  "homeUpgradePalisade": "Zwiększa limit populacji o kolejne {a} (razem +{a2}) i bezpieczeństwo wioski o kolejne {b} (razem +{b2}).",
+  "@homeUpgradePalisade": {"placeholders": {"a": {"type": "int"}, "a2": {"type": "int"}, "b": {"type": "int"}, "b2": {"type": "int"}}},
+  "homeUpgradeSklep": "Zwiększa maksymalną liczbę ruchów możliwych do wykupienia w sklepie o {n} (niezależnie od bonusu za przydzielonych pracowników).",
+  "@homeUpgradeSklep": {"placeholders": {"n": {"type": "int"}}},
+  "homeUpgradePopulation": "Zwiększa limit populacji o kolejne {n} (razem +{n2}).",
+  "@homeUpgradePopulation": {"placeholders": {"n": {"type": "int"}, "n2": {"type": "int"}}},
+  "homeUpgradeKuznia": "Zwiększa premię tygodniową o kolejne {n} złota (razem +{n2}/tydz.).",
+  "@homeUpgradeKuznia": {"placeholders": {"n": {"type": "int"}, "n2": {"type": "int"}}},
+  "homeUpgradeSpichlerz": "Dalej zmniejsza ryzyko głodu o kolejne {pct} (razem -{pct2}). Produkcja jabłek bez zmian.",
+  "@homeUpgradeSpichlerz": {"placeholders": {"pct": {"type": "String"}, "pct2": {"type": "String"}}},
+  "homeUpgradePiekarnia": "Zwiększa produkcję zboża o kolejne {n} (razem +{n2}/tydz.).",
+  "@homeUpgradePiekarnia": {"placeholders": {"n": {"type": "int"}, "n2": {"type": "int"}}},
+  "homeUpgradeTartak": "Zwiększa produkcję drewna o kolejne {n} (razem +{n2}/tydz.).",
+  "@homeUpgradeTartak": {"placeholders": {"n": {"type": "int"}, "n2": {"type": "int"}}},
+  "homeUpgradeStudnia": "Dalej zmniejsza ryzyko pożaru o kolejne {pct} (razem -{pct2}). Produkcja wody bez zmian.",
+  "@homeUpgradeStudnia": {"placeholders": {"pct": {"type": "String"}, "pct2": {"type": "String"}}},
+  "homeUpgradeBrowar": "Zwiększa morale wioski o kolejne {n} (razem +{n2}).",
+  "@homeUpgradeBrowar": {"placeholders": {"n": {"type": "int"}, "n2": {"type": "int"}}},
+  "homeUpgradeKaplica": "Całkowicie usuwa ogólną szansę zepsucia (od tego budynku) i zwiększa morale wioski o kolejne {n} (razem +{n2}).",
+  "@homeUpgradeKaplica": {"placeholders": {"n": {"type": "int"}, "n2": {"type": "int"}}},
+  "homeUpgradeSzkola": "Odblokowuje zaawansowane odkrycia - m.in. kolejne +1 do bazowej liczby ruchów (razem +2) i limit 2 pracowników na budynek.",
+  "homeUpgradeRynek": "Poprawia kurs wymiany do {after}→{receive} (jeden z 3 niezależnych ulepszeń do najlepszego możliwego kursu {best}→{receive}).",
+  "@homeUpgradeRynek": {"placeholders": {"after": {"type": "int"}, "receive": {"type": "int"}, "best": {"type": "int"}}},
+  "homeUpgradeMagazyn": "Zwiększa limit magazynowania o kolejne {n} (razem +{n2}).",
+  "@homeUpgradeMagazyn": {"placeholders": {"n": {"type": "int"}, "n2": {"type": "int"}}},
+  "homeUpgradeKamieniarz": "Zwiększa produkcję kamienia o kolejne {n} (razem +{n2}/tydz.).",
+  "@homeUpgradeKamieniarz": {"placeholders": {"n": {"type": "int"}, "n2": {"type": "int"}}},
+  "homeUpgradeKoszary": "Zwiększa bezpieczeństwo wioski o kolejne {n} (razem +{n2}) i podwaja siłę każdego żołnierza.",
+  "@homeUpgradeKoszary": {"placeholders": {"n": {"type": "int"}, "n2": {"type": "int"}}},
+
+  "homeBonusLineSimple": "{label}: {base}{unit}",
+  "@homeBonusLineSimple": {"placeholders": {"label": {"type": "String"}, "base": {"type": "num"}, "unit": {"type": "String"}}},
+  "homeBonusLineWithWorkers": "{label}: baza {base}{unit}, pracownicy {sign}{workerBonus}{unit} → premia ogólna {total}{unit}",
+  "@homeBonusLineWithWorkers": {"placeholders": {"label": {"type": "String"}, "base": {"type": "num"}, "unit": {"type": "String"}, "sign": {"type": "String"}, "workerBonus": {"type": "num"}, "total": {"type": "num"}}},
+  "homeBonusPercentSimple": "{label}: {pct}",
+  "@homeBonusPercentSimple": {"placeholders": {"label": {"type": "String"}, "pct": {"type": "String"}}},
+  "homeBonusPercentWithWorkers": "{label}: baza {basePct}, z pracownikami → premia ogólna {totalPct}",
+  "@homeBonusPercentWithWorkers": {"placeholders": {"label": {"type": "String"}, "basePct": {"type": "String"}, "totalPct": {"type": "String"}}},
+
+  "homeLabelResourceProduction": "Produkcja każdego surowca",
+  "homeLabelPopulationLimit": "Limit populacji",
+  "homeLabelSecurity": "Bezpieczeństwo",
+  "homeSklepLockedBonusNote": "Odblokowuje zakładkę Sklep (liczbowa premia dopiero po rozbudowie).",
+  "homeSklepMovesBonusText": "Maks. liczba ruchów do wykupienia: {max} (w tym +{workers} od pracowników).",
+  "@homeSklepMovesBonusText": {"placeholders": {"max": {"type": "int"}, "workers": {"type": "int"}}},
+  "homeLabelGoldPerWeek": "Złoto/tydz.",
+  "homeLabelAppleProductionPerWeek": "Produkcja jabłek/tydz.",
+  "homeLabelHungerRiskReduction": "Redukcja ryzyka głodu",
+  "homeLabelGrainProductionPerWeek": "Produkcja zboża/tydz.",
+  "homeLabelWoodProductionPerWeek": "Produkcja drewna/tydz.",
+  "homeLabelWaterProductionPerWeek": "Produkcja wody/tydz.",
+  "homeLabelFireRiskReduction": "Redukcja ryzyka pożaru",
+  "homeLabelVillageMorale": "Morale wioski",
+  "homeLabelSpoilRiskReduction": "Redukcja ogólnej szansy zepsucia",
+  "homeMarketRateBonus": "Kurs wymiany: {give}→{receive} (najlepszy możliwy: {best}→{receive} = 2:1)",
+  "@homeMarketRateBonus": {"placeholders": {"give": {"type": "int"}, "receive": {"type": "int"}, "best": {"type": "int"}}},
+  "homeLabelWarehouseLimit": "Limit magazynu",
+  "homeLabelStoneProductionPerWeek": "Produkcja kamienia/tydz.",
+
+  "homeResourcesNotUnlockedMessage": "Najpierw odkryj wszystkie surowce w Okolicach (zbuduj Sad, Łąkę i Pole).",
+
+  "homeTabVillage": "Wioska",
+  "homeTabSurroundings": "Okolice",
+  "homeTabResources": "Surowce",
+  "homeTabShop": "Sklep",
+  "homeTabStats": "Statystyki",
+  "homeTabGoals": "Cele",
+  "homeTabDebug": "Debug",
+  "homeTutorialVillageDesc": "Dotknij pustej działki, żeby zbudować budynek, albo gotowego budynku, żeby go rozbudować lub zobaczyć szczegóły. Ratusz buduje się jako pierwszy i odblokowuje resztę.",
+  "homeTutorialSurroundingsDesc": "Tereny wokół wioski (rzeka, las, góry...) - ich zabudowa powiększa planszę zbiorów i daje premie do surowców.",
+  "homeTutorialResourcesDesc": "Podgląd zapasów, produkcji i zużycia tygodniowego każdego surowca, a stąd też wymiana na targu, gdy Rynek jest gotowy.",
+  "homeTutorialShopDesc": "Kupuj dodatkowe ruchy na planszy zbiorów i ulepszenia automatycznego dopasowywania (odblokowuje się w trakcie gry).",
+  "homeTutorialStatsDesc": "Rekordy, populacja, morale, bezpieczeństwo, armia i komiksy fabularne, a także wybór wyglądu planszy zbiorów.",
+  "homeTutorialGoalsDesc": "Cele bieżącego aktu fabuły i questy poboczne - realizuj je, żeby zdobywać doświadczenie.",
+  "homeTutorialArrowTitle": "Przycisk \"→\"",
+  "homeTutorialArrowDesc": "Kończy tydzień i przenosi do planszy zbiorów (albo starcia z bossem, jeśli akurat wypada).",
+  "homeVillageTutorialTitle": "Witaj w wiosce",
+  "homeVillageTutorialGotIt": "Rozumiem",
+
+  "homeConfirmDemolishTitle": "Zburzyć budynek?",
+  "homeConfirmDemolishMessage": "Na pewno chcesz zburzyć: {name}?\nOdzyskasz połowę zainwestowanych surowców.",
+  "@homeConfirmDemolishMessage": {"placeholders": {"name": {"type": "String"}}},
+  "homeCancel": "Anuluj",
+  "homeDemolish": "Zburz",
+
+  "homeRatuszBonusText": "Co tydzień: +{n} każdego surowca.\nZłoto zebrane w ścieżce daje dodatkowo +1 (np. 4 w ścieżce = 5).\nWymaga odblokowania wszystkich surowców w Okolicach. Musi zostać zbudowany jako pierwszy budynek wioski - odblokowuje budowę pozostałych, a jego rozbudowa (poziom 2) odblokowuje ich rozbudowę.",
+  "@homeRatuszBonusText": {"placeholders": {"n": {"type": "int"}}},
+  "homeRatuszUpgradedSnack": "Ratusz rozbudowany!",
+
+  "homeBuildingNamePalisade": "Palisada",
+  "homePalisadeBonusText": "Zwiększa limit populacji o {pop} i bezpieczeństwo wioski o {sec} (widoczne w Statystykach).",
+  "@homePalisadeBonusText": {"placeholders": {"pop": {"type": "int"}, "sec": {"type": "int"}}},
+  "homePalisadeUpgradedSnack": "Palisada rozbudowana!",
+  "homePalisadeDemolishedSnack": "Palisada zburzona - odzyskano połowę surowców.",
+
+  "homeMilitaryTitle": "Wojsko",
+  "homeMilitaryTotalStrength": "Łączna siła armii: {n}",
+  "@homeMilitaryTotalStrength": {"placeholders": {"n": {"type": "int"}}},
+  "homeMilitaryAvailableResidents": "Dostępni mieszkańcy: {n} (każda rekrutacja zabiera jednego z wioski).",
+  "@homeMilitaryAvailableResidents": {"placeholders": {"n": {"type": "int"}}},
+  "homeMilitaryRequiresForge": "Rekrutacja wymaga zbudowanej Kuźni (broń dla żołnierzy).",
+  "homeMilitaryNotEnoughResidents": "Za mało mieszkańców, żeby rekrutować kolejnego żołnierza.",
+  "homeMilitaryUnitLine": "{label}: {count} (siła każdego: {strength})",
+  "@homeMilitaryUnitLine": {"placeholders": {"label": {"type": "String"}, "count": {"type": "int"}, "strength": {"type": "int"}}},
+  "homeMilitaryRecruitButton": "Rekrutuj (-{pop} mieszkaniec, -{gold} złota{extra})",
+  "@homeMilitaryRecruitButton": {"placeholders": {"pop": {"type": "int"}, "gold": {"type": "int"}, "extra": {"type": "String"}}},
+
+  "homeDiscoveriesTitle": "Odkrycia",
+  "homeDiscoveryUnlocked": "Odkryto",
+  "homeDiscoveryRequiresLevel": "Wymaga Uczelni na poziomie {n}.",
+  "@homeDiscoveryRequiresLevel": {"placeholders": {"n": {"type": "int"}}},
+  "homeDiscoveryUnlockButton": "Odkryj ({cost})",
+  "@homeDiscoveryUnlockButton": {"placeholders": {"cost": {"type": "String"}}},
+
+  "homeBuildingUpgradedSnack": "{label} rozbudowany!",
+  "@homeBuildingUpgradedSnack": {"placeholders": {"label": {"type": "String"}}},
+  "homeBuildingDemolishedSnack": "{label}: budynek zburzony - odzyskano połowę surowców.",
+  "@homeBuildingDemolishedSnack": {"placeholders": {"label": {"type": "String"}}},
+
+  "homeBuildingNameDom": "Dom",
+  "homeLevel0": "Poziom 0",
+  "homeRebuildToLevel1": "Odbuduj do poziomu 1",
+  "homeDecrepitHouseNotDemolishable": "Opuszczonego domu nie można zburzyć - w środku wciąż mieszkają ludzie.",
+  "homeDecrepitHouseBonusText": "Dom stoi opuszczony i zaniedbany od lat - obecnie nie daje żadnego bonusu do populacji.",
+  "homeDecrepitHouseUpgradeText": "Odbuduj dom, żeby zaczął dawać +{n} do limitu populacji.",
+  "@homeDecrepitHouseUpgradeText": {"placeholders": {"n": {"type": "int"}}},
+  "homeHouseRebuiltSnack": "Dom odbudowany - znów daje bonus do populacji!",
+  "homeHouseDemolishedSnack": "Dom zburzony - odzyskano połowę surowców.",
+
+  "homeMarketTradeTitle": "Rynek - handel",
+  "homeMarketRateLine": "Kurs: {give} surowca za {receive} innego.",
+  "@homeMarketRateLine": {"placeholders": {"give": {"type": "int"}, "receive": {"type": "int"}}},
+  "homeMarketGiveOption": "Daj: {label} (masz {have})",
+  "@homeMarketGiveOption": {"placeholders": {"label": {"type": "String"}, "have": {"type": "int"}}},
+  "homeMarketReceiveOption": "Otrzymaj: {label}",
+  "@homeMarketReceiveOption": {"placeholders": {"label": {"type": "String"}}},
+  "homeMax": "Maks.",
+  "homeMarketSummaryLine": "Razem: oddajesz {totalGive} {giveLabel}, dostajesz {totalReceive} {receiveLabel}.",
+  "@homeMarketSummaryLine": {"placeholders": {"totalGive": {"type": "int"}, "giveLabel": {"type": "String"}, "totalReceive": {"type": "int"}, "receiveLabel": {"type": "String"}}},
+  "homeMarketNotEnough": "Za mało {label}, żeby wymienić choć raz.",
+  "@homeMarketNotEnough": {"placeholders": {"label": {"type": "String"}}},
+  "homeClose": "Zamknij",
+  "homeMarketTradeSnack": "Wymieniono {totalGive} {giveLabel} na {totalReceive} {receiveLabel}.",
+  "@homeMarketTradeSnack": {"placeholders": {"totalGive": {"type": "int"}, "giveLabel": {"type": "String"}, "totalReceive": {"type": "int"}, "receiveLabel": {"type": "String"}}},
+  "homeExchangeButton": "Wymień",
+
+  "homeMoveBoughtSnack": "Kupiono +1 ruch na tydzień! Teraz: {total} ruchów.",
+  "@homeMoveBoughtSnack": {"placeholders": {"total": {"type": "int"}}},
+  "homeAutoMatchTier1Snack": "Odblokowano automatyczne usuwanie czwórek!",
+  "homeAutoMatchTier2Snack": "Odblokowano automatyczne usuwanie trójek!",
+
+  "homeAreaBuildFirst": "Najpierw zbuduj: {label}.",
+  "@homeAreaBuildFirst": {"placeholders": {"label": {"type": "String"}}},
+  "homeAreaBonusStarter": "{label} jest już dostępne na planszy zbiorów - ten budynek daje dodatkowo +1 do każdej zebranej ścieżki tego surowca.",
+  "@homeAreaBonusStarter": {"placeholders": {"label": {"type": "String"}}},
+  "homeAreaBonusUnlock": "Odblokowuje {label} jako nowy surowiec do zbierania na planszy zbiorów.",
+  "@homeAreaBonusUnlock": {"placeholders": {"label": {"type": "String"}}},
+  "homeAreaUpgradeText": "Odblokowuje możliwość wyboru {label} jako \"surowca tygodnia\" (10-20% więcej na planszy zbiorów w wybranym tygodniu).",
+  "@homeAreaUpgradeText": {"placeholders": {"label": {"type": "String"}}},
+  "homeAreaUpgradedSnack": "{label} rozbudowany! Możesz teraz wybierać {resource} jako surowiec tygodnia.",
+  "@homeAreaUpgradedSnack": {"placeholders": {"label": {"type": "String"}, "resource": {"type": "String"}}},
+
+  "homeTitleUpgradedSuffix": "{title} (rozbudowany)",
+  "@homeTitleUpgradedSuffix": {"placeholders": {"title": {"type": "String"}}},
+  "homeTitleBuiltSuffix": "{title} (zbudowany)",
+  "@homeTitleBuiltSuffix": {"placeholders": {"title": {"type": "String"}}},
+  "homeAreaBuildCostTitle": "Koszt budowy (poziom 1)",
+  "homeEffectLabel": "Efekt",
+  "homeLevel1": "Poziom 1",
+  "homeUpgradeToLevel2": "Rozbudowa do poziomu 2",
+  "homeLevel2": "Poziom 2",
+  "homeDemolishRefundNote": "Zburzenie zwróci połowę wszystkich zainwestowanych surowców.",
+  "homeBuild": "Zbuduj",
+  "homeUpgrade": "Rozbuduj",
+
+  "homeMainBuildingNotDemolishable": "Głównego budynku wioski nie można zburzyć.",
+  "homeLocked": "Zablokowane",
+  "homeBuildRatuszFirst": "Najpierw zbuduj Ratusz (główny budynek wioski).",
+  "homeBuildCostTitle": "Koszt budowy",
+  "homePerksLabel": "Premie",
+  "homeDemolishRefund50Title": "Odzysk przy zburzeniu (50%)",
+  "homeRequiresUpgradedRatusz": "Wymaga rozbudowanego (poziom 2) Ratusza.",
+  "homeGeneralBonusTitle": "Premia ogólna",
+  "homeWorkersTitle": "Pracownicy",
+  "homeWorkersRequiresDiscovery": "Wymaga odkrycia \"Zarządzanie pracownikami\" w Uczelni.",
+  "homeWorkerBonusExplanation": "Każdy przydzielony mieszkaniec zwiększa premię budynku o +50% (maks. {max} = {multiplier} premia).",
+  "@homeWorkerBonusExplanation": {"placeholders": {"max": {"type": "int"}, "multiplier": {"type": "String"}}},
+  "homeWorkerMultiplierDouble": "podwójna",
+  "homeAvailableResidents": "Wolni mieszkańcy: {n}",
+  "@homeAvailableResidents": {"placeholders": {"n": {"type": "int"}}},
+
+  "homeWeeklyBoostTitle": "Surowiec tygodnia",
+  "homeWeeklyBoostDescription": "Dzięki rozbudowanym (poziom 2) okolicom wioski możesz wybrać surowiec, który w tym tygodniu będzie pojawiał się częściej (+10-20%).",
+  "homeSkipButton": "Pomiń",
+
+  "homeEventChoiceResultSnack": "{title}: {resultText}{bonus}",
+  "@homeEventChoiceResultSnack": {"placeholders": {"title": {"type": "String"}, "resultText": {"type": "String"}, "bonus": {"type": "String"}}},
+  "homeEventResultSnack": "{icon} {title}: {description}{bonus}",
+  "@homeEventResultSnack": {"placeholders": {"icon": {"type": "String"}, "title": {"type": "String"}, "description": {"type": "String"}, "bonus": {"type": "String"}}},
+  "homeEventUnitMorale": "morale",
+  "homeEventUnitSecurity": "bezpieczeństwa",
+  "homeEventUnitPopulation": "populacji",
+  "homeEventUnitSoldiers": "żołnierzy",
+  "homeEventLossesSuffix": "(straty)",
+
+  "homeGoalNotFoughtYet": "jeszcze nie stoczono",
+  "homeGoalBattleProgress": "{cleared}/3 etapów (min. {required})",
+  "@homeGoalBattleProgress": {"placeholders": {"cleared": {"type": "int"}, "required": {"type": "int"}}},
+  "homeGoalRatuszBuilt": "Ratusz zbudowany",
+  "homeGoalOrchardDeveloped": "Sad rozwinięty",
+  "homeGoalMeadowDeveloped": "Łąka rozwinięta",
+  "homeGoalFieldDeveloped": "Pole rozwinięte",
+  "homeGoalBattleGrot": "Starcie z Grotem",
+  "homeGoalBattleMarta": "Starcie z Martą",
+  "homeGoalBogdanProof": "Pełny Dowód zebrany u Bogdana",
+  "homeGoalArmyStrength": "Siła armii",
+  "homeGoalVillageSecurity": "Bezpieczeństwo wioski",
+  "homeGoalLeszyDefeated": "Leszy pokonany",
+  "homeGoalQuestSladyWPopiele": "Quest \"Ślady w popiele\"",
+  "homeGoalQuestRozmowaZJadwiga": "Quest \"Rozmowa z Jadwigą\"",
+
+  "homeSideQuestMoraleProgress": "{n}/70 morale",
+  "@homeSideQuestMoraleProgress": {"placeholders": {"n": {"type": "int"}}},
+  "homeSideQuestArmyStrengthProgress": "{n}/20 siły armii",
+  "@homeSideQuestArmyStrengthProgress": {"placeholders": {"n": {"type": "int"}}},
+  "homeBuilt": "zbudowana",
+  "homeNotBuilt": "niezbudowana",
+  "homeSideQuestGrotKarczmaProgress": "Grot: {stages}/3 etapów (min. 2) • Karczma: {karczma}",
+  "@homeSideQuestGrotKarczmaProgress": {"placeholders": {"stages": {"type": "int"}, "karczma": {"type": "String"}}},
+
+  "homeGrotVictoryFullSnack": "Grot pokonany bez strat! Łup: +15 złota, +15 drewna.",
+  "homeGrotVictoryPartialSnack": "Grot odparty, ale starcie kosztowało wioskę: -10% drewna i złota.",
+  "homeGrotDefeatSnack": "Grot przełamał obronę wioski - ukończono tylko {cleared}/3 etapów starcia.",
+  "@homeGrotDefeatSnack": {"placeholders": {"cleared": {"type": "int"}}},
+  "homeMartaVictoryFullTrustSnack": "Marta w pełni Ci zaufała, dając sobie czas na rozmowę: +15 morale.",
+  "homeMartaVictoryTrustSnack": "Marta przełamana - staje się sojuszniczką: +10 morale.",
+  "homeMartaVictoryPartialSnack": "Marta częściowo Ci zaufała, ale wciąż coś ukrywa.",
+  "homeMartaDefeatSnack": "Marta wycofała się, nie zdradzając niczego więcej - ukończono tylko {cleared}/3 etapów starcia.",
+  "@homeMartaDefeatSnack": {"placeholders": {"cleared": {"type": "int"}}},
+  "homeBogdanVictoryFullSnack": "Bogdan pęka całkowicie pod ciężarem dowodów i ucieka bez zemsty.",
+  "homeBogdanVictoryPartialSnack": "Bogdan ucieka, ale zdążył podpalić część magazynu ({burns} raz(y)) po drodze.",
+  "@homeBogdanVictoryPartialSnack": {"placeholders": {"burns": {"type": "int"}}},
+  "homeBogdanDefeatSnack": "Nie udało się przełamać Bogdana - magazyn ucierpiał {burns} raz(y), a on wciąż jest przekonany o swojej racji.",
+  "@homeBogdanDefeatSnack": {"placeholders": {"burns": {"type": "int"}}},
+
+  "homeDebugGrotResultSnack": "Debug: starcie z Grotem zakończone - {cleared}/3 etapów (bez wpływu na zapis gry).",
+  "@homeDebugGrotResultSnack": {"placeholders": {"cleared": {"type": "int"}}},
+  "homeDebugMartaResultSnack": "Debug: starcie z Martą zakończone - {cleared}/3 etapów{suffix} (bez wpływu na zapis gry).",
+  "@homeDebugMartaResultSnack": {"placeholders": {"cleared": {"type": "int"}, "suffix": {"type": "String"}}},
+  "homeDebugMartaFullTrustSuffix": " (pełne zaufanie)",
+  "homeDebugBogdanResultSnack": "Debug: starcie z Bogdanem zakończone - Dowód {proof}, {burns} spalenie(a) (bez wpływu na zapis gry).",
+  "@homeDebugBogdanResultSnack": {"placeholders": {"proof": {"type": "String"}, "burns": {"type": "int"}}},
+  "homeDebugProofGathered": "zebrany",
+  "homeDebugProofIncomplete": "niepełny",
+  "homeDebugLeszyResultSnack": "Debug: starcie z Leszym zakończone - {result} (bez wpływu na zapis gry).",
+  "@homeDebugLeszyResultSnack": {"placeholders": {"result": {"type": "String"}}},
+  "homeDebugVictory": "zwycięstwo",
+  "homeDebugDefeat": "porażka",
+
+  "homeActFailure0": "Wioska nie zdążyła przygotować się na czas - dziedzictwo Antoniego zostało zaprzepaszczone.",
+  "homeActFailure1": "Grot przełamał obronę nieprzygotowanej wioski.",
+  "homeActFailure2": "Marta nie zdradziła kluczowej prawdy, a wioska straciła nadzieję.",
+  "homeActFailure3": "Osłabiona głodem i słabą obroną wioska nie przetrwała konfrontacji z Bogdanem.",
+  "homeActFailure4": "Wioska nie zdążyła się przygotować - armia zbyt słaba, mury zbyt kruche na to, co nadchodzi z lasu.",
+  "homeActFailure5": "Leszy został pokonany, ale niektóre wątki pozostają niedomknięte - historia kończy się bez pełnej odpowiedzi.",
+  "homeActFailureDefault": "Cel tego aktu nie został osiągnięty.",
+
+  "homeBossIntroGrotMessage": "Grot i jego zbrojni zbliżają się do wioski. Czas przygotować obronę.",
+  "homeBossIntroMartaMessage": "Marta staje naprzeciw Ciebie, uzbrojona, wysłana przez ojca. Nie ma odwrotu.",
+  "homeBossIntroBogdanMessage": "Bogdan Kruk przybywa osobiście, żądając prawdy. Konfrontacja jest nieunikniona.",
+  "homeBossIntroLeszyMessage": "Mroczny cień lasu budzi się w pełni. Ostateczne starcie o los wioski zaczyna się teraz.",
+  "homeLeszyVictorySnack": "Leszy pokonany! Cień cofa się w głąb ziemi.",
+
+  "homeActGoalReachedSnack": "Cel Aktu {actNumber} (\"{actName}\") osiągnięty! (+{xp} XP)",
+  "@homeActGoalReachedSnack": {"placeholders": {"actNumber": {"type": "int"}, "actName": {"type": "String"}, "xp": {"type": "int"}}},
+
+  "homeSideQuestCompletedSnack": "Quest poboczny ukończony: \"{title}\" (+{xp} XP)",
+  "@homeSideQuestCompletedSnack": {"placeholders": {"title": {"type": "String"}, "xp": {"type": "int"}}},
+
+  "homeDebugJumpedToWeekSnack": "Debug: przeniesiono do tygodnia {week}.",
+  "@homeDebugJumpedToWeekSnack": {"placeholders": {"week": {"type": "int"}}},
+
+  "homeExitGameTitle": "Wyjść z gry?",
+  "homeExitGameMessage": "Na pewno chcesz zamknąć Rolnika?",
+  "homeExit": "Wyjdź"
+}

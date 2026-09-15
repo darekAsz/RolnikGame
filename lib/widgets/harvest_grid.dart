@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../l10n/gen/app_localizations.dart';
 import '../models/grid_position.dart';
 import '../models/resource_type.dart';
 import '../models/season.dart';
@@ -237,22 +238,20 @@ class HarvestGridState extends State<HarvestGrid> {
     if (!mounted || _shufflePromptShown) return;
     if (_hasAvailableMove()) return;
     _shufflePromptShown = true;
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Text('Brak dostępnych ruchów'),
-        content: const Text(
-          'Na planszy nie ma już żadnego możliwego połączenia. '
-          'Możesz przetasować planszę (koszt: 1 ruch).',
-        ),
+        title: Text(l10n.harvestGridNoMovesTitle),
+        content: Text(l10n.harvestGridNoMovesMessage),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
               _shufflePromptShown = false;
             },
-            child: const Text('Zamknij'),
+            child: Text(l10n.harvestGridCloseButton),
           ),
           FilledButton(
             onPressed: () {
@@ -261,7 +260,7 @@ class HarvestGridState extends State<HarvestGrid> {
               _shuffleBoard();
               widget.onShuffleUsed?.call();
             },
-            child: const Text('Przetasuj (−1 ruch)'),
+            child: Text(l10n.harvestGridReshuffleButton),
           ),
         ],
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/gen/app_localizations.dart';
 import '../models/resource_type.dart';
 
 /// Narzędzia testowe - nie są częścią normalnej rozgrywki. Pozwala szybko
@@ -50,19 +51,20 @@ class _DebugViewState extends State<DebugView> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Debug', style: Theme.of(context).textTheme.titleLarge),
+          Text(l10n.debugTitle, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 4),
           Text(
-            'Narzędzia testowe - nie są częścią normalnej rozgrywki.',
+            l10n.debugSubtitle,
             style: Theme.of(context).textTheme.bodySmall,
           ),
           const SizedBox(height: 20),
-          Text('Przejdź do tygodnia', style: Theme.of(context).textTheme.titleMedium),
+          Text(l10n.debugJumpToWeekHeader, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
           Row(
             children: [
@@ -71,21 +73,21 @@ class _DebugViewState extends State<DebugView> {
                   controller: _weekController,
                   keyboardType: TextInputType.number,
                   onSubmitted: (_) => _submitWeek(),
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Numer tygodnia (1-65)',
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    labelText: l10n.debugWeekNumberLabel,
                   ),
                 ),
               ),
               const SizedBox(width: 12),
               FilledButton(
                 onPressed: _submitWeek,
-                child: const Text('Przejdź'),
+                child: Text(l10n.debugJumpButton),
               ),
             ],
           ),
           const SizedBox(height: 24),
-          Text('Dodaj surowce', style: Theme.of(context).textTheme.titleMedium),
+          Text(l10n.debugAddResourcesHeader, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
@@ -93,22 +95,21 @@ class _DebugViewState extends State<DebugView> {
             children: [
               FilledButton.tonal(
                 onPressed: widget.onAddAllResources,
-                child: const Text('+100 wszystkich'),
+                child: Text(l10n.debugAddAllButton),
               ),
               for (final type in ResourceType.values)
                 if (!kBattleOnlyResourceTypes.contains(type))
                   OutlinedButton(
                     onPressed: () => widget.onAddResource(type),
-                    child: Text('+100 ${type.label.toLowerCase()}'),
+                    child: Text(l10n.debugAddResourceButton(type.label.toLowerCase())),
                   ),
             ],
           ),
           const SizedBox(height: 24),
-          Text('Walka treningowa z bossem', style: Theme.of(context).textTheme.titleMedium),
+          Text(l10n.debugBossTrainingHeader, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 4),
           Text(
-            'Uruchamia starcie od razu, z aktualnymi statystykami wioski - wynik NIE jest '
-            'zapisywany ani nie wpływa na fabułę/surowce.',
+            l10n.debugBossTrainingDescription,
             style: Theme.of(context).textTheme.bodySmall,
           ),
           const SizedBox(height: 8),
@@ -116,10 +117,10 @@ class _DebugViewState extends State<DebugView> {
             spacing: 8,
             runSpacing: 8,
             children: [
-              OutlinedButton(onPressed: widget.onFightGrot, child: const Text('Grot (tydz. 26)')),
-              OutlinedButton(onPressed: widget.onFightMarta, child: const Text('Marta (tydz. 39)')),
-              OutlinedButton(onPressed: widget.onFightBogdan, child: const Text('Bogdan (tydz. 52)')),
-              OutlinedButton(onPressed: widget.onFightLeszy, child: const Text('Leszy (tydz. 59)')),
+              OutlinedButton(onPressed: widget.onFightGrot, child: Text(l10n.debugFightGrot)),
+              OutlinedButton(onPressed: widget.onFightMarta, child: Text(l10n.debugFightMarta)),
+              OutlinedButton(onPressed: widget.onFightBogdan, child: Text(l10n.debugFightBogdan)),
+              OutlinedButton(onPressed: widget.onFightLeszy, child: Text(l10n.debugFightLeszy)),
             ],
           ),
         ],

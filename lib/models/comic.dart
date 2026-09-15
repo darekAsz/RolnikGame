@@ -1,3 +1,6 @@
+import '../services/app_locale.dart';
+import 'comic_translations_en.dart';
+
 /// Model komiksów fabularnych "Dług Kruka" - tekstowe plansze (na razie bez
 /// grafiki) prezentowane graczowi w miarę postępu tygodni. Treść odpowiada
 /// scenariuszom ze scenopisu fabuły (30 komiksów, po jednym co 2-3 tygodnie).
@@ -30,6 +33,14 @@ class Comic {
     required this.title,
     required this.panels,
   });
+}
+
+extension ComicLocalization on Comic {
+  String get localizedTitle =>
+      AppLocale.instance.isEnglish ? (kComicsEn[number]?.title ?? title) : title;
+
+  List<ComicPanel> get localizedPanels =>
+      AppLocale.instance.isEnglish ? (kComicsEn[number]?.panels ?? panels) : panels;
 }
 
 /// Etykieta aktu i pora roku - wyświetlane na planszy tytułowej przed

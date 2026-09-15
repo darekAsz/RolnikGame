@@ -1,3 +1,5 @@
+import '../services/app_locale.dart';
+import 'discovery_translations_en.dart';
 import 'resource_type.dart';
 
 /// Odkrycia badane w Uczelni (BuildingKind.szkola) - trwałe, jednorazowo
@@ -35,6 +37,14 @@ class Discovery {
     required this.requiredBuildingLevel,
     required this.cost,
   });
+}
+
+extension DiscoveryLocalization on Discovery {
+  String get localizedName =>
+      AppLocale.instance.isEnglish ? (kDiscoveriesEn[id]?.name ?? name) : name;
+
+  String get localizedDescription =>
+      AppLocale.instance.isEnglish ? (kDiscoveriesEn[id]?.description ?? description) : description;
 }
 
 // Koszty stopniowane wg wartości efektu i wymaganego poziomu Uczelni:

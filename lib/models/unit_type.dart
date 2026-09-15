@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../services/app_locale.dart';
 import 'resource_type.dart';
 
 /// Trzy rodzaje jednostek rekrutowanych w Koszarach - każdy z innym kosztem
@@ -29,6 +30,16 @@ class UnitPalette {
 
 extension UnitTypeStyle on UnitType {
   String get label {
+    if (AppLocale.instance.isEnglish) {
+      switch (this) {
+        case UnitType.spearman:
+          return 'Spearman';
+        case UnitType.archer:
+          return 'Archer';
+        case UnitType.warrior:
+          return 'Warrior';
+      }
+    }
     switch (this) {
       case UnitType.spearman:
         return 'Włócznik';

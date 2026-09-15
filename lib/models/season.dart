@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../services/app_locale.dart';
 import 'resource_type.dart';
 
 /// Pory roku, każda trwająca 13 tygodni (wiosna -> lato -> jesień -> zima ->
@@ -35,6 +36,18 @@ String boardImagePathForWeek(int week) {
 
 extension SeasonStyle on Season {
   String get label {
+    if (AppLocale.instance.isEnglish) {
+      switch (this) {
+        case Season.spring:
+          return 'Spring';
+        case Season.summer:
+          return 'Summer';
+        case Season.autumn:
+          return 'Autumn';
+        case Season.winter:
+          return 'Winter';
+      }
+    }
     switch (this) {
       case Season.spring:
         return 'Wiosna';
@@ -90,6 +103,17 @@ extension SeasonStyle on Season {
   }
 
   String get spoiledLabel {
+    if (AppLocale.instance.isEnglish) {
+      switch (this) {
+        case Season.summer:
+          return 'Burnt';
+        case Season.winter:
+          return 'Frozen';
+        case Season.spring:
+        case Season.autumn:
+          return '';
+      }
+    }
     switch (this) {
       case Season.summer:
         return 'Spalone';
@@ -102,6 +126,18 @@ extension SeasonStyle on Season {
   }
 
   String get description {
+    if (AppLocale.instance.isEnglish) {
+      switch (this) {
+        case Season.spring:
+          return 'More stone, less wood.';
+        case Season.summer:
+          return 'More grain, but some of the ears are burnt.';
+        case Season.autumn:
+          return 'More apples and grass.';
+        case Season.winter:
+          return 'Less water, some of it is frozen.';
+      }
+    }
     switch (this) {
       case Season.spring:
         return 'Więcej kamienia, mniej drewna.';

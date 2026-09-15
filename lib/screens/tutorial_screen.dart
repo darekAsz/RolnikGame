@@ -1,37 +1,18 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/gen/app_localizations.dart';
 import '../services/game_progress_storage.dart';
 import 'home_shell.dart';
 
 class TutorialScreen extends StatelessWidget {
   const TutorialScreen({super.key});
 
-  static const _steps = [
-    (
-      Icons.touch_app,
-      'Łącz surowce',
-      'Przeciągnij palcem po sąsiadujących kafelkach tego samego surowca '
-          '(również po skosie), żeby je zebrać.',
-    ),
-    (
-      Icons.style,
-      'Dziki joker',
-      'Za dłuższą ścieżkę (5 i więcej kafelków) dostajesz jokera - łączy się '
-          'z każdym surowcem i mnoży zbiory.',
-    ),
-    (
-      Icons.whatshot,
-      'Bomba',
-      'Za jeszcze dłuższą ścieżkę (6 i więcej) dostajesz bombę - włączona do '
-          'ścieżki niszczy sąsiednie kafelki.',
-    ),
-    (
-      Icons.home_work,
-      'Rozbuduj wioskę',
-      'Zebrane surowce zostają w wiosce między tygodniami - w przyszłości '
-          'posłużą do jej rozbudowy.',
-    ),
-  ];
+  static List<(IconData, String, String)> _steps(AppLocalizations l10n) => [
+        (Icons.touch_app, l10n.tutorialStep1Title, l10n.tutorialStep1Description),
+        (Icons.style, l10n.tutorialStep2Title, l10n.tutorialStep2Description),
+        (Icons.whatshot, l10n.tutorialStep3Title, l10n.tutorialStep3Description),
+        (Icons.home_work, l10n.tutorialStep4Title, l10n.tutorialStep4Description),
+      ];
 
   Future<void> _finish(BuildContext context) async {
     await GameProgressStorage.markTutorialSeen();
@@ -43,8 +24,10 @@ class TutorialScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final steps = _steps(l10n);
     return Scaffold(
-      appBar: AppBar(title: const Text('Jak grać')),
+      appBar: AppBar(title: Text(l10n.tutorialAppBarTitle)),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -52,10 +35,10 @@ class TutorialScreen extends StatelessWidget {
             children: [
               Expanded(
                 child: ListView.separated(
-                  itemCount: _steps.length,
+                  itemCount: steps.length,
                   separatorBuilder: (context, index) => const SizedBox(height: 22),
                   itemBuilder: (context, index) {
-                    final (icon, title, description) = _steps[index];
+                    final (icon, title, description) = steps[index];
                     return Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -88,9 +71,9 @@ class TutorialScreen extends StatelessWidget {
                 width: double.infinity,
                 child: FilledButton(
                   onPressed: () => _finish(context),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 14),
-                    child: Text('Rozumiem, zaczynamy!'),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    child: Text(l10n.tutorialFinishButton),
                   ),
                 ),
               ),

@@ -52,3 +52,6 @@ app.*.map.json
 # Oryginalne PNG komiksów sprzed konwersji na WebP (assets/comics/) - 283 MB,
 # nieużywane przez grę, zostawione tu tylko jako lokalna kopia zapasowa źródeł.
 /comics/
+
+# Lokalny stan narzędzia Claude Code (nie część projektu).
+/.claude/

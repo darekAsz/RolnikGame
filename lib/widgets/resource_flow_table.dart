@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/gen/app_localizations.dart';
 import '../models/resource_type.dart';
 import 'resource_icon.dart';
 
@@ -29,6 +30,7 @@ class ResourceFlowTable extends StatelessWidget {
     ];
 
     if (rows.isEmpty) {
+      final l10n = AppLocalizations.of(context)!;
       return Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
@@ -36,7 +38,7 @@ class ResourceFlowTable extends StatelessWidget {
           color: Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(16),
         ),
-        child: const Text('Brak zbudowanych źródeł produkcji ani zużycia.'),
+        child: Text(l10n.resourceFlowEmptyState),
       );
     }
 
@@ -90,7 +92,9 @@ class _ResourceFlowRow extends StatelessWidget {
           : Theme.of(context).colorScheme.onSurfaceVariant;
 
   Widget _header(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final net = production - consumption;
+    final netText = '${net >= 0 ? '+' : ''}$net';
     return Row(
       children: [
         SizedBox(width: 22, height: 22, child: resourceIconAsset(type.assetPath, size: 22)),
@@ -105,7 +109,7 @@ class _ResourceFlowRow extends StatelessWidget {
           Text('-$consumption', style: const TextStyle(color: Color(0xFFC0392B))),
         const SizedBox(width: 12),
         Text(
-          '= ${net >= 0 ? '+' : ''}$net/tydz.',
+          '= ${l10n.resourceFlowNetPerWeek(netText)}',
           style: TextStyle(color: _netColor(context, net), fontWeight: FontWeight.bold),
         ),
       ],

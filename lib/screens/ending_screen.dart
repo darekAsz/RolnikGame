@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/gen/app_localizations.dart';
+
 /// Ekran zakończenia gry - pokazywany raz, zaraz po pomyślnym rozstrzygnięciu
 /// Aktu V (tydzień 65, ostatni akt fabuły), po komiksie #30. Który z trzech
 /// wariantów epilogu się pojawia zależy od tego, jak przebiegła cała
@@ -54,6 +56,7 @@ class EndingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final tier = _tier;
     return PopScope(
       canPop: false,
@@ -67,7 +70,7 @@ class EndingScreen extends StatelessWidget {
                 Icon(Icons.auto_awesome, color: tier.color, size: 52),
                 const SizedBox(height: 12),
                 Text(
-                  'Koniec Roku Pierwszego',
+                  l10n.endingTitle,
                   style: Theme.of(context).textTheme.displaySmall?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -83,7 +86,7 @@ class EndingScreen extends StatelessWidget {
                     border: Border.all(color: tier.color),
                   ),
                   child: Text(
-                    tier.label,
+                    tier.label(l10n),
                     style: TextStyle(color: tier.color, fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -98,7 +101,7 @@ class EndingScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 20),
                         Text(
-                          tier.epilogue,
+                          tier.epilogue(l10n),
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                 color: Colors.white70,
                                 height: 1.5,
@@ -129,9 +132,9 @@ class EndingScreen extends StatelessWidget {
                       foregroundColor: const Color(0xFF1A1410),
                     ),
                     onPressed: () => Navigator.of(context).pop(),
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      child: Text('Kontynuuj', style: TextStyle(fontWeight: FontWeight.bold)),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Text(l10n.endingContinue, style: const TextStyle(fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ),
@@ -167,6 +170,7 @@ class _StatsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -179,30 +183,42 @@ class _StatsCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Rok Pierwszy w liczbach',
+            l10n.endingStatsCardTitle,
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
           ),
           const SizedBox(height: 10),
-          _StatRow(icon: Icons.groups, label: 'Populacja', value: '$population / $populationLimit'),
-          _StatRow(icon: Icons.mood, label: 'Morale wioski', value: '${morale.round()}%'),
-          _StatRow(icon: Icons.military_tech, label: 'Zdobyte doświadczenie', value: '$xp XP'),
+          _StatRow(
+            icon: Icons.groups,
+            label: l10n.endingStatPopulationLabel,
+            value: l10n.endingStatPopulationValue(population, populationLimit),
+          ),
+          _StatRow(
+            icon: Icons.mood,
+            label: l10n.endingStatMoraleLabel,
+            value: l10n.endingStatMoraleValue(morale.round()),
+          ),
+          _StatRow(
+            icon: Icons.military_tech,
+            label: l10n.endingStatXpLabel,
+            value: l10n.endingStatXpValue(xp),
+          ),
           _StatRow(
             icon: Icons.shield_moon,
-            label: 'Starcie z Grotem',
-            value: '$bossBattleStagesCleared / 3 etapów',
+            label: l10n.endingStatGrotLabel,
+            value: l10n.endingStatGrotValue(bossBattleStagesCleared),
           ),
           _StatRow(
             icon: Icons.checklist,
-            label: 'Questy poboczne',
-            value: '$totalSideQuestsClaimed / $totalSideQuestsCount',
+            label: l10n.endingStatSideQuestsLabel,
+            value: l10n.endingStatSideQuestsValue(totalSideQuestsClaimed, totalSideQuestsCount),
           ),
           _StatRow(
             icon: everStarved ? Icons.warning_amber : Icons.eco,
-            label: 'Głód',
-            value: everStarved ? 'Wioska go zaznała' : 'Nigdy nie nawiedził wioski',
+            label: l10n.endingStatHungerLabel,
+            value: everStarved ? l10n.endingStatHungerYes : l10n.endingStatHungerNo,
           ),
         ],
       ),
@@ -236,42 +252,34 @@ class _StatRow extends StatelessWidget {
 }
 
 enum _EndingTier {
-  golden(
-    label: 'Złoty wiek',
-    color: Color(0xFFD4AF37),
-    imageKey: 'ending_golden',
-    epilogue:
-        'Wioska tętni życiem jak nigdy dotąd. Spichlerze pełne, mury mocne, a ludzie nie boją się '
-        'już zmierzchu. Kazimierz spłacił dług, którego sam nie zaciągnął - i zrobił to z nawiązką, '
-        'zamieniając brzemię dziadka w fundament czegoś trwałego. Marta zostaje - nie jako wróg, nie '
-        'z konieczności, ale jako ktoś, kto wreszcie znalazł dom po drugiej stronie granicy, która '
-        'przestała cokolwiek dzielić.',
-  ),
-  hardWon(
-    label: 'Trudne zwycięstwo',
-    color: Color(0xFF6E9B7A),
-    imageKey: 'ending_hardwon',
-    epilogue:
-        'Wioska przetrwała - poobijana, zmęczona, ale wciąż stoi. Nie wszystko poszło gładko: były '
-        'noce niedostatku i starcia, których wynik ważył się na włosku. Ale dług został spłacony, a '
-        'Marta i Jadwiga stoją dziś obok Kazimierza jako rodzina, którą sam sobie wybrał - nie tę, '
-        'którą odziedziczył.',
-  ),
-  scarred(
-    label: 'Blizny, które zostają',
-    color: Color(0xFF8C8377),
-    imageKey: 'ending_scarred',
-    epilogue:
-        'Zwycięstwo smakuje gorzko. Wioska stoi, dług spłacony, Leszy pokonany - ale cena była '
-        'wysoka: głodne noce, puste spichlerze, sąsiedzi patrzący na Kazimierza inaczej niż kiedyś na '
-        'Antoniego. Marta zostaje przy nim, a on sam zaczyna rozumieć, dlaczego dziadek dźwigał tę '
-        'tajemnicę w milczeniu przez dwadzieścia lat - nie każde zwycięstwo da się świętować.',
-  );
+  golden(color: Color(0xFFD4AF37), imageKey: 'ending_golden'),
+  hardWon(color: Color(0xFF6E9B7A), imageKey: 'ending_hardwon'),
+  scarred(color: Color(0xFF8C8377), imageKey: 'ending_scarred');
 
-  final String label;
   final Color color;
   final String imageKey;
-  final String epilogue;
 
-  const _EndingTier({required this.label, required this.color, required this.imageKey, required this.epilogue});
+  const _EndingTier({required this.color, required this.imageKey});
+
+  String label(AppLocalizations l10n) {
+    switch (this) {
+      case _EndingTier.golden:
+        return l10n.endingTierGoldenLabel;
+      case _EndingTier.hardWon:
+        return l10n.endingTierHardWonLabel;
+      case _EndingTier.scarred:
+        return l10n.endingTierScarredLabel;
+    }
+  }
+
+  String epilogue(AppLocalizations l10n) {
+    switch (this) {
+      case _EndingTier.golden:
+        return l10n.endingTierGoldenEpilogue;
+      case _EndingTier.hardWon:
+        return l10n.endingTierHardWonEpilogue;
+      case _EndingTier.scarred:
+        return l10n.endingTierScarredEpilogue;
+    }
+  }
 }

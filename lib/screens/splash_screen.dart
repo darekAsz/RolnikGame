@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../l10n/gen/app_localizations.dart';
 import '../services/area_storage.dart';
 import '../services/comic_storage.dart';
 import '../services/discovery_storage.dart';
@@ -66,23 +67,23 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     if (_hasSave) {
       final confirmed = await showDialog<bool>(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Zacząć nową grę?'),
-          content: const Text(
-            'To nadpisze i bezpowrotnie usunie obecny zapis gry. Jeśli chcesz '
-            'kontynuować dotychczasową rozgrywkę, wybierz zamiast tego "Kontynuuj".',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Anuluj'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Nadpisz i zacznij od nowa'),
-            ),
-          ],
-        ),
+        builder: (context) {
+          final l10n = AppLocalizations.of(context)!;
+          return AlertDialog(
+            title: Text(l10n.splashNewGameDialogTitle),
+            content: Text(l10n.splashNewGameDialogContent),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(l10n.splashCancel),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text(l10n.splashOverwriteAndStart),
+              ),
+            ],
+          );
+        },
       );
       if (confirmed != true) return;
     }
@@ -131,6 +132,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       body: Stack(
         fit: StackFit.expand,
@@ -175,7 +177,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
-                      'Rolnik',
+                      l10n.splashTitle,
                       style: Theme.of(context).textTheme.displaySmall?.copyWith(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -183,7 +185,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                           ),
                     ),
                     Text(
-                      'Dług Kruka',
+                      l10n.splashSubtitle,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             color: Colors.white70,
                             letterSpacing: 1.5,
@@ -195,9 +197,9 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                       width: 220,
                       child: FilledButton(
                         onPressed: _onNewGamePressed,
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 12),
-                          child: Text('Nowa gra'),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          child: Text(l10n.splashNewGame),
                         ),
                       ),
                     ),
@@ -210,9 +212,9 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                           foregroundColor: Colors.white,
                           side: const BorderSide(color: Colors.white70),
                         ),
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 12),
-                          child: Text('Kontynuuj'),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          child: Text(l10n.splashContinue),
                         ),
                       ),
                     ),

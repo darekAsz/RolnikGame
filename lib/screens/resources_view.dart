@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/gen/app_localizations.dart';
 import '../models/resource_type.dart';
 import '../widgets/resource_flow_table.dart';
 import '../widgets/resource_icon.dart';
@@ -28,6 +29,7 @@ class ResourcesView extends StatelessWidget {
   });
 
   void _showLockedInfo(BuildContext context, ResourceType type) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -39,15 +41,11 @@ class ResourcesView extends StatelessWidget {
             Text(type.label),
           ],
         ),
-        content: Text(
-          '${type.label} nie zostało jeszcze odkryte. Dopóki nie odblokujesz go w '
-          'Okolicach wioski, wszystkie premie do tego surowca (np. z Ratusza czy '
-          'budynków produkcyjnych) nie będą działać.',
-        ),
+        content: Text(l10n.resourcesViewLockedInfoContent(type.label)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Rozumiem'),
+            child: Text(l10n.resourcesViewGotItButton),
           ),
         ],
       ),
@@ -56,6 +54,7 @@ class ResourcesView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
       child: Column(
@@ -63,18 +62,18 @@ class ResourcesView extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(child: Text('Surowce', style: Theme.of(context).textTheme.titleLarge)),
+              Expanded(child: Text(l10n.resourcesViewTitle, style: Theme.of(context).textTheme.titleLarge)),
               if (onTrade != null)
                 FilledButton.icon(
                   onPressed: onTrade,
                   icon: const Icon(Icons.swap_horiz, size: 18),
-                  label: const Text('Rynek'),
+                  label: Text(l10n.resourcesViewMarketButton),
                 ),
             ],
           ),
           const SizedBox(height: 4),
           Text(
-            'Magazyn: limit $storageCap każdego surowca.',
+            l10n.resourcesViewStorageLimit(storageCap),
             style: Theme.of(context).textTheme.bodySmall,
           ),
           const SizedBox(height: 12),
@@ -149,7 +148,7 @@ class ResourcesView extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 20),
-          Text('Produkcja i zużycie surowców (tygodniowo)',
+          Text(l10n.resourcesViewProductionConsumptionTitle,
               style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 10),
           ResourceFlowTable(
