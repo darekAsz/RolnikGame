@@ -95,7 +95,7 @@ Uruchamia się też raz automatycznie ~550ms po rozdaniu nowej planszy, oraz kas
 
 | Pora roku | Modyfikator wag | Psujący się surowiec |
 |---|---|---|
-| Wiosna 🌱 | kamień ×1.1, drewno ×0.9 | brak |
+| Wiosna 🌱 | kamień ×1.1, drewno ×1.1 | brak |
 | Lato ☀️ | zboże ×1.1 | Zboże (Spalone) |
 | Jesień 🍂 | jabłko ×1.1, trawa ×1.1 | brak |
 | Zima ❄️ | woda ×0.9 | Woda (Zamarznięte) |
@@ -150,7 +150,8 @@ Ratusz, Palisada, Sklep, Karczma, Dom, Kuźnia, Spichlerz, Piekarnia, Tartak, St
 
 1. **Wszystkie 7 surowców ekonomii musi być odblokowanych** (przez rozwój Okolic — Sad, Łąka, Pole), zanim da się zbudować cokolwiek w wiosce, łącznie z Ratuszem.
 2. **Ratusz musi być zbudowany, zanim da się zbudować jakikolwiek inny budynek** (w tym Palisadę).
-3. **Ratusz musi być rozbudowany do poziomu 2, zanim da się rozbudować jakikolwiek inny budynek do poziomu 2.**
+3. **Rozbudowa Ratusza do poziomu 2 odblokowuje się dopiero w Akcie II (tydzień 27)** - to też nowy, dodatkowy cel główny tego aktu (patrz 10), niezależny od starcia z Martą.
+4. **Ratusz musi być rozbudowany do poziomu 2, zanim da się rozbudować jakikolwiek inny budynek do poziomu 2.**
 
 ### 4.4. Efekty budynków (poziom 1 → poziom 2)
 
@@ -170,7 +171,7 @@ Ratusz, Palisada, Sklep, Karczma, Dom, Kuźnia, Spichlerz, Piekarnia, Tartak, St
 | **Kaplica** | -5% ryzyka zepsucia; +5 morale | -10% ryzyka (łącznie, efektywnie zeruje bazowe 10%); +10 morale (łącznie) |
 | **Uczelnia** | odblokowuje panel odkryć (wymagające poziomu 1) | odblokowuje odkrycia wymagające poziomu 2 |
 | **Rynek** | wymiana: 8 oddane → 1 otrzymane (surowy start) | wymiana: 6 oddane → 1 otrzymane (jedno z 3 niezależnych ulepszeń) — patrz sekcja 8 |
-| **Magazyn** | +300 do limitu magazynu każdego surowca | +600 (łącznie) |
+| **Magazyn** | +50 do limitu magazynu każdego surowca | +100 (łącznie) |
 | **Kamieniarz** | +3 kamienia/tydzień | +6 kamienia/tydzień |
 | **Koszary** | +5 bezpieczeństwa; odblokowuje rekrutację (wymaga zbudowanej Kuźni) | +10 bezpieczeństwa (łącznie); **podwaja siłę każdego żołnierza** |
 
@@ -191,6 +192,7 @@ Koszary poziom 2 podwaja siłę KAŻDEGO żołnierza (patrz tabela wyżej); Kowa
 - Limit pracowników na budynek: **0** domyślnie → **1** po odkryciu „Zarządzanie pracownikami I” → **2** po „Zarządzanie pracownikami II” (oba w Uczelni).
 - Każdy przydzielony pracownik daje **+50% do premii budynku**, maks. 2 pracowników = podwojona premia.
 - Przydzielenie pracownika zużywa jednostkę **limitu populacji** (wspólna pula na całą wioskę), nie samą liczbę mieszkańców.
+- Wyjątki od reguły +50%/pracownika - płaski, addytywny bonus zamiast mnożnika: **Sklep** (+1 do limitu dokupywanych ruchów/pracownika), **Rynek** (-1 do kursu wymiany/pracownika) i **Magazyn** (+25 do limitu magazynu/pracownika, patrz niżej).
 
 ### 4.6. Dodatkowe domy
 
@@ -207,29 +209,29 @@ Koszary poziom 2 podwaja siłę KAŻDEGO żołnierza (patrz tabela wyżej); Kowa
 | **Limit populacji** | 5 | + Dom (3/6, skal. pracownikami) + Karczma (2/4, skal.) + Palisada (1/2, skal.) + aktywne dodatkowe domy (3/6 każdy, rozbudowa niezależna od pracowników) + bonus z wydarzeń |
 | **Morale** (0-100) | 50 | + Browar (10/20, skal.) + Kaplica (5/10, skal.) + bonus z wydarzeń + (bezpieczeństwo / 100) |
 | **Bezpieczeństwo** | 0 | + Palisada (20/40, skal.) + Koszary (5/10, skal.) + bonus z wydarzeń |
-| **Limit magazynu** (na surowiec) | 500 | + Magazyn (300/600, skal.) + odkrycie „Rachunkowość” (+150 flat) |
+| **Limit magazynu** (na surowiec) | 100 | + Magazyn (50/100 wg poziomu, NIE skal. pracownikami) + Magazyn: +25/pracownika (flat, maks. 2 = +50) + odkrycie „Rachunkowość” (+150 flat) |
 | **Ryzyko zepsucia** (bazowo 10%) | — | − Kaplica (5%/10%) − Studnia (3%/6%) − Spichlerz (3%/6%), suma przycięta do [0%, 10%] |
 
-**Populacja i głód**: zużycie zboża = `ceil(populacja / 4)` (dzielnik +2 z odkryciem „Agronomia zapasowa”, czyli /6). Jeśli brakuje zboża → głód: populacja -1 (0 z odkryciem „Medycyna wiejska”), morale -5. Jeśli zboża wystarcza i populacja &lt; limit → wzrost +1/tydzień (+1 więcej z odkryciem „Szybszy przyrost”, czyli +2).
+**Populacja i głód**: zużycie zboża = `ceil(populacja / 1)`, czyli 1 zboże/mieszkaniec (dzielnik +1 z odkryciem „Agronomia zapasowa”, czyli 2 mieszkańców/1 zboże). Brakujące zboże jest dobierane z jabłek jako zapasowe źródło jedzenia (dokładnie brakująca ilość, nie cała potrzeba) - głód następuje dopiero, gdy i jabłek nie starcza: populacja -1 (0 z odkryciem „Medycyna wiejska”), morale -5. Jeśli jedzenia wystarcza i populacja &lt; limit → wzrost zależny od morale wioski: `morale/100` mieszkańca/tydzień (np. 50% morale = +0,5/tydzień), **×2 z odkryciem „Szybszy przyrost”**. Ułamkowa reszta odkłada się między tygodniami (patrz `HomeShell._populationGrowthProgress`), więc np. stałe 0,5/tydzień faktycznie daje +1 co dwa tygodnie, nie jest tracone przy zaokrąglaniu.
 
 ---
 
 ## 6. Okolice (Surroundings) — 6 terenów
 
-Kolejność odblokowania (każdy wymaga poprzedniego): **Sad → Łąka → Pole → Rzeka → Góry → Las**.
+Kolejność odblokowania (każdy wymaga poprzedniego): **Sad → Łąka → Pole → Las → Rzeka → Góry**.
 
-| Teren | Surowiec | Efekt (Sad/Łąka/Pole = nowy surowiec; Rzeka/Góry/Las = surowiec startowy) |
+| Teren | Surowiec | Efekt (Sad/Łąka/Pole = nowy surowiec; Las/Rzeka/Góry = surowiec startowy) |
 |---|---|---|
 | Sad | Jabłko | odblokowuje nowy typ na planszy |
 | Łąka | Trawa | odblokowuje nowy typ |
 | Pole | Zboże | odblokowuje nowy typ |
-| Rzeka | Woda | już dostępna od startu — zamiast tego +1 do każdej ścieżki tego surowca |
+| Las | Drewno | już dostępna od startu — zamiast tego +1 do każdej ścieżki tego surowca |
+| Rzeka | Woda | już dostępna od startu — +1 do każdej ścieżki |
 | Góry | Kamień | już dostępna od startu — +1 do każdej ścieżki |
-| Las | Drewno | już dostępna od startu — +1 do każdej ścieżki |
 
 Ta premia +1 działa też w starciach z bossami, wszędzie tam, gdzie dany surowiec da się zebrać/zbankować (np. Miecz z drewna u Grota, Opanowanie wodą u Bogdana, zdolności bankujące drewno/kamień/wodę u Leszego) — wcześniej działała tylko w zwykłych zbiorach.
 
-- Koszt poziomu 1 rośnie wraz z terenem (Sad: 10 drewna/8 kamienia → Rzeka/Góry/Las: 18 drewna, 15 kamienia, 12 jabłka, 10 trawy, 10 zboża — czyli konsumują surowce odblokowane wcześniejszymi terenami).
+- Koszt poziomu 1 rośnie wraz z terenem, ale drewno jest celowo złagodzone dla pierwszych czterech terenów (Sad: 7 drewna/8 kamienia → Łąka: 9 drewna → Pole: 11 drewna → Las: 14 drewna, 15 kamienia, 12 jabłka, 10 trawy, 10 zboża), podczas gdy Rzeka/Góry jako faktycznie ostatni etap zostają przy pełnym koszcie: 18 drewna, 15 kamienia, 12 jabłka, 10 trawy, 10 zboża (czyli konsumują surowce odblokowane wcześniejszymi terenami).
 - Koszt poziomu 2: **flat 20 złota** dla każdego terenu.
 - Poziom 2 dowolnego terenu odblokowuje „Surowiec tygodnia” (patrz 3.8).
 - Każdy zbudowany teren (poziom 1) dodaje **+1 wiersz** do planszy zbiorów; komplet 6 terenów dodaje dodatkowo **+1 kolumnę** (niezależnie odkrycie „Kartografia” też dodaje +1 kolumnę).
@@ -238,31 +240,31 @@ Ta premia +1 działa też w starciach z bossami, wszędzie tam, gdzie dany surow
 
 ## 7. Uczelnia — 14 odkryć
 
-*Koszty przeliczone wg wartości efektu i wymaganego poziomu Uczelni: tanie usprawnienia poziomu 1 → solidniejsze inwestycje poziomu 2 → Szczęśliwa passa/Wybuchowy zapał jako szczyt (jedyne odkrycia zmieniające na stałe samą mechanikę match-3, nie tylko ekonomię wioski).*
+*Koszty przeliczone wg wartości efektu i wymaganego poziomu Uczelni: tanie usprawnienia poziomu 1 → solidniejsze inwestycje poziomu 2 → Szczęśliwa passa/Wybuchowy zapał jako szczyt (jedyne odkrycia zmieniające na stałe samą mechanikę match-3, nie tylko ekonomię wioski). Wszystkie ceny podniesione o ~1/3 względem pierwotnych.*
 
 | Odkrycie | Poziom Uczelni | Koszt | Efekt |
 |---|---|---|---|
-| Podstawy agronomii | 1 | 10 złota | +1 ruch bazowy |
-| Zaawansowana agronomia | 2 | 15 złota | +1 ruch bazowy (razem +2) |
-| Zarządzanie pracownikami I | 1 | 15 złota, 10 drewna, 10 kamienia | odblokowuje 1 pracownika/budynek |
-| Zarządzanie pracownikami II | 2 | 25 złota, 15 drewna, 15 kamienia | limit pracowników → 2 |
-| Rachunkowość | 1 | 12 złota, 10 drewna | +150 do limitu magazynu (każdy surowiec) |
-| Medycyna wiejska | 1 | 10 złota, 8 zboża | głód nie zabiera populacji, tylko morale |
-| Agronomia zapasowa | 1 | 10 złota, 8 zboża | dzielnik zużycia zboża 4→6 |
-| Meteorologia | 1 | 12 złota | +15pp do szansy na pozytywne wydarzenie |
-| Kartografia | 2 | 20 złota, 15 drewna, 15 kamienia | +1 kolumna planszy zbiorów |
-| Dyplomacja | 2 | 15 złota | +1 do ilości otrzymywanej przy wymianie na Rynku |
-| Kowalstwo wojskowe | 2 | 18 złota, 10 kamienia | +1 siły każdego żołnierza |
-| Szybszy przyrost | 2 | 18 złota, 10 zboża | +1 do tygodniowego przyrostu populacji |
-| **Szczęśliwa passa** | 2 | 25 złota, 20 drewna, 20 kamienia | joker już od ścieżki 4 (zamiast 5) |
-| **Wybuchowy zapał** | 2 | 35 złota, 25 drewna, 25 kamienia, 15 zboża | bomba już od ścieżki 5 (zamiast 6) |
+| Podstawy agronomii | 1 | 13 złota | +1 ruch bazowy |
+| Zaawansowana agronomia | 2 | 20 złota | +1 ruch bazowy (razem +2) |
+| Zarządzanie pracownikami I | 1 | 20 złota, 13 drewna, 13 kamienia | odblokowuje 1 pracownika/budynek |
+| Zarządzanie pracownikami II | 2 | 33 złota, 20 drewna, 20 kamienia | limit pracowników → 2 |
+| Rachunkowość | 1 | 16 złota, 13 drewna | +150 do limitu magazynu (każdy surowiec) |
+| Medycyna wiejska | 1 | 13 złota, 11 zboża | głód nie zabiera populacji, tylko morale |
+| Agronomia zapasowa | 1 | 13 złota, 11 zboża | dzielnik zużycia zboża 4→6 |
+| Meteorologia | 1 | 16 złota | +15pp do szansy na pozytywne wydarzenie |
+| Kartografia | 2 | 27 złota, 20 drewna, 20 kamienia | +1 kolumna planszy zbiorów |
+| Dyplomacja | 2 | 20 złota | +1 do ilości otrzymywanej przy wymianie na Rynku |
+| Kowalstwo wojskowe | 2 | 24 złota, 13 kamienia | +1 siły każdego żołnierza |
+| Szybszy przyrost | 2 | 24 złota, 13 zboża | ×2 do tempa przyrostu populacji (zależnego od morale) |
+| **Szczęśliwa passa** | 2 | 33 złota, 27 drewna, 27 kamienia | joker już od ścieżki 4 (zamiast 5) |
+| **Wybuchowy zapał** | 2 | 47 złota, 33 drewna, 33 kamienia, 20 zboża | bomba już od ścieżki 5 (zamiast 6) |
 
 ---
 
 ## 8. Sklep i Rynek
 
-- **Dokupowanie ruchów**: baza 10 (+1 za każde z dwóch odkryć agronomii, maks. 12), limit dokupionych ruchów **2** z samym Sklepem (poziom 1), **+4 więcej (razem 6)** po rozbudowie do poziomu 2 — świadomie rosnący skok, **+1 za każdego przydzielonego pracownika** (maks. 2, dodatek prosty i addytywny, nie mnożnik). Koszt rośnie z każdym zakupem: **5 złota + 5 za każdy już kupiony** (5/10/15/20/25/30 za kolejne ruchy).
-- **Auto-dopasowywanie**: poziom 1 (ciągi 4+) kosztuje 15 złota; poziom 2 (ciągi 3+, wymaga poziomu 1) kosztuje 25 złota.
+- **Dokupowanie ruchów**: baza 10 (+1 za każde z dwóch odkryć agronomii, maks. 12), limit dokupionych ruchów **2** z samym Sklepem (poziom 1), **+4 więcej (razem 6)** po rozbudowie do poziomu 2 — świadomie rosnący skok, **+1 za każdego przydzielonego pracownika** (maks. 2, dodatek prosty i addytywny, nie mnożnik). Koszt rośnie z każdym zakupem, trzema surowcami naraz: **50 złota + 15 za każdy już kupiony**, **15 drewna + 5 za każdy już kupiony**, **10 kamienia + 5 za każdy już kupiony**.
+- **Auto-dopasowywanie**: poziom 1 (ciągi 4+) kosztuje 60 złota, 20 drewna, 20 kamienia; poziom 2 (ciągi 3+, wymaga poziomu 1, realna zmiana mechaniki match-3) kosztuje jeszcze więcej - 100 złota, 30 drewna, 30 kamienia.
 - **Kurs wymiany na Rynku**: zawsze dostajesz **1** surowiec. Ile trzeba oddać, spada z 3 niezależnych ulepszeń: Rynek poziom 2 (**-2**), odkrycie Dyplomacji (**-2**), przydzieleni pracownicy (do 2, **-1 za każdego**). Bez żadnego z nich: **8→1** (surowy początek). Z kompletem wszystkich trzech: dokładnie **2→1** — to twardy sufit, kurs nigdy nie jest lepszy, żeby handel nie stał się darmowym generatorem surowców. Ulepszenia sumują się niezależnie, np. odkrycie Dyplomacji + 1 pracownik = **-3**, czyli **5→1**.
 
 ---
@@ -283,13 +285,13 @@ Ta premia +1 działa też w starciach z bossami, wszędzie tam, gdzie dany surow
 |---|---|---|---|
 | 0 | Zanim odejdziesz | 1-13 | Ratusz + Sad/Łąka/Pole zbudowane + określone zapasy każdego z 7 surowców |
 | I | Ostrzeżenie | 14-26 | pokonać min. 2/3 etapów starcia z **Grotem** |
-| II | Krew rodziny | 27-39 | min. 2/3 etapów starcia z **Martą** |
+| II | Krew rodziny | 27-39 | min. 2/3 etapów starcia z **Martą** + rozbudowany Ratusz (poziom 2) |
 | III | Twarzą w twarz | 40-52 | pełny Dowód w starciu z **Bogdanem** |
 | IV | Głodny Cień | 53-59 | siła armii ≥ 20 i bezpieczeństwo ≥ 50 (gotowość na starcie z **Leszym**, w środku Aktu V) |
-| V | Powrót Wiosny | 60-65 | zwyciężyć **Leszego** (tydzień 64) + ukończyć oba questy poboczne epilogu |
+| V | Powrót Wiosny | 60-65 | zwyciężyć **Leszego** (tydzień 64) + ukończyć questy „Ślady w popiele” i „Rozmowa z Jadwigą” (patrz 12 — śledzone od Aktu II/III, ale wymagane dopiero jako część celu Aktu V) |
 
 - Niespełnienie celu na ostatnim tygodniu aktu → **ekran porażki aktu** → przywrócenie dowolnego wcześniejszego checkpointu albo nowa gra.
-- Każdy ukończony cel aktu: **+25 XP**.
+- Każdy ukończony cel aktu: paczka surowców do magazynu, rosnąca z numerem aktu - `20 + akt×4` drewna, `20 + akt×4` kamienia, `10 + akt×4` złota (Akt 0: 20/20/10 → Akt V: 40/40/30).
 
 ---
 
@@ -369,23 +371,25 @@ Miecz, Tarcza, Prawda i Dowód (surowce-cele specyficzne dla danego starcia) maj
 
 ---
 
-## 12. Questy poboczne (11, łącznie 190 XP)
+## 12. Questy poboczne (11)
 
-Nie wygasają, można je ukończyć w dowolnym momencie gry, niezależnie od bieżącego aktu — dają wyłącznie XP.
+Nie wygasają, można je ukończyć w dowolnym momencie gry, niezależnie od bieżącego aktu — dają jednorazową paczkę surowców do magazynu (dobraną tematycznie i pod skalę kosztów danego aktu), tak samo jak cel główny każdego aktu (patrz 10). „Akt” w tabeli to akt, w którym quest pojawia się w zakładce Cele (czyli od kiedy jego warunek faktycznie może zostać spełniony) — dla „Ostatnia lekcja” dodatkowo dopiero od tygodnia 7 (śmierć Antoniego), nie od początku Aktu 0.
 
-| Quest | Akt | XP | Warunek |
+Wyjątek: „Ślady w popiele” i „Rozmowa z Jadwigą” są śledzone i można je ukończyć już w Akcie II/III (kiedy realnie rozstrzyga się ich warunek), ale ich ukończenie jest DODATKOWO wymagane jako część celu głównego Aktu V (patrz 10) — jeśli gracz je pominie, dowie się o tym dopiero przy próbie zamknięcia gry.
+
+| Quest | Akt | Nagroda | Warunek |
 |---|---|---|---|
-| Ostatnia lekcja | 0 | 10 | Ratusz poziom 2 |
-| Dobry sąsiad | 0 | 10 | Karczma zbudowana |
-| Milczenie Jadwigi | 1 | 15 | Kaplica zbudowana |
-| Wdowa po najemniku | 1 | 15 | min. 2/3 etapów Grota + Karczma |
-| Ostatni list | 2 | 15 | odkrycie „Kartografia” |
-| Marta incognito | 2 | 15 | morale ≥ 70 |
-| Stary handlarz | 3 | 20 | Rynek zbudowany |
-| Klątwa studni | 4 | 20 | Studnia poziom 2 |
-| Ostatnia szarża | 4 | 20 | siła armii ≥ 20 |
-| Ślady w popiele | 5 | 25 | pełne zaufanie Marty |
-| Rozmowa z Jadwigą | 5 | 25 | pełny Dowód u Bogdana |
+| Ostatnia lekcja | 0 (od tyg. 7) | +15 drewna, +15 kamienia | Ratusz poziom 2 |
+| Dobry sąsiad | 0 | +10 zboża, +10 jabłka, +5 złota | Karczma zbudowana |
+| Milczenie Jadwigi | 1 | +20 kamienia, +10 złota | Kaplica zbudowana |
+| Wdowa po najemniku | 1 | +20 drewna, +15 kamienia, +10 złota | min. 2/3 etapów Grota + Karczma |
+| Ostatni list | 2 | +20 złota, +10 trawy | odkrycie „Kartografia” |
+| Marta incognito | 2 | +20 jabłka, +15 trawy, +10 złota | morale ≥ 70 |
+| Ślady w popiele | 2 | +20 zboża, +15 wody, +15 złota | pełne zaufanie Marty (wymagane też do celu Aktu V) |
+| Stary handlarz | 3 | +25 złota, +15 drewna | Rynek zbudowany |
+| Rozmowa z Jadwigą | 3 | +20 kamienia, +20 złota | pełny Dowód u Bogdana (wymagane też do celu Aktu V) |
+| Klątwa studni | 4 | +30 wody, +15 kamienia | Studnia poziom 2 |
+| Ostatnia szarża | 4 | +30 drewna, +30 kamienia, +15 złota | siła armii ≥ 20 |
 
 ---
 
@@ -395,10 +399,6 @@ Nie wygasają, można je ukończyć w dowolnym momencie gry, niezależnie od bie
 
 - Komiks przypisany do tygodnia N odblokowuje się dopiero, gdy tydzień N **w pełni się zakończy** (nie w chwili, gdy gracz do niego dopiero dociera) — patrz `_showPendingComics`, wywoływane na końcu `_startWeek` z numerem właśnie zakończonego tygodnia, nie już zaktualizowanym `_week`.
 - **Wyjątek dla 4 komiksów opisujących wynik starcia z bossem** (#10 Grot, #15 Marta, #20 Bogdan, #29 Leszy): dodatkowo zablokowane, dopóki dana walka nie zostanie faktycznie stoczona (sprawdzane po fladze wyniku, nie po numerze tygodnia) — inaczej dałoby się poznać wynik walki z zakładki Komiksy, zanim się ją stoczy. Ukryte też na liście w zakładce Komiksy (`ComicsView.hiddenComicNumbers`), nie tylko w automatycznym wyskakującym okienku.
-
-## 14. Doświadczenie (XP)
-
-Czysto kosmetyczny licznik w Statystykach — **nic obecnie nie odblokowuje**. Maksymalnie możliwe do zdobycia: **340 XP** (150 z 6 celów aktów × 25, + 190 z 11 questów pobocznych).
 
 ## 15. Zapisy i checkpointy
 

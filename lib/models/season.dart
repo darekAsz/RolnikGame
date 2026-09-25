@@ -77,7 +77,7 @@ extension SeasonStyle on Season {
   Map<ResourceType, double> get weightMultipliers {
     switch (this) {
       case Season.spring:
-        return const {ResourceType.stone: 1.1, ResourceType.wood: 0.9};
+        return const {ResourceType.stone: 1.1, ResourceType.wood: 1.1};
       case Season.summer:
         return const {ResourceType.grain: 1.1};
       case Season.autumn:
@@ -129,7 +129,7 @@ extension SeasonStyle on Season {
     if (AppLocale.instance.isEnglish) {
       switch (this) {
         case Season.spring:
-          return 'More stone, less wood.';
+          return 'More stone and wood.';
         case Season.summer:
           return 'More grain, but some of the ears are burnt.';
         case Season.autumn:
@@ -140,7 +140,7 @@ extension SeasonStyle on Season {
     }
     switch (this) {
       case Season.spring:
-        return 'Więcej kamienia, mniej drewna.';
+        return 'Więcej kamienia i drewna.';
       case Season.summer:
         return 'Więcej zboża, ale część kłosów jest spalona.';
       case Season.autumn:

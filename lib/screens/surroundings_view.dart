@@ -7,7 +7,7 @@ import '../widgets/resource_icon.dart';
 
 /// Ekran "okolic wioski" - jedna ścieżka rozwoju przez wszystkie sześć
 /// terenów: Sad -> Łąka -> Pole odblokowują po kolei jabłko/trawę/zboże,
-/// a Rzeka -> Góry -> Las to końcowe ulepszenia, które te trzy surowce
+/// a Las -> Rzeka -> Góry to końcowe ulepszenia, które te trzy surowce
 /// zużywają jako koszt (dając w zamian premię +1/ścieżkę do surowca
 /// dostępnego od początku gry). Każdy etap wymaga ukończenia poprzedniego.
 /// Każdy teren ma dwa poziomy: 1 (zbudowany) i 2 (rozbudowany - odblokowuje
@@ -28,9 +28,9 @@ class SurroundingsView extends StatelessWidget {
     AreaKind.orchard,
     AreaKind.meadow,
     AreaKind.field,
+    AreaKind.forest,
     AreaKind.river,
     AreaKind.mountains,
-    AreaKind.forest,
   ];
 
   bool _isLocked(AreaKind area) {

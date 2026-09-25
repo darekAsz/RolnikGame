@@ -18,14 +18,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statsTitle => 'Statistics';
 
   @override
-  String get statsXpLabel => 'Experience';
-
-  @override
-  String statsXpValue(int xp) {
-    return '$xp XP';
-  }
-
-  @override
   String get statsTotalCollectedLabel => 'Total resources collected';
 
   @override
@@ -109,6 +101,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statsLanguageEnglish => 'English';
 
   @override
+  String get statsDebugLabel => 'Debug';
+
+  @override
+  String get statsReplayTutorialLabel => 'Replay tutorial';
+
+  @override
   String get comicsTitle => 'Comics';
 
   @override
@@ -172,6 +170,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get goalsSideQuests => 'Side quests';
 
   @override
+  String get goalsNoSideQuestsThisAct => 'No side quests in this act.';
+
+  @override
   String get goalsStoryContext => 'Story context';
 
   @override
@@ -191,11 +192,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String goalsDecidedAtEnd(int endWeek) {
     return 'The requirements above only decide the outcome at the end of the act (week $endWeek).';
-  }
-
-  @override
-  String goalsQuestXp(String title, int xp) {
-    return '$title (+$xp XP)';
   }
 
   @override
@@ -240,10 +236,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'Each drag counts as one move — the counter at the top shows how many are left. When they run out, the harvest round ends.';
 
   @override
-  String get harvestScreenTutorialDialogTitle => 'How to harvest resources';
-
-  @override
-  String get harvestScreenTutorialGotItButton => 'Got it';
+  String get harvestScreenTutorialBuildOverviewDescription =>
+      'Opens a list of everything you can build right now, along with its cost and what you\'re still missing from storage.';
 
   @override
   String get harvestScreenRoundEndTitle => '⏳ Out of moves';
@@ -305,7 +299,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shopSubtitle =>
-      'Spend gold to permanently increase the number of moves on the harvest board.';
+      'Spend resources to permanently increase the number of moves on the harvest board.';
 
   @override
   String get shopMovesPerWeekLabel => 'Moves per week';
@@ -319,17 +313,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shopBuyMoveTitle => '+1 move per week (permanent)';
 
   @override
-  String shopGoldAvailable(int gold) {
-    return 'You have: $gold gold';
-  }
-
-  @override
   String get shopMaxMovesReached => 'Maximum number of moves reached.';
-
-  @override
-  String shopCost(int cost) {
-    return 'Cost: $cost gold';
-  }
 
   @override
   String get shopBuyButton => 'Buy';
@@ -356,6 +340,45 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shopUnlockedLabel => 'Unlocked';
+
+  @override
+  String get shopMovesUnlockTitle => 'How to raise this limit';
+
+  @override
+  String shopMovesUnlockSklepLevel2(int bonus) {
+    return 'Upgrade the Shop to level 2 (+$bonus to the purchasable move limit)';
+  }
+
+  @override
+  String shopMovesUnlockSklepWorkers(int current, int max) {
+    return 'Assign workers to the Shop ($current/$max, each +1 to the limit)';
+  }
+
+  @override
+  String shopMovesUnlockDiscovery1(int bonus) {
+    return 'Research \"Basics of Agronomy\" at the University (+$bonus to the base move count)';
+  }
+
+  @override
+  String shopMovesUnlockDiscovery2(int bonus) {
+    return 'Research \"Advanced Agronomy\" at the University (+$bonus to the base move count, requires University level 2)';
+  }
+
+  @override
+  String get buildOverviewTooltip => 'What can be built now';
+
+  @override
+  String get buildOverviewTitle => 'What can be built now';
+
+  @override
+  String get buildOverviewAreasSection => 'Surroundings';
+
+  @override
+  String get buildOverviewBuildingsSection => 'Village';
+
+  @override
+  String get buildOverviewEmpty =>
+      'Nothing else can be built right now - unlock more surroundings or the Town Hall first.';
 
   @override
   String resourcesViewLockedInfoContent(String resource) {
@@ -468,14 +491,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get endingStatXpLabel => 'Experience earned';
-
-  @override
-  String endingStatXpValue(int xp) {
-    return '$xp XP';
-  }
-
-  @override
   String get endingStatGrotLabel => 'Battle with Grot';
 
   @override
@@ -522,38 +537,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'Victory tastes bitter. The village stands, the debt is paid, Leszy defeated - but the price was high: hungry nights, empty granaries, neighbors looking at Kazimierz differently than they once looked at Antoni. Marta stays by his side, and he himself begins to understand why his grandfather carried this secret in silence for twenty years - not every victory can be celebrated.';
 
   @override
-  String get tutorialAppBarTitle => 'How to Play';
+  String get tutorialNextButton => 'Next';
 
   @override
-  String get tutorialStep1Title => 'Chain resources';
+  String get tutorialBackButton => 'Back';
 
   @override
-  String get tutorialStep1Description =>
-      'Drag your finger across adjacent tiles of the same resource (diagonals count too) to collect them.';
+  String get tutorialSkipButton => 'Skip';
 
   @override
-  String get tutorialStep2Title => 'Wild joker';
-
-  @override
-  String get tutorialStep2Description =>
-      'A longer chain (5 tiles or more) earns you a joker - it connects with any resource and multiplies your harvest.';
-
-  @override
-  String get tutorialStep3Title => 'Bomb';
-
-  @override
-  String get tutorialStep3Description =>
-      'An even longer chain (6 or more) earns you a bomb - added to a chain, it destroys neighboring tiles.';
-
-  @override
-  String get tutorialStep4Title => 'Expand the village';
-
-  @override
-  String get tutorialStep4Description =>
-      'Collected resources stay in the village between weeks - in the future they\'ll be used to expand it.';
-
-  @override
-  String get tutorialFinishButton => 'Got it, let\'s start!';
+  String get tutorialDoneButton => 'Done';
 
   @override
   String get actFailureTitle => 'Defeat';
@@ -625,7 +618,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get debugFightBogdan => 'Bogdan (week 52)';
 
   @override
-  String get debugFightLeszy => 'Leszy (week 59)';
+  String get debugFightLeszy => 'Leszy (week 64)';
 
   @override
   String bossIntroWeekLabel(int week) {
@@ -1599,6 +1592,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeTabDebug => 'Debug';
 
   @override
+  String get homeTutorialNavBarTitle => 'Navigation bar';
+
+  @override
+  String get homeTutorialNavBarDesc =>
+      'The tabs at the bottom switch between the village\'s screens. We\'ll now go through each of them in turn.';
+
+  @override
   String get homeTutorialVillageDesc =>
       'Tap an empty plot to build a building, or an existing building to upgrade it or see details. The Town Hall is built first and unlocks the rest.';
 
@@ -1620,7 +1620,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeTutorialGoalsDesc =>
-      'The current story act\'s goals and side quests - complete them to earn experience.';
+      'The current story act\'s goal and side quests - both reward resources for storage once completed.';
 
   @override
   String get homeTutorialArrowTitle => 'The \"→\" button';
@@ -1628,12 +1628,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get homeTutorialArrowDesc =>
       'Ends the week and moves on to the harvest board (or a boss battle, if one falls this week).';
-
-  @override
-  String get homeVillageTutorialTitle => 'Welcome to the village';
-
-  @override
-  String get homeVillageTutorialGotIt => 'Got it';
 
   @override
   String get homeConfirmDemolishTitle => 'Demolish the building?';
@@ -1875,10 +1869,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeLevel2 => 'Level 2';
 
   @override
-  String get homeDemolishRefundNote =>
-      'Demolishing will refund half of all invested resources.';
-
-  @override
   String get homeBuild => 'Build';
 
   @override
@@ -1907,6 +1897,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get homeRequiresUpgradedRatusz =>
       'Requires an upgraded (level 2) Town Hall.';
+
+  @override
+  String get homeRatuszLevel2LockedRequirement =>
+      'Town Hall upgrades unlock in Act II (week 27).';
 
   @override
   String get homeGeneralBonusTitle => 'Overall bonus';
@@ -1985,6 +1979,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeGoalRatuszBuilt => 'Town Hall built';
+
+  @override
+  String get homeGoalRatuszUpgraded => 'Town Hall upgraded to level 2';
 
   @override
   String get homeGoalOrchardDeveloped => 'Orchard developed';
@@ -2168,13 +2165,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Leszy defeated! The Shadow retreats deep into the earth.';
 
   @override
-  String homeActGoalReachedSnack(int actNumber, String actName, int xp) {
-    return 'Act $actNumber (\"$actName\") goal achieved! (+$xp XP)';
+  String homeActGoalReachedSnack(int actNumber, String actName, String reward) {
+    return 'Act $actNumber (\"$actName\") goal achieved! ($reward)';
   }
 
   @override
-  String homeSideQuestCompletedSnack(String title, int xp) {
-    return 'Side quest completed: \"$title\" (+$xp XP)';
+  String homeSideQuestCompletedSnack(String title, String reward) {
+    return 'Side quest completed: \"$title\" ($reward)';
   }
 
   @override

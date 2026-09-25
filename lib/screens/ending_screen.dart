@@ -9,7 +9,6 @@ import '../l10n/gen/app_localizations.dart';
 /// bo w przeciwieństwie do poprzednich aktów nie ma tu dalszego starcia,
 /// które mogłoby ocenić wynik za gracza.
 class EndingScreen extends StatelessWidget {
-  final int xp;
   final int population;
   final int populationLimit;
   final double morale;
@@ -27,7 +26,6 @@ class EndingScreen extends StatelessWidget {
 
   const EndingScreen({
     super.key,
-    required this.xp,
     required this.population,
     required this.populationLimit,
     required this.morale,
@@ -110,7 +108,6 @@ class EndingScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 24),
                         _StatsCard(
-                          xp: xp,
                           population: population,
                           populationLimit: populationLimit,
                           morale: morale,
@@ -148,7 +145,6 @@ class EndingScreen extends StatelessWidget {
 }
 
 class _StatsCard extends StatelessWidget {
-  final int xp;
   final int population;
   final int populationLimit;
   final double morale;
@@ -158,7 +154,6 @@ class _StatsCard extends StatelessWidget {
   final int totalSideQuestsCount;
 
   const _StatsCard({
-    required this.xp,
     required this.population,
     required this.populationLimit,
     required this.morale,
@@ -199,11 +194,6 @@ class _StatsCard extends StatelessWidget {
             icon: Icons.mood,
             label: l10n.endingStatMoraleLabel,
             value: l10n.endingStatMoraleValue(morale.round()),
-          ),
-          _StatRow(
-            icon: Icons.military_tech,
-            label: l10n.endingStatXpLabel,
-            value: l10n.endingStatXpValue(xp),
           ),
           _StatRow(
             icon: Icons.shield_moon,

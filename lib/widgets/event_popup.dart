@@ -59,9 +59,17 @@ class _EventPopupCard extends StatelessWidget {
 
   const _EventPopupCard({required this.queue});
 
+  // Kolory drewnianej ramki: ciemna kora na zewnątrz, jasny akcent drewna
+  // jako cienka linia wewnątrz, treść na tle przypominającym pergamin -
+  // stałe kolory niezależne od motywu (jasny/ciemny), żeby "drewniana
+  // tabliczka" zawsze wyglądała tak samo.
+  static const _outerWood = Color(0xFF4A2E17);
+  static const _innerWoodAccent = Color(0xFFD9A066);
+  static const _parchment = Color(0xFFFBEFD8);
+  static const _inkColor = Color(0xFF3E2712);
+
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     return Positioned(
       top: MediaQuery.of(context).padding.top + 12,
       left: 16,
@@ -74,69 +82,92 @@ class _EventPopupCard extends StatelessWidget {
             valueListenable: queue.index,
             builder: (context, index, _) {
               final safeIndex = index.clamp(0, messages.length - 1);
-              return Material(
-                elevation: 6,
-                borderRadius: BorderRadius.circular(14),
-                color: scheme.surfaceContainerHighest,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(14, 10, 6, 10),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(Icons.campaign, color: scheme.primary, size: 20),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(top: 2),
-                              child: Text(
-                                messages[safeIndex],
-                                style: Theme.of(context).textTheme.bodyMedium,
-                              ),
-                            ),
-                            if (messages.length > 1) ...[
-                              const SizedBox(height: 6),
-                              Row(
-                                children: [
-                                  IconButton(
-                                    onPressed: safeIndex > 0 ? () => queue.index.value = safeIndex - 1 : null,
-                                    icon: const Icon(Icons.arrow_back_ios_new, size: 16),
-                                    visualDensity: VisualDensity.compact,
-                                    padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints(),
+              return Container(
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  color: _outerWood,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: const [
+                    BoxShadow(color: Colors.black45, blurRadius: 10, offset: Offset(0, 5)),
+                  ],
+                ),
+                child: Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: _innerWoodAccent,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Material(
+                    color: _parchment,
+                    borderRadius: BorderRadius.circular(10),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(14, 10, 6, 10),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Icon(Icons.campaign, color: _outerWood, size: 20),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 2),
+                                  child: Text(
+                                    messages[safeIndex],
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(color: _inkColor),
                                   ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    '${safeIndex + 1}/${messages.length}',
-                                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                          color: scheme.onSurfaceVariant,
-                                        ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  IconButton(
-                                    onPressed: safeIndex < messages.length - 1
-                                        ? () => queue.index.value = safeIndex + 1
-                                        : null,
-                                    icon: const Icon(Icons.arrow_forward_ios, size: 16),
-                                    visualDensity: VisualDensity.compact,
-                                    padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints(),
+                                ),
+                                if (messages.length > 1) ...[
+                                  const SizedBox(height: 6),
+                                  Row(
+                                    children: [
+                                      IconButton(
+                                        onPressed: safeIndex > 0
+                                            ? () => queue.index.value = safeIndex - 1
+                                            : null,
+                                        icon: const Icon(Icons.arrow_back_ios_new,
+                                            size: 16, color: _outerWood),
+                                        visualDensity: VisualDensity.compact,
+                                        padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints(),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        '${safeIndex + 1}/${messages.length}',
+                                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                              color: _inkColor,
+                                            ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      IconButton(
+                                        onPressed: safeIndex < messages.length - 1
+                                            ? () => queue.index.value = safeIndex + 1
+                                            : null,
+                                        icon: const Icon(Icons.arrow_forward_ios,
+                                            size: 16, color: _outerWood),
+                                        visualDensity: VisualDensity.compact,
+                                        padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints(),
+                                      ),
+                                    ],
                                   ),
                                 ],
-                              ),
-                            ],
-                          ],
-                        ),
+                              ],
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: queue.close,
+                            icon: const Icon(Icons.close, size: 18, color: _outerWood),
+                            visualDensity: VisualDensity.compact,
+                            tooltip: AppLocalizations.of(context)!.commonClose,
+                          ),
+                        ],
                       ),
-                      IconButton(
-                        onPressed: queue.close,
-                        icon: const Icon(Icons.close, size: 18),
-                        visualDensity: VisualDensity.compact,
-                        tooltip: AppLocalizations.of(context)!.commonClose,
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               );

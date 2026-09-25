@@ -19,11 +19,12 @@ class StatsView extends StatelessWidget {
   final int armyStrength;
   final int comicsUnreadCount;
   final VoidCallback? onOpenComics;
-  final int xp;
   final BoardStyle boardStyle;
   final ValueChanged<BoardStyle>? onBoardStyleChanged;
   final ResourceIconStyle resourceIconStyle;
   final ValueChanged<ResourceIconStyle>? onResourceIconStyleChanged;
+  final VoidCallback? onOpenDebug;
+  final VoidCallback? onReplayTutorial;
 
   const StatsView({
     super.key,
@@ -36,11 +37,12 @@ class StatsView extends StatelessWidget {
     this.armyStrength = 0,
     this.comicsUnreadCount = 0,
     this.onOpenComics,
-    this.xp = 0,
     this.boardStyle = BoardStyle.photo,
     this.onBoardStyleChanged,
     this.resourceIconStyle = ResourceIconStyle.orb,
     this.onResourceIconStyleChanged,
+    this.onOpenDebug,
+    this.onReplayTutorial,
   });
 
   @override
@@ -53,12 +55,6 @@ class StatsView extends StatelessWidget {
         children: [
           Text(l10n.statsTitle, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 16),
-          _StatCard(
-            icon: Icons.star,
-            label: l10n.statsXpLabel,
-            value: l10n.statsXpValue(xp),
-          ),
-          const SizedBox(height: 12),
           _StatCard(
             icon: Icons.all_inclusive,
             label: l10n.statsTotalCollectedLabel,
@@ -140,6 +136,14 @@ class StatsView extends StatelessWidget {
           ],
           const SizedBox(height: 12),
           const _LanguageCard(),
+          if (onReplayTutorial != null) ...[
+            const SizedBox(height: 12),
+            _TutorialReplayCard(onTap: onReplayTutorial!),
+          ],
+          if (onOpenDebug != null) ...[
+            const SizedBox(height: 12),
+            _DebugCard(onTap: onOpenDebug!),
+          ],
         ],
       ),
     );
@@ -196,6 +200,72 @@ class _ComicsCard extends StatelessWidget {
                 )
               else
                 Icon(Icons.chevron_right, color: scheme.onSurfaceVariant),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TutorialReplayCard extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _TutorialReplayCard({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final scheme = Theme.of(context).colorScheme;
+    return Material(
+      color: scheme.surfaceContainerHighest,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          child: Row(
+            children: [
+              Icon(Icons.school, size: 30, color: scheme.primary),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(l10n.statsReplayTutorialLabel, style: Theme.of(context).textTheme.labelMedium),
+              ),
+              Icon(Icons.chevron_right, color: scheme.onSurfaceVariant),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DebugCard extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _DebugCard({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final scheme = Theme.of(context).colorScheme;
+    return Material(
+      color: scheme.surfaceContainerHighest,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          child: Row(
+            children: [
+              Icon(Icons.bug_report, size: 30, color: scheme.primary),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(l10n.statsDebugLabel, style: Theme.of(context).textTheme.labelMedium),
+              ),
+              Icon(Icons.chevron_right, color: scheme.onSurfaceVariant),
             ],
           ),
         ),

@@ -65,7 +65,14 @@ enum _Phase { intro, fighting, summary }
 
 class _BossBattleScreenState extends State<BossBattleScreen> {
   static const _stageCount = 3;
-  static const _totalMoves = 30;
+  static const _totalMoves = 40;
+  // Gwarantowane minimum ruchów na wejściu w każdy etap - jeśli pula
+  // wspólna dla wszystkich 3 etapów spadnie poniżej tego progu (np. etap 1
+  // pochłonął większość z 40 startowych ruchów), dopełniamy ją do minimum
+  // zamiast wpuszczać gracza w kolejny etap z garstką ruchów. Nadwyżka
+  // ponad minimum nadal przechodzi bez zmian - to wciąż nagroda za
+  // sprawną grę we wcześniejszych etapach, nie sztywny reset.
+  static const _minMovesPerStage = 20;
   static const _stage1WoodTarget = 30;
   static const _stage1StoneTarget = 20;
   // Dodatkowe "szumowe" typy nie liczą się do żadnego celu - utrudniają
@@ -150,6 +157,9 @@ class _BossBattleScreenState extends State<BossBattleScreen> {
       } else {
         _stageIndex++;
         _phase = _Phase.intro;
+        if (_movesLeft < _minMovesPerStage) {
+          _movesLeft = _minMovesPerStage;
+        }
       }
     });
   }
@@ -306,8 +316,13 @@ class _BossBattleScreenState extends State<BossBattleScreen> {
                   SeasonBackground(season: _season),
                   HarvestGrid(
                     key: ValueKey(_stageIndex),
-                    rows: 6,
-                    cols: 6,
+                    // Największy rozmiar osiągalny w normalnej grze (patrz
+                    // HarvestScreen._gridRows/_gridCols: baza 6, +1 wiersz za
+                    // każdą z 6 zbudowanych Okolic, +1 kolumna za komplet
+                    // Okolic, +1 kolumna za odkrycie Kartografia) - w starciu
+                    // z bossem zawsze od razu w pełnej skali.
+                    rows: 12,
+                    cols: 8,
                     availableTypes: switch (_stageIndex) {
                       0 => _stage1Types,
                       1 => _stage2Types,

@@ -3,13 +3,16 @@ import 'package:flutter/material.dart';
 import '../l10n/gen/app_localizations.dart';
 import '../models/resource_type.dart';
 import '../models/season.dart';
+import '../models/tutorial_step.dart';
 import '../services/board_style_storage.dart';
 import '../services/game_progress_storage.dart';
 import '../services/resource_storage.dart';
 import '../services/stats_storage.dart';
+import '../widgets/buildable_overview_sheet.dart';
 import '../widgets/harvest_grid.dart';
 import '../widgets/resource_icon.dart';
 import '../widgets/season_background.dart';
+import '../widgets/tutorial_overlay.dart';
 
 class HarvestScreen extends StatefulWidget {
   final int week;
@@ -30,6 +33,11 @@ class HarvestScreen extends StatefulWidget {
   final int minComboForJoker;
   final int minComboForBomb;
   final BoardStyle boardStyle;
+  // Migawka z HomeShell (w trakcie zbiorów nie da się nic zbudować, więc nie
+  // trzeba tego przeliczać na bieżąco) - do okna "co można teraz zbudować"
+  // dostępnego z tego ekranu (patrz _BuildOverviewButton w AppBar).
+  final List<BuildableOverviewEntry> areaEntries;
+  final List<BuildableOverviewEntry> buildingEntries;
 
   const HarvestScreen({
     super.key,
@@ -47,6 +55,8 @@ class HarvestScreen extends StatefulWidget {
     this.extraColumnFromDiscovery = false,
     this.minComboForJoker = 5,
     this.minComboForBomb = 6,
+    this.areaEntries = const [],
+    this.buildingEntries = const [],
   });
 
   @override
@@ -59,6 +69,13 @@ class _HarvestScreenState extends State<HarvestScreen> {
   static const int _totalAreaCount = 6;
 
   final _gridKey = GlobalKey<HarvestGridState>();
+  final _boardKey = GlobalKey();
+  final _movesLabelKey = GlobalKey();
+  final _buildOverviewButtonKey = GlobalKey();
+
+  bool _tourActive = false;
+  int _tourStepIndex = 0;
+  List<TutorialStep> _tourSteps = [];
 
   late int _movesLeft;
   bool _loaded = false;
@@ -84,87 +101,66 @@ class _HarvestScreenState extends State<HarvestScreen> {
 
   /// Samouczek planszy zbiorów - pokazuje się tylko raz (patrz
   /// GameProgressStorage.markHarvestTutorialSeen), przy pierwszym wejściu na
-  /// tę planszę, żeby wyjaśnić mechanikę kontekstowo, zanim gracz dotknie
-  /// kafelków.
+  /// tę planszę, żeby wyjaśnić mechanikę kontekstowo (z podświetleniem na
+  /// żywo, patrz TutorialOverlay), zanim gracz dotknie kafelków.
   Future<void> _maybeShowTutorial() async {
     final progress = await GameProgressStorage.load();
     if (!mounted || progress.harvestTutorialSeen) return;
     await GameProgressStorage.markHarvestTutorialSeen();
     if (!mounted) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _showTutorialDialog();
+      if (mounted) _startTour();
     });
   }
 
-  List<(IconData, String, String)> _tutorialSteps(AppLocalizations l10n) => [
-        (
-          Icons.touch_app,
-          l10n.harvestScreenTutorialStep1Title,
-          l10n.harvestScreenTutorialStep1Description,
+  void _startTour() {
+    final l10n = AppLocalizations.of(context)!;
+    setState(() {
+      _tourSteps = [
+        TutorialStep(
+          targetKey: _boardKey,
+          title: l10n.harvestScreenTutorialStep1Title,
+          description: l10n.harvestScreenTutorialStep1Description,
+          padding: EdgeInsets.zero,
+          borderRadius: BorderRadius.zero,
         ),
-        (
-          Icons.style,
-          l10n.harvestScreenTutorialStep2Title,
-          l10n.harvestScreenTutorialStep2Description,
+        TutorialStep(
+          targetKey: _boardKey,
+          title: l10n.harvestScreenTutorialStep2Title,
+          description: l10n.harvestScreenTutorialStep2Description,
+          padding: EdgeInsets.zero,
+          borderRadius: BorderRadius.zero,
         ),
-        (
-          Icons.whatshot,
-          l10n.harvestScreenTutorialStep3Title,
-          l10n.harvestScreenTutorialStep3Description,
+        TutorialStep(
+          targetKey: _boardKey,
+          title: l10n.harvestScreenTutorialStep3Title,
+          description: l10n.harvestScreenTutorialStep3Description,
+          padding: EdgeInsets.zero,
+          borderRadius: BorderRadius.zero,
         ),
-        (
-          Icons.repeat,
-          l10n.harvestScreenTutorialStep4Title,
-          l10n.harvestScreenTutorialStep4Description,
+        TutorialStep(
+          targetKey: _movesLabelKey,
+          title: l10n.harvestScreenTutorialStep4Title,
+          description: l10n.harvestScreenTutorialStep4Description,
+        ),
+        TutorialStep(
+          targetKey: _buildOverviewButtonKey,
+          title: l10n.buildOverviewTooltip,
+          description: l10n.harvestScreenTutorialBuildOverviewDescription,
         ),
       ];
+      _tourStepIndex = 0;
+      _tourActive = true;
+    });
+  }
 
-  void _showTutorialDialog() {
-    final l10n = AppLocalizations.of(context)!;
-    final tutorialSteps = _tutorialSteps(l10n);
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.harvestScreenTutorialDialogTitle),
-        content: SizedBox(
-          width: 360,
-          child: ListView.separated(
-            shrinkWrap: true,
-            itemCount: tutorialSteps.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 16),
-            itemBuilder: (context, index) {
-              final (icon, title, description) = tutorialSteps[index];
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CircleAvatar(
-                    backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
-                    child: Icon(icon, color: Theme.of(context).colorScheme.primary),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(title, style: Theme.of(context).textTheme.titleSmall),
-                        const SizedBox(height: 2),
-                        Text(description, style: Theme.of(context).textTheme.bodySmall),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
-        ),
-        actions: [
-          FilledButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(l10n.harvestScreenTutorialGotItButton),
-          ),
-        ],
-      ),
-    );
+  void _tourGoTo(int index) {
+    if (index < 0) return;
+    if (index >= _tourSteps.length) {
+      setState(() => _tourActive = false);
+      return;
+    }
+    setState(() => _tourStepIndex = index);
   }
 
   List<ResourceType> get _visibleTypes =>
@@ -264,6 +260,15 @@ class _HarvestScreenState extends State<HarvestScreen> {
     );
   }
 
+  void _showBuildableOverview() {
+    showBuildableOverviewSheet(
+      context,
+      areaEntries: widget.areaEntries,
+      buildingEntries: widget.buildingEntries,
+      stockpile: _collected,
+    );
+  }
+
   void _confirmManualShuffle() {
     final l10n = AppLocalizations.of(context)!;
     showDialog(
@@ -326,7 +331,9 @@ class _HarvestScreenState extends State<HarvestScreen> {
         if (didPop) return;
         _confirmGiveUpWeek();
       },
-      child: Scaffold(
+      child: Stack(
+        children: [
+      Scaffold(
         appBar: AppBar(
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -344,11 +351,18 @@ class _HarvestScreenState extends State<HarvestScreen> {
           ),
           actions: [
             IconButton(
+              key: _buildOverviewButtonKey,
+              onPressed: _showBuildableOverview,
+              icon: const Icon(Icons.construction),
+              tooltip: l10n.buildOverviewTooltip,
+            ),
+            IconButton(
               onPressed: _movesLeft > 0 ? _confirmManualShuffle : null,
               icon: const Icon(Icons.shuffle),
               tooltip: l10n.harvestScreenShuffleTooltip,
             ),
             Padding(
+              key: _movesLabelKey,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Center(child: Text(l10n.harvestScreenMovesLabel(_movesLeft))),
             ),
@@ -388,6 +402,7 @@ class _HarvestScreenState extends State<HarvestScreen> {
             ),
             Expanded(
               child: Container(
+                key: _boardKey,
                 margin: const EdgeInsets.all(12),
                 padding: const EdgeInsets.all(10),
                 decoration: widget.boardStyle == BoardStyle.classic
@@ -436,6 +451,16 @@ class _HarvestScreenState extends State<HarvestScreen> {
           ],
           ),
         ),
+      ),
+      if (_tourActive)
+        TutorialOverlay(
+          steps: _tourSteps,
+          stepIndex: _tourStepIndex,
+          onNext: () => _tourGoTo(_tourStepIndex + 1),
+          onBack: _tourStepIndex > 0 ? () => _tourGoTo(_tourStepIndex - 1) : null,
+          onSkip: () => setState(() => _tourActive = false),
+        ),
+        ],
       ),
     );
   }

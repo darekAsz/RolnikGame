@@ -1041,8 +1041,13 @@ class _LeszyBattleScreenState extends State<LeszyBattleScreen> {
                   SeasonBackground(season: _season),
                   HarvestGrid(
                     key: _gridKey,
-                    rows: 6,
-                    cols: 6,
+                    // Największy rozmiar osiągalny w normalnej grze (patrz
+                    // HarvestScreen._gridRows/_gridCols: baza 6, +1 wiersz za
+                    // każdą z 6 zbudowanych Okolic, +1 kolumna za komplet
+                    // Okolic, +1 kolumna za odkrycie Kartografia) - w starciu
+                    // z bossem zawsze od razu w pełnej skali.
+                    rows: 12,
+                    cols: 8,
                     availableTypes: _boardTypes,
                     autoMatchMinLength: switch (widget.autoMatchTier) {
                       0 => null,

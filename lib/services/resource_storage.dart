@@ -6,8 +6,7 @@ import '../models/resource_type.dart';
 // uniknąć głodu/dezercji w pierwszych tygodniach zanim gracz zdąży odblokować
 // własną produkcję jedzenia.
 const Map<ResourceType, int> _kStartingStockpile = {
-  ResourceType.apple: 100,
-  ResourceType.grain: 100,
+  ResourceType.grain: 14,
 };
 
 class ResourceStorage {

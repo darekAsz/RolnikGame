@@ -116,18 +116,6 @@ abstract class AppLocalizations {
   /// **'Statystyki'**
   String get statsTitle;
 
-  /// No description provided for @statsXpLabel.
-  ///
-  /// In pl, this message translates to:
-  /// **'Doświadczenie'**
-  String get statsXpLabel;
-
-  /// No description provided for @statsXpValue.
-  ///
-  /// In pl, this message translates to:
-  /// **'{xp} XP'**
-  String statsXpValue(int xp);
-
   /// No description provided for @statsTotalCollectedLabel.
   ///
   /// In pl, this message translates to:
@@ -278,6 +266,18 @@ abstract class AppLocalizations {
   /// **'English'**
   String get statsLanguageEnglish;
 
+  /// No description provided for @statsDebugLabel.
+  ///
+  /// In pl, this message translates to:
+  /// **'Debug'**
+  String get statsDebugLabel;
+
+  /// No description provided for @statsReplayTutorialLabel.
+  ///
+  /// In pl, this message translates to:
+  /// **'Uruchom samouczek ponownie'**
+  String get statsReplayTutorialLabel;
+
   /// No description provided for @comicsTitle.
   ///
   /// In pl, this message translates to:
@@ -374,6 +374,12 @@ abstract class AppLocalizations {
   /// **'Questy poboczne'**
   String get goalsSideQuests;
 
+  /// No description provided for @goalsNoSideQuestsThisAct.
+  ///
+  /// In pl, this message translates to:
+  /// **'Brak questów pobocznych w tym akcie.'**
+  String get goalsNoSideQuestsThisAct;
+
   /// No description provided for @goalsStoryContext.
   ///
   /// In pl, this message translates to:
@@ -409,12 +415,6 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Powyższe warunki decydują o wyniku dopiero na koniec aktu (tydzień {endWeek}).'**
   String goalsDecidedAtEnd(int endWeek);
-
-  /// No description provided for @goalsQuestXp.
-  ///
-  /// In pl, this message translates to:
-  /// **'{title} (+{xp} XP)'**
-  String goalsQuestXp(String title, int xp);
 
   /// No description provided for @harvestGridNoMovesTitle.
   ///
@@ -488,17 +488,11 @@ abstract class AppLocalizations {
   /// **'Każde przeciągnięcie to jeden ruch - licznik na górze pokazuje, ile zostało. Gdy się skończą, runda zbiorów dobiega końca.'**
   String get harvestScreenTutorialStep4Description;
 
-  /// No description provided for @harvestScreenTutorialDialogTitle.
+  /// No description provided for @harvestScreenTutorialBuildOverviewDescription.
   ///
   /// In pl, this message translates to:
-  /// **'Jak zbierać surowce'**
-  String get harvestScreenTutorialDialogTitle;
-
-  /// No description provided for @harvestScreenTutorialGotItButton.
-  ///
-  /// In pl, this message translates to:
-  /// **'Rozumiem'**
-  String get harvestScreenTutorialGotItButton;
+  /// **'Otwiera listę wszystkiego, co możesz teraz zbudować, razem z kosztem i tym, czego jeszcze brakuje w magazynie.'**
+  String get harvestScreenTutorialBuildOverviewDescription;
 
   /// No description provided for @harvestScreenRoundEndTitle.
   ///
@@ -605,7 +599,7 @@ abstract class AppLocalizations {
   /// No description provided for @shopSubtitle.
   ///
   /// In pl, this message translates to:
-  /// **'Wydaj złoto, żeby na stałe zwiększyć liczbę ruchów na planszy zbiorów.'**
+  /// **'Wydaj surowce, żeby na stałe zwiększyć liczbę ruchów na planszy zbiorów.'**
   String get shopSubtitle;
 
   /// No description provided for @shopMovesPerWeekLabel.
@@ -626,23 +620,11 @@ abstract class AppLocalizations {
   /// **'+1 ruch na tydzień (na stałe)'**
   String get shopBuyMoveTitle;
 
-  /// No description provided for @shopGoldAvailable.
-  ///
-  /// In pl, this message translates to:
-  /// **'Masz: {gold} złota'**
-  String shopGoldAvailable(int gold);
-
   /// No description provided for @shopMaxMovesReached.
   ///
   /// In pl, this message translates to:
   /// **'Osiągnięto maksymalną liczbę ruchów.'**
   String get shopMaxMovesReached;
-
-  /// No description provided for @shopCost.
-  ///
-  /// In pl, this message translates to:
-  /// **'Koszt: {cost} złota'**
-  String shopCost(int cost);
 
   /// No description provided for @shopBuyButton.
   ///
@@ -685,6 +667,66 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Odblokowane'**
   String get shopUnlockedLabel;
+
+  /// No description provided for @shopMovesUnlockTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Jak zwiększyć ten limit'**
+  String get shopMovesUnlockTitle;
+
+  /// No description provided for @shopMovesUnlockSklepLevel2.
+  ///
+  /// In pl, this message translates to:
+  /// **'Rozbuduj Sklep do poziomu 2 (+{bonus} do limitu dokupywanych ruchów)'**
+  String shopMovesUnlockSklepLevel2(int bonus);
+
+  /// No description provided for @shopMovesUnlockSklepWorkers.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zatrudnij pracowników w Sklepie ({current}/{max}, każdy +1 do limitu)'**
+  String shopMovesUnlockSklepWorkers(int current, int max);
+
+  /// No description provided for @shopMovesUnlockDiscovery1.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zbadaj w Uczelni \"Podstawy agronomii\" (+{bonus} do bazowej liczby ruchów)'**
+  String shopMovesUnlockDiscovery1(int bonus);
+
+  /// No description provided for @shopMovesUnlockDiscovery2.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zbadaj w Uczelni \"Zaawansowaną agronomię\" (+{bonus} do bazowej liczby ruchów, wymaga Uczelni poziomu 2)'**
+  String shopMovesUnlockDiscovery2(int bonus);
+
+  /// No description provided for @buildOverviewTooltip.
+  ///
+  /// In pl, this message translates to:
+  /// **'Co można teraz zbudować'**
+  String get buildOverviewTooltip;
+
+  /// No description provided for @buildOverviewTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Co można teraz zbudować'**
+  String get buildOverviewTitle;
+
+  /// No description provided for @buildOverviewAreasSection.
+  ///
+  /// In pl, this message translates to:
+  /// **'Okolice'**
+  String get buildOverviewAreasSection;
+
+  /// No description provided for @buildOverviewBuildingsSection.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wioska'**
+  String get buildOverviewBuildingsSection;
+
+  /// No description provided for @buildOverviewEmpty.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nic więcej nie da się teraz zbudować - najpierw odblokuj kolejne okolice albo Ratusz.'**
+  String get buildOverviewEmpty;
 
   /// No description provided for @resourcesViewLockedInfoContent.
   ///
@@ -866,18 +908,6 @@ abstract class AppLocalizations {
   /// **'{value}%'**
   String endingStatMoraleValue(int value);
 
-  /// No description provided for @endingStatXpLabel.
-  ///
-  /// In pl, this message translates to:
-  /// **'Zdobyte doświadczenie'**
-  String get endingStatXpLabel;
-
-  /// No description provided for @endingStatXpValue.
-  ///
-  /// In pl, this message translates to:
-  /// **'{xp} XP'**
-  String endingStatXpValue(int xp);
-
   /// No description provided for @endingStatGrotLabel.
   ///
   /// In pl, this message translates to:
@@ -956,65 +986,29 @@ abstract class AppLocalizations {
   /// **'Zwycięstwo smakuje gorzko. Wioska stoi, dług spłacony, Leszy pokonany - ale cena była wysoka: głodne noce, puste spichlerze, sąsiedzi patrzący na Kazimierza inaczej niż kiedyś na Antoniego. Marta zostaje przy nim, a on sam zaczyna rozumieć, dlaczego dziadek dźwigał tę tajemnicę w milczeniu przez dwadzieścia lat - nie każde zwycięstwo da się świętować.'**
   String get endingTierScarredEpilogue;
 
-  /// No description provided for @tutorialAppBarTitle.
+  /// No description provided for @tutorialNextButton.
   ///
   /// In pl, this message translates to:
-  /// **'Jak grać'**
-  String get tutorialAppBarTitle;
+  /// **'Dalej'**
+  String get tutorialNextButton;
 
-  /// No description provided for @tutorialStep1Title.
+  /// No description provided for @tutorialBackButton.
   ///
   /// In pl, this message translates to:
-  /// **'Łącz surowce'**
-  String get tutorialStep1Title;
+  /// **'Wstecz'**
+  String get tutorialBackButton;
 
-  /// No description provided for @tutorialStep1Description.
+  /// No description provided for @tutorialSkipButton.
   ///
   /// In pl, this message translates to:
-  /// **'Przeciągnij palcem po sąsiadujących kafelkach tego samego surowca (również po skosie), żeby je zebrać.'**
-  String get tutorialStep1Description;
+  /// **'Pomiń'**
+  String get tutorialSkipButton;
 
-  /// No description provided for @tutorialStep2Title.
+  /// No description provided for @tutorialDoneButton.
   ///
   /// In pl, this message translates to:
-  /// **'Dziki joker'**
-  String get tutorialStep2Title;
-
-  /// No description provided for @tutorialStep2Description.
-  ///
-  /// In pl, this message translates to:
-  /// **'Za dłuższą ścieżkę (5 i więcej kafelków) dostajesz jokera - łączy się z każdym surowcem i mnoży zbiory.'**
-  String get tutorialStep2Description;
-
-  /// No description provided for @tutorialStep3Title.
-  ///
-  /// In pl, this message translates to:
-  /// **'Bomba'**
-  String get tutorialStep3Title;
-
-  /// No description provided for @tutorialStep3Description.
-  ///
-  /// In pl, this message translates to:
-  /// **'Za jeszcze dłuższą ścieżkę (6 i więcej) dostajesz bombę - włączona do ścieżki niszczy sąsiednie kafelki.'**
-  String get tutorialStep3Description;
-
-  /// No description provided for @tutorialStep4Title.
-  ///
-  /// In pl, this message translates to:
-  /// **'Rozbuduj wioskę'**
-  String get tutorialStep4Title;
-
-  /// No description provided for @tutorialStep4Description.
-  ///
-  /// In pl, this message translates to:
-  /// **'Zebrane surowce zostają w wiosce między tygodniami - w przyszłości posłużą do jej rozbudowy.'**
-  String get tutorialStep4Description;
-
-  /// No description provided for @tutorialFinishButton.
-  ///
-  /// In pl, this message translates to:
-  /// **'Rozumiem, zaczynamy!'**
-  String get tutorialFinishButton;
+  /// **'Zakończ'**
+  String get tutorialDoneButton;
 
   /// No description provided for @actFailureTitle.
   ///
@@ -1139,7 +1133,7 @@ abstract class AppLocalizations {
   /// No description provided for @debugFightLeszy.
   ///
   /// In pl, this message translates to:
-  /// **'Leszy (tydz. 59)'**
+  /// **'Leszy (tydz. 64)'**
   String get debugFightLeszy;
 
   /// No description provided for @bossIntroWeekLabel.
@@ -2604,6 +2598,18 @@ abstract class AppLocalizations {
   /// **'Debug'**
   String get homeTabDebug;
 
+  /// No description provided for @homeTutorialNavBarTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Pasek nawigacji'**
+  String get homeTutorialNavBarTitle;
+
+  /// No description provided for @homeTutorialNavBarDesc.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zakładki u dołu przełączają między ekranami wioski. Przejdziemy teraz po kolei przez każdy z nich.'**
+  String get homeTutorialNavBarDesc;
+
   /// No description provided for @homeTutorialVillageDesc.
   ///
   /// In pl, this message translates to:
@@ -2637,7 +2643,7 @@ abstract class AppLocalizations {
   /// No description provided for @homeTutorialGoalsDesc.
   ///
   /// In pl, this message translates to:
-  /// **'Cele bieżącego aktu fabuły i questy poboczne - realizuj je, żeby zdobywać doświadczenie.'**
+  /// **'Cel bieżącego aktu fabuły i questy poboczne - oba dają surowce do magazynu po ukończeniu.'**
   String get homeTutorialGoalsDesc;
 
   /// No description provided for @homeTutorialArrowTitle.
@@ -2651,18 +2657,6 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Kończy tydzień i przenosi do planszy zbiorów (albo starcia z bossem, jeśli akurat wypada).'**
   String get homeTutorialArrowDesc;
-
-  /// No description provided for @homeVillageTutorialTitle.
-  ///
-  /// In pl, this message translates to:
-  /// **'Witaj w wiosce'**
-  String get homeVillageTutorialTitle;
-
-  /// No description provided for @homeVillageTutorialGotIt.
-  ///
-  /// In pl, this message translates to:
-  /// **'Rozumiem'**
-  String get homeVillageTutorialGotIt;
 
   /// No description provided for @homeConfirmDemolishTitle.
   ///
@@ -3010,12 +3004,6 @@ abstract class AppLocalizations {
   /// **'Poziom 2'**
   String get homeLevel2;
 
-  /// No description provided for @homeDemolishRefundNote.
-  ///
-  /// In pl, this message translates to:
-  /// **'Zburzenie zwróci połowę wszystkich zainwestowanych surowców.'**
-  String get homeDemolishRefundNote;
-
   /// No description provided for @homeBuild.
   ///
   /// In pl, this message translates to:
@@ -3069,6 +3057,12 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Wymaga rozbudowanego (poziom 2) Ratusza.'**
   String get homeRequiresUpgradedRatusz;
+
+  /// No description provided for @homeRatuszLevel2LockedRequirement.
+  ///
+  /// In pl, this message translates to:
+  /// **'Rozbudowa Ratusza odblokuje się w Akcie II (tydzień 27).'**
+  String get homeRatuszLevel2LockedRequirement;
 
   /// No description provided for @homeGeneralBonusTitle.
   ///
@@ -3192,6 +3186,12 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Ratusz zbudowany'**
   String get homeGoalRatuszBuilt;
+
+  /// No description provided for @homeGoalRatuszUpgraded.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ratusz rozbudowany do poziomu 2'**
+  String get homeGoalRatuszUpgraded;
 
   /// No description provided for @homeGoalOrchardDeveloped.
   ///
@@ -3478,14 +3478,14 @@ abstract class AppLocalizations {
   /// No description provided for @homeActGoalReachedSnack.
   ///
   /// In pl, this message translates to:
-  /// **'Cel Aktu {actNumber} (\"{actName}\") osiągnięty! (+{xp} XP)'**
-  String homeActGoalReachedSnack(int actNumber, String actName, int xp);
+  /// **'Cel Aktu {actNumber} (\"{actName}\") osiągnięty! ({reward})'**
+  String homeActGoalReachedSnack(int actNumber, String actName, String reward);
 
   /// No description provided for @homeSideQuestCompletedSnack.
   ///
   /// In pl, this message translates to:
-  /// **'Quest poboczny ukończony: \"{title}\" (+{xp} XP)'**
-  String homeSideQuestCompletedSnack(String title, int xp);
+  /// **'Quest poboczny ukończony: \"{title}\" ({reward})'**
+  String homeSideQuestCompletedSnack(String title, String reward);
 
   /// No description provided for @homeDebugJumpedToWeekSnack.
   ///

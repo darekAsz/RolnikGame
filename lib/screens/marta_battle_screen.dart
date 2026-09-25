@@ -62,11 +62,27 @@ enum _Phase { intro, fighting, summary }
 
 class _MartaBattleScreenState extends State<MartaBattleScreen> {
   static const _stageCount = 3;
-  static const _totalMoves = 32;
-  // Woda w etapie 1 nie liczy się do niczego - to tylko "szum" utrudniający
-  // trafianie w drewno/kamień (patrz _onHarvestStage1).
-  static const _stage1Types = {ResourceType.wood, ResourceType.stone, ResourceType.water};
-  static const _stage2Types = {ResourceType.wood, ResourceType.stone, ResourceType.water};
+  static const _totalMoves = 40;
+  // Gwarantowane minimum ruchów na wejściu w każdy etap - patrz analogiczna
+  // stała w boss_battle_screen.dart (Grot).
+  static const _minMovesPerStage = 20;
+  // Woda i zboże w etapie 1 nie liczą się do niczego - to tylko "szum"
+  // utrudniający trafianie w drewno/kamień (patrz _onHarvestStage1). Liczba
+  // typów (4 w etapie 1, 5 w etapie 2) dobrana tak, żeby dorównać gęstości
+  // planszy u Grota (BossBattleScreen._stage1Types/_stage2Types).
+  static const _stage1Types = {
+    ResourceType.wood,
+    ResourceType.stone,
+    ResourceType.water,
+    ResourceType.grain,
+  };
+  static const _stage2Types = {
+    ResourceType.wood,
+    ResourceType.stone,
+    ResourceType.water,
+    ResourceType.grass,
+    ResourceType.apple,
+  };
   // Prawda wciąż jedynym surowcem, który się liczy (patrz _onHarvestStage3),
   // ale reszta miesza planszę tak jak w etapach 1-2 - bez tego cała plansza
   // była jednym kolorem i każde przeciągnięcie trafiało.
@@ -154,6 +170,9 @@ class _MartaBattleScreenState extends State<MartaBattleScreen> {
       } else {
         _stageIndex++;
         _phase = _Phase.intro;
+        if (_movesLeft < _minMovesPerStage) {
+          _movesLeft = _minMovesPerStage;
+        }
       }
     });
   }
@@ -351,8 +370,13 @@ class _MartaBattleScreenState extends State<MartaBattleScreen> {
                   SeasonBackground(season: _season),
                   HarvestGrid(
                     key: ValueKey(_stageIndex),
-                    rows: 6,
-                    cols: 6,
+                    // Największy rozmiar osiągalny w normalnej grze (patrz
+                    // HarvestScreen._gridRows/_gridCols: baza 6, +1 wiersz za
+                    // każdą z 6 zbudowanych Okolic, +1 kolumna za komplet
+                    // Okolic, +1 kolumna za odkrycie Kartografia) - w starciu
+                    // z bossem zawsze od razu w pełnej skali.
+                    rows: 12,
+                    cols: 8,
                     availableTypes: switch (_stageIndex) {
                       0 => _stage1Types,
                       1 => _stage2Types,

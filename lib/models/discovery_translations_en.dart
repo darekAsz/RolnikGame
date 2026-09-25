@@ -54,7 +54,7 @@ const Map<DiscoveryId, DiscoveryTranslation> kDiscoveriesEn = {
   ),
   DiscoveryId.fastGrowth: DiscoveryTranslation(
     'Faster Growth',
-    'Increases weekly population growth from +1 to +2 (with enough food).',
+    'Doubles the population growth rate (based on village morale), with enough food.',
   ),
   DiscoveryId.weatherForecast: DiscoveryTranslation(
     'Meteorology',

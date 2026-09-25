@@ -16,7 +16,6 @@ import '../services/story_progress_storage.dart';
 import '../services/village_building_storage.dart';
 import '../services/village_event_storage.dart';
 import 'home_shell.dart';
-import 'tutorial_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -114,13 +113,13 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     await StoryProgressStorage.reset();
     await ComicStorage.reset();
     await ExperienceStorage.reset();
-    final progress = await GameProgressStorage.load();
     if (!mounted) return;
+    // Samouczek (podświetlanie na żywo, patrz HomeShell._maybeStartTour) nie
+    // jest już osobnym ekranem sprzed HomeShell - potrzebuje prawdziwego
+    // drzewa widgetów wioski/zakładek, więc HomeShell sam decyduje, czy się
+    // uruchomić, na podstawie tej samej flagi (game_tutorial_seen).
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (_) =>
-            progress.tutorialSeen ? const HomeShell() : const TutorialScreen(),
-      ),
+      MaterialPageRoute(builder: (_) => const HomeShell()),
     );
   }
 
@@ -193,6 +192,28 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                           ),
                     ),
                     const SizedBox(height: 40),
+                    // Bez zapisanej gry "Kontynuuj" nie miałoby dokąd prowadzić - w
+                    // takim wypadku przycisk znika całkiem, zamiast zostawać
+                    // widoczny, ale wyszarzony/nieklikalny. Gdy jest widoczny, stoi
+                    // WYŻEJ niż "Nowa gra" - wracający gracz najczęściej chce
+                    // kontynuować, nie zaczynać od nowa.
+                    if (_hasSave) ...[
+                      SizedBox(
+                        width: 220,
+                        child: OutlinedButton(
+                          onPressed: _continueGame,
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            side: const BorderSide(color: Colors.white70),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            child: Text(l10n.splashContinue),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
                     SizedBox(
                       width: 220,
                       child: FilledButton(
@@ -200,21 +221,6 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           child: Text(l10n.splashNewGame),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: 220,
-                      child: OutlinedButton(
-                        onPressed: _hasSave ? _continueGame : null,
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          side: const BorderSide(color: Colors.white70),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          child: Text(l10n.splashContinue),
                         ),
                       ),
                     ),

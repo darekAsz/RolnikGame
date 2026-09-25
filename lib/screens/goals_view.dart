@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 
 import '../l10n/gen/app_localizations.dart';
 import '../models/goal_requirement.dart';
+import '../models/resource_type.dart';
 import '../models/side_quest.dart';
 import '../models/story_act.dart';
+import '../widgets/resource_icon.dart';
 
 /// Zakładka "Cele" - pokazuje bieżący tydzień/akt fabuły oraz cel główny
-/// (z żywą listą wymagań i postępem), questy poboczne (z nagrodą w XP i
-/// postępem, gdzie to ma sens) i kontekst fabularny dla aktualnego etapu
+/// (z żywą listą wymagań i postępem), questy poboczne (z nagrodą w surowcach
+/// i postępem, gdzie to ma sens) i kontekst fabularny dla aktualnego etapu
 /// historii.
 class GoalsView extends StatelessWidget {
   final int week;
@@ -115,18 +117,39 @@ class GoalsView extends StatelessWidget {
                   _GoalCard(
                     icon: Icons.checklist,
                     label: l10n.goalsSideQuests,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        for (final quest in sideQuestsForAct(act.actNumber))
-                          _SideQuestRow(
-                            quest: quest,
-                            claimed: claimedSideQuests.contains(quest.id),
-                            progress:
-                                claimedSideQuests.contains(quest.id) ? null : sideQuestProgress?.call(quest.id),
-                          ),
-                      ],
-                    ),
+                    child: Builder(builder: (context) {
+                      // sideQuestsUpToAct (nie sideQuestsForAct) - questy z
+                      // wcześniejszych aktów zostają widoczne, dopóki nie
+                      // zostaną ukończone, zamiast znikać z listy w chwili
+                      // przejścia do kolejnego aktu. fromWeek dodatkowo
+                      // filtruje questy powiązane z wydarzeniem w środku aktu
+                      // (np. śmierć Antoniego w tygodniu 7 Aktu 0) - patrz
+                      // SideQuest.fromWeek.
+                      final visible = sideQuestsUpToAct(act.actNumber)
+                          .where((q) => q.fromWeek == null || week >= q.fromWeek!)
+                          .toList();
+                      if (visible.isEmpty) {
+                        return Text(
+                          l10n.goalsNoSideQuestsThisAct,
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              ),
+                        );
+                      }
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          for (final quest in visible)
+                            _SideQuestRow(
+                              quest: quest,
+                              claimed: claimedSideQuests.contains(quest.id),
+                              progress: claimedSideQuests.contains(quest.id)
+                                  ? null
+                                  : sideQuestProgress?.call(quest.id),
+                            ),
+                        ],
+                      );
+                    }),
                   ),
                   const SizedBox(height: 12),
                   _GoalCard(
@@ -247,7 +270,6 @@ class _SideQuestRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     final color = claimed ? const Color(0xFF2F9E57) : scheme.onSurfaceVariant;
     return Padding(
@@ -266,13 +288,40 @@ class _SideQuestRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  l10n.goalsQuestXp(quest.localizedTitle, quest.xpReward),
+                  quest.localizedTitle,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: color,
                         decoration: claimed ? TextDecoration.lineThrough : null,
                       ),
                 ),
+                const SizedBox(height: 2),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 2,
+                  children: [
+                    for (final entry in quest.resourceReward.entries)
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: resourceIconAsset(entry.key.assetPath, size: 14),
+                          ),
+                          const SizedBox(width: 3),
+                          Text(
+                            '+${entry.value}',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: color,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 2),
                 Text(quest.localizedDescription, style: Theme.of(context).textTheme.bodySmall),
                 if (progress != null) ...[
                   const SizedBox(height: 2),

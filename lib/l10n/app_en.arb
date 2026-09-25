@@ -5,8 +5,6 @@
   "commonClose": "Close",
 
   "statsTitle": "Statistics",
-  "statsXpLabel": "Experience",
-  "statsXpValue": "{xp} XP",
   "statsTotalCollectedLabel": "Total resources collected",
   "statsLongestPathLabel": "Longest path",
   "statsLongestPathValue": "{count} tiles",
@@ -32,6 +30,8 @@
   "statsLanguageLabel": "Language",
   "statsLanguagePolish": "Polish",
   "statsLanguageEnglish": "English",
+  "statsDebugLabel": "Debug",
+  "statsReplayTutorialLabel": "Replay tutorial",
 
   "comicsTitle": "Comics",
   "comicsUnlockedCount": "{unlocked} of {total} unlocked",
@@ -50,13 +50,13 @@
   "goalsMainGoal": "Main goal",
   "goalsRequirements": "Requirements",
   "goalsSideQuests": "Side quests",
+  "goalsNoSideQuestsThisAct": "No side quests in this act.",
   "goalsStoryContext": "Story context",
   "goalsCompletedGoals": "Completed goals",
   "goalsResolvedActLabel": "Act {act}: {name}",
   "goalsRequirementsMet": "Requirements already met",
   "goalsRequirementsNotMet": "Requirements not yet met",
   "goalsDecidedAtEnd": "The requirements above only decide the outcome at the end of the act (week {endWeek}).",
-  "goalsQuestXp": "{title} (+{xp} XP)",
 
   "harvestGridNoMovesTitle": "No available moves",
   "harvestGridNoMovesMessage": "There are no more possible matches on the board. You can reshuffle the board (cost: 1 move).",
@@ -71,8 +71,7 @@
   "harvestScreenTutorialStep3Description": "A chain of 6+ orbs turns one of the new orbs into a bomb — when included in your next chain, it destroys all neighboring tiles.",
   "harvestScreenTutorialStep4Title": "Moves run out",
   "harvestScreenTutorialStep4Description": "Each drag counts as one move — the counter at the top shows how many are left. When they run out, the harvest round ends.",
-  "harvestScreenTutorialDialogTitle": "How to harvest resources",
-  "harvestScreenTutorialGotItButton": "Got it",
+  "harvestScreenTutorialBuildOverviewDescription": "Opens a list of everything you can build right now, along with its cost and what you're still missing from storage.",
   "harvestScreenRoundEndTitle": "⏳ Out of moves",
   "harvestScreenRoundEndCollectedLabel": "Resources collected this week:",
   "harvestScreenRoundEndNothingCollected": "Nothing was collected.",
@@ -91,13 +90,11 @@
   "harvestScreenMovesLabel": "Moves: {moves}",
 
   "shopTitle": "Shop",
-  "shopSubtitle": "Spend gold to permanently increase the number of moves on the harvest board.",
+  "shopSubtitle": "Spend resources to permanently increase the number of moves on the harvest board.",
   "shopMovesPerWeekLabel": "Moves per week",
   "shopMovesBreakdown": "Base {base} + purchased {extra}",
   "shopBuyMoveTitle": "+1 move per week (permanent)",
-  "shopGoldAvailable": "You have: {gold} gold",
   "shopMaxMovesReached": "Maximum number of moves reached.",
-  "shopCost": "Cost: {cost} gold",
   "shopBuyButton": "Buy",
   "shopAutoMatchTier1Title": "Automatic clearing of four-tile matches",
   "shopAutoMatchTier1Description": "By default, tiles arranged in a match stay on the board until you collect them by hand. This upgrade makes matches of 4 or more disappear automatically. It doesn't work during boss battles — there, collecting always stays manual.",
@@ -105,6 +102,28 @@
   "shopAutoMatchTier2Description": "The next tier — after this upgrade, matches made of just 3 tiles also disappear automatically. Just like the previous tier, it doesn't work during boss battles.",
   "shopAutoMatchTier2LockedRequirement": "Requires: automatic clearing of four-tile matches",
   "shopUnlockedLabel": "Unlocked",
+  "shopMovesUnlockTitle": "How to raise this limit",
+  "shopMovesUnlockSklepLevel2": "Upgrade the Shop to level 2 (+{bonus} to the purchasable move limit)",
+  "@shopMovesUnlockSklepLevel2": {
+    "placeholders": {"bonus": {"type": "int"}}
+  },
+  "shopMovesUnlockSklepWorkers": "Assign workers to the Shop ({current}/{max}, each +1 to the limit)",
+  "@shopMovesUnlockSklepWorkers": {
+    "placeholders": {"current": {"type": "int"}, "max": {"type": "int"}}
+  },
+  "shopMovesUnlockDiscovery1": "Research \"Basics of Agronomy\" at the University (+{bonus} to the base move count)",
+  "@shopMovesUnlockDiscovery1": {
+    "placeholders": {"bonus": {"type": "int"}}
+  },
+  "shopMovesUnlockDiscovery2": "Research \"Advanced Agronomy\" at the University (+{bonus} to the base move count, requires University level 2)",
+  "@shopMovesUnlockDiscovery2": {
+    "placeholders": {"bonus": {"type": "int"}}
+  },
+  "buildOverviewTooltip": "What can be built now",
+  "buildOverviewTitle": "What can be built now",
+  "buildOverviewAreasSection": "Surroundings",
+  "buildOverviewBuildingsSection": "Village",
+  "buildOverviewEmpty": "Nothing else can be built right now - unlock more surroundings or the Town Hall first.",
 
   "resourcesViewLockedInfoContent": "{resource} hasn't been discovered yet. Until you unlock it in the Village Surroundings, all bonuses to this resource (e.g. from the Town Hall or production buildings) won't apply.",
   "resourcesViewGotItButton": "Got it",
@@ -140,8 +159,6 @@
   "endingStatPopulationValue": "{population} / {populationLimit}",
   "endingStatMoraleLabel": "Village morale",
   "endingStatMoraleValue": "{value}%",
-  "endingStatXpLabel": "Experience earned",
-  "endingStatXpValue": "{xp} XP",
   "endingStatGrotLabel": "Battle with Grot",
   "endingStatGrotValue": "{cleared} / 3 stages",
   "endingStatSideQuestsLabel": "Side quests",
@@ -156,16 +173,10 @@
   "endingTierHardWonEpilogue": "The village survived - bruised, exhausted, but still standing. Not everything went smoothly: there were nights of hardship and battles whose outcome hung by a thread. But the debt was paid, and Marta and Jadwiga now stand beside Kazimierz as the family he chose for himself - not the one he inherited.",
   "endingTierScarredEpilogue": "Victory tastes bitter. The village stands, the debt is paid, Leszy defeated - but the price was high: hungry nights, empty granaries, neighbors looking at Kazimierz differently than they once looked at Antoni. Marta stays by his side, and he himself begins to understand why his grandfather carried this secret in silence for twenty years - not every victory can be celebrated.",
 
-  "tutorialAppBarTitle": "How to Play",
-  "tutorialStep1Title": "Chain resources",
-  "tutorialStep1Description": "Drag your finger across adjacent tiles of the same resource (diagonals count too) to collect them.",
-  "tutorialStep2Title": "Wild joker",
-  "tutorialStep2Description": "A longer chain (5 tiles or more) earns you a joker - it connects with any resource and multiplies your harvest.",
-  "tutorialStep3Title": "Bomb",
-  "tutorialStep3Description": "An even longer chain (6 or more) earns you a bomb - added to a chain, it destroys neighboring tiles.",
-  "tutorialStep4Title": "Expand the village",
-  "tutorialStep4Description": "Collected resources stay in the village between weeks - in the future they'll be used to expand it.",
-  "tutorialFinishButton": "Got it, let's start!",
+  "tutorialNextButton": "Next",
+  "tutorialBackButton": "Back",
+  "tutorialSkipButton": "Skip",
+  "tutorialDoneButton": "Done",
 
   "actFailureTitle": "Defeat",
   "actFailureSubtitle": "Act {actNumber}: \"{actName}\" has failed.",
@@ -189,7 +200,7 @@
   "debugFightGrot": "Grot (week 26)",
   "debugFightMarta": "Marta (week 39)",
   "debugFightBogdan": "Bogdan (week 52)",
-  "debugFightLeszy": "Leszy (week 59)",
+  "debugFightLeszy": "Leszy (week 64)",
 
   "bossIntroWeekLabel": "Week {week}",
   "bossIntroPrepareButton": "Prepare for battle",
@@ -444,16 +455,16 @@
   "homeTabStats": "Statistics",
   "homeTabGoals": "Goals",
   "homeTabDebug": "Debug",
+  "homeTutorialNavBarTitle": "Navigation bar",
+  "homeTutorialNavBarDesc": "The tabs at the bottom switch between the village's screens. We'll now go through each of them in turn.",
   "homeTutorialVillageDesc": "Tap an empty plot to build a building, or an existing building to upgrade it or see details. The Town Hall is built first and unlocks the rest.",
   "homeTutorialSurroundingsDesc": "The land around the village (river, forest, mountains...) - developing it enlarges the harvest board and gives resource bonuses.",
   "homeTutorialResourcesDesc": "A view of stockpiles, weekly production and consumption of each resource, and from here also trading at the market once the Market is ready.",
   "homeTutorialShopDesc": "Buy extra moves on the harvest board and automatic-matching upgrades (unlocks during the game).",
   "homeTutorialStatsDesc": "Records, population, morale, security, army, and story comics, plus the harvest board's appearance settings.",
-  "homeTutorialGoalsDesc": "The current story act's goals and side quests - complete them to earn experience.",
+  "homeTutorialGoalsDesc": "The current story act's goal and side quests - both reward resources for storage once completed.",
   "homeTutorialArrowTitle": "The \"→\" button",
   "homeTutorialArrowDesc": "Ends the week and moves on to the harvest board (or a boss battle, if one falls this week).",
-  "homeVillageTutorialTitle": "Welcome to the village",
-  "homeVillageTutorialGotIt": "Got it",
 
   "homeConfirmDemolishTitle": "Demolish the building?",
   "homeConfirmDemolishMessage": "Are you sure you want to demolish: {name}?\nYou'll recover half of the invested resources.",
@@ -521,7 +532,6 @@
   "homeLevel1": "Level 1",
   "homeUpgradeToLevel2": "Upgrade to level 2",
   "homeLevel2": "Level 2",
-  "homeDemolishRefundNote": "Demolishing will refund half of all invested resources.",
   "homeBuild": "Build",
   "homeUpgrade": "Upgrade",
 
@@ -532,6 +542,7 @@
   "homePerksLabel": "Perks",
   "homeDemolishRefund50Title": "Refund on demolish (50%)",
   "homeRequiresUpgradedRatusz": "Requires an upgraded (level 2) Town Hall.",
+  "homeRatuszLevel2LockedRequirement": "Town Hall upgrades unlock in Act II (week 27).",
   "homeGeneralBonusTitle": "Overall bonus",
   "homeWorkersTitle": "Workers",
   "homeWorkersRequiresDiscovery": "Requires the \"Worker Management\" discovery at the Academy.",
@@ -554,6 +565,7 @@
   "homeGoalNotFoughtYet": "not fought yet",
   "homeGoalBattleProgress": "{cleared}/3 stages (min. {required})",
   "homeGoalRatuszBuilt": "Town Hall built",
+  "homeGoalRatuszUpgraded": "Town Hall upgraded to level 2",
   "homeGoalOrchardDeveloped": "Orchard developed",
   "homeGoalMeadowDeveloped": "Meadow developed",
   "homeGoalFieldDeveloped": "Field developed",
@@ -607,9 +619,9 @@
   "homeBossIntroLeszyMessage": "The dark shadow of the forest fully awakens. The final battle for the village's fate begins now.",
   "homeLeszyVictorySnack": "Leszy defeated! The Shadow retreats deep into the earth.",
 
-  "homeActGoalReachedSnack": "Act {actNumber} (\"{actName}\") goal achieved! (+{xp} XP)",
+  "homeActGoalReachedSnack": "Act {actNumber} (\"{actName}\") goal achieved! ({reward})",
 
-  "homeSideQuestCompletedSnack": "Side quest completed: \"{title}\" (+{xp} XP)",
+  "homeSideQuestCompletedSnack": "Side quest completed: \"{title}\" ({reward})",
 
   "homeDebugJumpedToWeekSnack": "Debug: jumped to week {week}.",
 

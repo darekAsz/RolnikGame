@@ -16,6 +16,8 @@ void main() {
 
     expect(find.text('Rolnik'), findsOneWidget);
     expect(find.text('Nowa gra'), findsOneWidget);
-    expect(find.text('Kontynuuj'), findsOneWidget);
+    // Bez zapisanej gry (świeży mock stan) przycisk "Kontynuuj" jest ukryty,
+    // nie tylko wyszarzony - patrz SplashScreen._hasSave.
+    expect(find.text('Kontynuuj'), findsNothing);
   });
 }

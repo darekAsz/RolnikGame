@@ -103,6 +103,12 @@ const kBuildingImageAssets = {
 /// złożona niż zwykła pojedyncza chata (np. Kamieniarz: chata + piec + warsztat).
 const kBuildingImageScale = {
   BuildingKind.kamieniarz: 1.1,
+  // Spichlerz siedzi na "małej" działce bardzo blisko Karczmy (patrz
+  // _VillageLayout.smallPlotRefs/standardPlotRefs) - przy pełnym rozmiarze
+  // (tak samo dużym jak działki standardowe) oba budynki wizualnie na siebie
+  // nachodziły. Pomniejszenie + przesunięcie działki (patrz smallPlotRefs)
+  // razem to rozwiązują.
+  BuildingKind.spichlerz: 0.75,
 };
 
 /// Osobny obrazek dla budynków rozbudowanych do poziomu 2 - budynki bez
@@ -498,7 +504,7 @@ class _VillageLayout {
     // X=350 pokrywa się z centerX/topGate - dom musi siedzieć wyraźnie niżej
     // niż wallTop (110), inaczej zasłania etykietę "Palisada" przy bramie.
     Offset(350, 250), // dom
-    Offset(540, 170), // spichlerz
+    Offset(460, 170), // spichlerz - przesunięty w lewo, żeby nie nachodzić na karczmę (570, 230)
     Offset(320, 630), // piekarnia
     Offset(490, 370), // tartak
     Offset(340, 790), // studnia

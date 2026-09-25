@@ -2,21 +2,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/side_quest.dart';
 
-/// Punkty doświadczenia i ukończone questy poboczne - na razie samo XP nic
-/// nie odblokowuje, to tylko licznik pokazywany w Statystykach.
+/// Ukończone questy poboczne (i cele główne aktów - patrz HomeShell) dają
+/// surowce bezpośrednio do magazynu, więc jedyne, co trzeba tu trwale
+/// zapamiętać, to które questy poboczne zostały już odebrane (żeby nie dać
+/// ich nagrody dwa razy).
 class ExperienceStorage {
-  static const _xpKey = 'experience_xp';
   static const _claimedSideQuestsKey = 'experience_claimed_side_quests';
-
-  static Future<int> loadXp() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getInt(_xpKey) ?? 0;
-  }
-
-  static Future<void> saveXp(int xp) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_xpKey, xp);
-  }
 
   /// Pomija nierozpoznane nazwy zamiast rzucać wyjątkiem - stary zapis może
   /// zawierać questa usuniętego z gry w międzyczasie (patrz models/side_quest.dart).
@@ -34,7 +25,6 @@ class ExperienceStorage {
 
   static Future<void> reset() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_xpKey, 0);
     await prefs.remove(_claimedSideQuestsKey);
   }
 }

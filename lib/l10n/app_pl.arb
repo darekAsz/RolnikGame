@@ -8,13 +8,6 @@
   "commonClose": "Zamknij",
 
   "statsTitle": "Statystyki",
-  "statsXpLabel": "Doświadczenie",
-  "statsXpValue": "{xp} XP",
-  "@statsXpValue": {
-    "placeholders": {
-      "xp": {"type": "int"}
-    }
-  },
   "statsTotalCollectedLabel": "Łącznie zebrane surowce",
   "statsLongestPathLabel": "Najdłuższa ścieżka",
   "statsLongestPathValue": "{count} kafelków",
@@ -50,6 +43,8 @@
   "statsLanguageLabel": "Język",
   "statsLanguagePolish": "Polski",
   "statsLanguageEnglish": "English",
+  "statsDebugLabel": "Debug",
+  "statsReplayTutorialLabel": "Uruchom samouczek ponownie",
 
   "comicsTitle": "Komiksy",
   "comicsUnlockedCount": "{unlocked} z {total} odblokowanych",
@@ -108,6 +103,7 @@
   "goalsMainGoal": "Cel główny",
   "goalsRequirements": "Warunki",
   "goalsSideQuests": "Questy poboczne",
+  "goalsNoSideQuestsThisAct": "Brak questów pobocznych w tym akcie.",
   "goalsStoryContext": "Kontekst fabularny",
   "goalsCompletedGoals": "Ukończone cele",
   "goalsResolvedActLabel": "Akt {act}: {name}",
@@ -125,13 +121,6 @@
       "endWeek": {"type": "int"}
     }
   },
-  "goalsQuestXp": "{title} (+{xp} XP)",
-  "@goalsQuestXp": {
-    "placeholders": {
-      "title": {"type": "String"},
-      "xp": {"type": "int"}
-    }
-  },
 
   "harvestGridNoMovesTitle": "Brak dostępnych ruchów",
   "harvestGridNoMovesMessage": "Na planszy nie ma już żadnego możliwego połączenia. Możesz przetasować planszę (koszt: 1 ruch).",
@@ -146,8 +135,7 @@
   "harvestScreenTutorialStep3Description": "Ścieżka z 6+ kulek zamienia jedną z nowych kulek w bombę - włączona do kolejnej ścieżki niszczy wszystkie sąsiednie kafelki.",
   "harvestScreenTutorialStep4Title": "Ruchy się kończą",
   "harvestScreenTutorialStep4Description": "Każde przeciągnięcie to jeden ruch - licznik na górze pokazuje, ile zostało. Gdy się skończą, runda zbiorów dobiega końca.",
-  "harvestScreenTutorialDialogTitle": "Jak zbierać surowce",
-  "harvestScreenTutorialGotItButton": "Rozumiem",
+  "harvestScreenTutorialBuildOverviewDescription": "Otwiera listę wszystkiego, co możesz teraz zbudować, razem z kosztem i tym, czego jeszcze brakuje w magazynie.",
   "harvestScreenRoundEndTitle": "⏳ Koniec ruchów",
   "harvestScreenRoundEndCollectedLabel": "Zebrane surowce w tym tygodniu:",
   "harvestScreenRoundEndNothingCollected": "Nic nie zebrano.",
@@ -172,22 +160,14 @@
   },
 
   "shopTitle": "Sklep",
-  "shopSubtitle": "Wydaj złoto, żeby na stałe zwiększyć liczbę ruchów na planszy zbiorów.",
+  "shopSubtitle": "Wydaj surowce, żeby na stałe zwiększyć liczbę ruchów na planszy zbiorów.",
   "shopMovesPerWeekLabel": "Ruchy na tydzień",
   "shopMovesBreakdown": "Baza {base} + dokupione {extra}",
   "@shopMovesBreakdown": {
     "placeholders": {"base": {"type": "int"}, "extra": {"type": "int"}}
   },
   "shopBuyMoveTitle": "+1 ruch na tydzień (na stałe)",
-  "shopGoldAvailable": "Masz: {gold} złota",
-  "@shopGoldAvailable": {
-    "placeholders": {"gold": {"type": "int"}}
-  },
   "shopMaxMovesReached": "Osiągnięto maksymalną liczbę ruchów.",
-  "shopCost": "Koszt: {cost} złota",
-  "@shopCost": {
-    "placeholders": {"cost": {"type": "int"}}
-  },
   "shopBuyButton": "Kup",
   "shopAutoMatchTier1Title": "Automatyczne usuwanie czwórek",
   "shopAutoMatchTier1Description": "Domyślnie kafelki ułożone w ciąg zostają na planszy, dopóki nie zbierzesz ich ręcznie. To ulepszenie sprawia, że ciągi 4+ znikają automatycznie. Nie działa w starciach z bossami - tam liczenie zawsze zostaje ręczne.",
@@ -195,6 +175,28 @@
   "shopAutoMatchTier2Description": "Kolejny stopień - po tym ulepszeniu automatycznie znikają też ciągi złożone tylko z 3 kafelków. Tak samo jak poprzedni stopień, nie działa w starciach z bossami.",
   "shopAutoMatchTier2LockedRequirement": "Wymaga: automatyczne usuwanie czwórek",
   "shopUnlockedLabel": "Odblokowane",
+  "shopMovesUnlockTitle": "Jak zwiększyć ten limit",
+  "shopMovesUnlockSklepLevel2": "Rozbuduj Sklep do poziomu 2 (+{bonus} do limitu dokupywanych ruchów)",
+  "@shopMovesUnlockSklepLevel2": {
+    "placeholders": {"bonus": {"type": "int"}}
+  },
+  "shopMovesUnlockSklepWorkers": "Zatrudnij pracowników w Sklepie ({current}/{max}, każdy +1 do limitu)",
+  "@shopMovesUnlockSklepWorkers": {
+    "placeholders": {"current": {"type": "int"}, "max": {"type": "int"}}
+  },
+  "shopMovesUnlockDiscovery1": "Zbadaj w Uczelni \"Podstawy agronomii\" (+{bonus} do bazowej liczby ruchów)",
+  "@shopMovesUnlockDiscovery1": {
+    "placeholders": {"bonus": {"type": "int"}}
+  },
+  "shopMovesUnlockDiscovery2": "Zbadaj w Uczelni \"Zaawansowaną agronomię\" (+{bonus} do bazowej liczby ruchów, wymaga Uczelni poziomu 2)",
+  "@shopMovesUnlockDiscovery2": {
+    "placeholders": {"bonus": {"type": "int"}}
+  },
+  "buildOverviewTooltip": "Co można teraz zbudować",
+  "buildOverviewTitle": "Co można teraz zbudować",
+  "buildOverviewAreasSection": "Okolice",
+  "buildOverviewBuildingsSection": "Wioska",
+  "buildOverviewEmpty": "Nic więcej nie da się teraz zbudować - najpierw odblokuj kolejne okolice albo Ratusz.",
 
   "resourcesViewLockedInfoContent": "{resource} nie zostało jeszcze odkryte. Dopóki nie odblokujesz go w Okolicach wioski, wszystkie premie do tego surowca (np. z Ratusza czy budynków produkcyjnych) nie będą działać.",
   "@resourcesViewLockedInfoContent": {
@@ -254,11 +256,6 @@
   "@endingStatMoraleValue": {
     "placeholders": {"value": {"type": "int"}}
   },
-  "endingStatXpLabel": "Zdobyte doświadczenie",
-  "endingStatXpValue": "{xp} XP",
-  "@endingStatXpValue": {
-    "placeholders": {"xp": {"type": "int"}}
-  },
   "endingStatGrotLabel": "Starcie z Grotem",
   "endingStatGrotValue": "{cleared} / 3 etapów",
   "@endingStatGrotValue": {
@@ -279,16 +276,10 @@
   "endingTierHardWonEpilogue": "Wioska przetrwała - poobijana, zmęczona, ale wciąż stoi. Nie wszystko poszło gładko: były noce niedostatku i starcia, których wynik ważył się na włosku. Ale dług został spłacony, a Marta i Jadwiga stoją dziś obok Kazimierza jako rodzina, którą sam sobie wybrał - nie tę, którą odziedziczył.",
   "endingTierScarredEpilogue": "Zwycięstwo smakuje gorzko. Wioska stoi, dług spłacony, Leszy pokonany - ale cena była wysoka: głodne noce, puste spichlerze, sąsiedzi patrzący na Kazimierza inaczej niż kiedyś na Antoniego. Marta zostaje przy nim, a on sam zaczyna rozumieć, dlaczego dziadek dźwigał tę tajemnicę w milczeniu przez dwadzieścia lat - nie każde zwycięstwo da się świętować.",
 
-  "tutorialAppBarTitle": "Jak grać",
-  "tutorialStep1Title": "Łącz surowce",
-  "tutorialStep1Description": "Przeciągnij palcem po sąsiadujących kafelkach tego samego surowca (również po skosie), żeby je zebrać.",
-  "tutorialStep2Title": "Dziki joker",
-  "tutorialStep2Description": "Za dłuższą ścieżkę (5 i więcej kafelków) dostajesz jokera - łączy się z każdym surowcem i mnoży zbiory.",
-  "tutorialStep3Title": "Bomba",
-  "tutorialStep3Description": "Za jeszcze dłuższą ścieżkę (6 i więcej) dostajesz bombę - włączona do ścieżki niszczy sąsiednie kafelki.",
-  "tutorialStep4Title": "Rozbuduj wioskę",
-  "tutorialStep4Description": "Zebrane surowce zostają w wiosce między tygodniami - w przyszłości posłużą do jej rozbudowy.",
-  "tutorialFinishButton": "Rozumiem, zaczynamy!",
+  "tutorialNextButton": "Dalej",
+  "tutorialBackButton": "Wstecz",
+  "tutorialSkipButton": "Pomiń",
+  "tutorialDoneButton": "Zakończ",
 
   "actFailureTitle": "Porażka",
   "actFailureSubtitle": "Akt {actNumber}: \"{actName}\" się nie powiódł.",
@@ -324,7 +315,7 @@
   "debugFightGrot": "Grot (tydz. 26)",
   "debugFightMarta": "Marta (tydz. 39)",
   "debugFightBogdan": "Bogdan (tydz. 52)",
-  "debugFightLeszy": "Leszy (tydz. 59)",
+  "debugFightLeszy": "Leszy (tydz. 64)",
 
   "bossIntroWeekLabel": "Tydzień {week}",
   "@bossIntroWeekLabel": {
@@ -774,16 +765,16 @@
   "homeTabStats": "Statystyki",
   "homeTabGoals": "Cele",
   "homeTabDebug": "Debug",
+  "homeTutorialNavBarTitle": "Pasek nawigacji",
+  "homeTutorialNavBarDesc": "Zakładki u dołu przełączają między ekranami wioski. Przejdziemy teraz po kolei przez każdy z nich.",
   "homeTutorialVillageDesc": "Dotknij pustej działki, żeby zbudować budynek, albo gotowego budynku, żeby go rozbudować lub zobaczyć szczegóły. Ratusz buduje się jako pierwszy i odblokowuje resztę.",
   "homeTutorialSurroundingsDesc": "Tereny wokół wioski (rzeka, las, góry...) - ich zabudowa powiększa planszę zbiorów i daje premie do surowców.",
   "homeTutorialResourcesDesc": "Podgląd zapasów, produkcji i zużycia tygodniowego każdego surowca, a stąd też wymiana na targu, gdy Rynek jest gotowy.",
   "homeTutorialShopDesc": "Kupuj dodatkowe ruchy na planszy zbiorów i ulepszenia automatycznego dopasowywania (odblokowuje się w trakcie gry).",
   "homeTutorialStatsDesc": "Rekordy, populacja, morale, bezpieczeństwo, armia i komiksy fabularne, a także wybór wyglądu planszy zbiorów.",
-  "homeTutorialGoalsDesc": "Cele bieżącego aktu fabuły i questy poboczne - realizuj je, żeby zdobywać doświadczenie.",
+  "homeTutorialGoalsDesc": "Cel bieżącego aktu fabuły i questy poboczne - oba dają surowce do magazynu po ukończeniu.",
   "homeTutorialArrowTitle": "Przycisk \"→\"",
   "homeTutorialArrowDesc": "Kończy tydzień i przenosi do planszy zbiorów (albo starcia z bossem, jeśli akurat wypada).",
-  "homeVillageTutorialTitle": "Witaj w wiosce",
-  "homeVillageTutorialGotIt": "Rozumiem",
 
   "homeConfirmDemolishTitle": "Zburzyć budynek?",
   "homeConfirmDemolishMessage": "Na pewno chcesz zburzyć: {name}?\nOdzyskasz połowę zainwestowanych surowców.",
@@ -877,7 +868,6 @@
   "homeLevel1": "Poziom 1",
   "homeUpgradeToLevel2": "Rozbudowa do poziomu 2",
   "homeLevel2": "Poziom 2",
-  "homeDemolishRefundNote": "Zburzenie zwróci połowę wszystkich zainwestowanych surowców.",
   "homeBuild": "Zbuduj",
   "homeUpgrade": "Rozbuduj",
 
@@ -888,6 +878,7 @@
   "homePerksLabel": "Premie",
   "homeDemolishRefund50Title": "Odzysk przy zburzeniu (50%)",
   "homeRequiresUpgradedRatusz": "Wymaga rozbudowanego (poziom 2) Ratusza.",
+  "homeRatuszLevel2LockedRequirement": "Rozbudowa Ratusza odblokuje się w Akcie II (tydzień 27).",
   "homeGeneralBonusTitle": "Premia ogólna",
   "homeWorkersTitle": "Pracownicy",
   "homeWorkersRequiresDiscovery": "Wymaga odkrycia \"Zarządzanie pracownikami\" w Uczelni.",
@@ -915,6 +906,7 @@
   "homeGoalBattleProgress": "{cleared}/3 etapów (min. {required})",
   "@homeGoalBattleProgress": {"placeholders": {"cleared": {"type": "int"}, "required": {"type": "int"}}},
   "homeGoalRatuszBuilt": "Ratusz zbudowany",
+  "homeGoalRatuszUpgraded": "Ratusz rozbudowany do poziomu 2",
   "homeGoalOrchardDeveloped": "Sad rozwinięty",
   "homeGoalMeadowDeveloped": "Łąka rozwinięta",
   "homeGoalFieldDeveloped": "Pole rozwinięte",
@@ -979,11 +971,11 @@
   "homeBossIntroLeszyMessage": "Mroczny cień lasu budzi się w pełni. Ostateczne starcie o los wioski zaczyna się teraz.",
   "homeLeszyVictorySnack": "Leszy pokonany! Cień cofa się w głąb ziemi.",
 
-  "homeActGoalReachedSnack": "Cel Aktu {actNumber} (\"{actName}\") osiągnięty! (+{xp} XP)",
-  "@homeActGoalReachedSnack": {"placeholders": {"actNumber": {"type": "int"}, "actName": {"type": "String"}, "xp": {"type": "int"}}},
+  "homeActGoalReachedSnack": "Cel Aktu {actNumber} (\"{actName}\") osiągnięty! ({reward})",
+  "@homeActGoalReachedSnack": {"placeholders": {"actNumber": {"type": "int"}, "actName": {"type": "String"}, "reward": {"type": "String"}}},
 
-  "homeSideQuestCompletedSnack": "Quest poboczny ukończony: \"{title}\" (+{xp} XP)",
-  "@homeSideQuestCompletedSnack": {"placeholders": {"title": {"type": "String"}, "xp": {"type": "int"}}},
+  "homeSideQuestCompletedSnack": "Quest poboczny ukończony: \"{title}\" ({reward})",
+  "@homeSideQuestCompletedSnack": {"placeholders": {"title": {"type": "String"}, "reward": {"type": "String"}}},
 
   "homeDebugJumpedToWeekSnack": "Debug: przeniesiono do tygodnia {week}.",
   "@homeDebugJumpedToWeekSnack": {"placeholders": {"week": {"type": "int"}}},

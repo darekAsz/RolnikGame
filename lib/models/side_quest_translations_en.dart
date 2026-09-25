@@ -13,7 +13,7 @@ class SideQuestTranslation {
 const Map<SideQuestId, SideQuestTranslation> kSideQuestsEn = {
   SideQuestId.ostatniaLekcja: SideQuestTranslation(
     'The Last Lesson',
-    'Upgrade the Town Hall to level 2 before the village is consumed by mourning.',
+    'Upgrade the Town Hall to level 2 to honor what Antoni managed to teach you.',
   ),
   SideQuestId.dobrySasiad: SideQuestTranslation(
     'A Good Neighbor',

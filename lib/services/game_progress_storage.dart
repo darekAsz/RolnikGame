@@ -7,7 +7,6 @@ class GameProgress {
   final bool ratuszBuilt;
   final bool palisadeBuilt;
   final bool harvestTutorialSeen;
-  final bool villageTutorialSeen;
 
   const GameProgress({
     required this.week,
@@ -16,22 +15,21 @@ class GameProgress {
     required this.ratuszBuilt,
     required this.palisadeBuilt,
     this.harvestTutorialSeen = false,
-    this.villageTutorialSeen = false,
   });
 }
 
 class GameProgressStorage {
   static const _weekKey = 'game_week';
+  // Samouczek wioski/zakładek z podświetleniem na żywo (patrz
+  // HomeShell._startTour) - pokazuje się raz, przy pierwszym wejściu do
+  // wioski w nowej grze.
   static const _tutorialKey = 'game_tutorial_seen';
   static const _hasSaveKey = 'game_has_save';
   static const _ratuszBuiltKey = 'game_ratusz_built';
   static const _palisadeBuiltKey = 'game_palisade_built';
-  // Osobne od _tutorialKey (ekran "Jak grać" pokazywany raz przed pierwszym
-  // wejściem do gry) - te dwa pokazują się kontekstowo, przy pierwszym
-  // wejściu na planszę zbiorów i na ekran wioski, więc potrzebują własnych
-  // flag "widziane".
+  // Osobny samouczek planszy zbiorów (kulek) - pokazuje się kontekstowo,
+  // przy pierwszym wejściu na tę planszę, więc potrzebuje własnej flagi.
   static const _harvestTutorialKey = 'game_harvest_tutorial_seen';
-  static const _villageTutorialKey = 'game_village_tutorial_seen';
 
   static Future<GameProgress> load() async {
     final prefs = await SharedPreferences.getInstance();
@@ -42,7 +40,6 @@ class GameProgressStorage {
       ratuszBuilt: prefs.getBool(_ratuszBuiltKey) ?? false,
       palisadeBuilt: prefs.getBool(_palisadeBuiltKey) ?? false,
       harvestTutorialSeen: prefs.getBool(_harvestTutorialKey) ?? false,
-      villageTutorialSeen: prefs.getBool(_villageTutorialKey) ?? false,
     );
   }
 
@@ -59,11 +56,6 @@ class GameProgressStorage {
   static Future<void> markHarvestTutorialSeen() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_harvestTutorialKey, true);
-  }
-
-  static Future<void> markVillageTutorialSeen() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_villageTutorialKey, true);
   }
 
   static Future<void> setRatuszBuilt(bool built) async {
@@ -87,6 +79,5 @@ class GameProgressStorage {
     await prefs.setBool(_palisadeBuiltKey, false);
     await prefs.setBool(_tutorialKey, false);
     await prefs.setBool(_harvestTutorialKey, false);
-    await prefs.setBool(_villageTutorialKey, false);
   }
 }

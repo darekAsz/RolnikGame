@@ -12,6 +12,7 @@ import '../models/resource_type.dart';
 import '../models/season.dart';
 import '../models/side_quest.dart';
 import '../models/story_act.dart';
+import '../models/tutorial_step.dart';
 import '../models/unit_type.dart';
 import '../models/village_event.dart';
 import '../services/area_storage.dart';
@@ -29,8 +30,10 @@ import '../services/stats_storage.dart';
 import '../services/story_progress_storage.dart';
 import '../services/village_building_storage.dart';
 import '../services/village_event_storage.dart';
+import '../widgets/buildable_overview_sheet.dart';
 import '../widgets/event_popup.dart';
 import '../widgets/resource_icon.dart';
+import '../widgets/tutorial_overlay.dart';
 import '../widgets/unit_portrait.dart';
 import '../widgets/village_board.dart';
 import 'act_failure_screen.dart';
@@ -87,11 +90,24 @@ class _HomeShellState extends State<HomeShell> {
   // turę dzięki odkryciom w Uczelni, więc bazowy limit ma zostać niski.
   static const int _maxMovePurchasesBase = 2;
   static const int _sklepMovesCapBonus = 4;
-  static const int _moveBaseCost = 5;
-  static const int _moveCostIncrement = 5;
-  // Poziom 1: automatyczne czwórki (i więcej). Poziom 2 (ulepszenie): też trójki.
-  static const int _autoMatchTier1Cost = 15;
-  static const int _autoMatchTier2Cost = 25;
+  static const int _moveCoinBaseCost = 50;
+  static const int _moveCoinCostIncrement = 15;
+  static const int _moveWoodBaseCost = 15;
+  static const int _moveWoodCostIncrement = 5;
+  static const int _moveStoneBaseCost = 10;
+  static const int _moveStoneCostIncrement = 5;
+  // Poziom 1: automatyczne czwórki (i więcej). Poziom 2 (ulepszenie): też
+  // trójki - realna zmiana samej mechaniki match-3, stąd wyraźnie wyższy koszt.
+  static const Map<ResourceType, int> _autoMatchTier1Cost = {
+    ResourceType.coin: 60,
+    ResourceType.wood: 20,
+    ResourceType.stone: 20,
+  };
+  static const Map<ResourceType, int> _autoMatchTier2Cost = {
+    ResourceType.coin: 100,
+    ResourceType.wood: 30,
+    ResourceType.stone: 30,
+  };
   static const int _basePopulation = 5;
   static const int _housePopulationBonus = 3;
   static const int _palisadePopulationBonus = 1;
@@ -102,8 +118,13 @@ class _HomeShellState extends State<HomeShell> {
   static const int _baseMorale = 50;
   static const int _breweryMoraleBonus = 10;
   static const int _kaplicaMoraleBonus = 5;
-  static const int _baseStorageCap = 500;
-  static const int _warehouseStorageBonus = 300;
+  static const int _baseStorageCap = 100;
+  // Za poziom Magazynu (nie mnożone przez pracowników, w odróżnieniu od
+  // większości innych bonusów budynków - patrz _storageCap) i osobno, wprost
+  // za każdego przydzielonego pracownika - prosty, addytywny model, tak samo
+  // jak limit dokupywanych ruchów w Sklepie czy zniżka na Rynku.
+  static const int _warehouseStorageBonusPerLevel = 50;
+  static const int _warehouseWorkerStorageBonus = 25;
   static const int _weeklyProductionBonus = 3;
   static const int _kuzniaWeeklyGoldBonus = 2;
   static const int _szkolaMovesBonus = 1;
@@ -142,9 +163,11 @@ class _HomeShellState extends State<HomeShell> {
   // tydzień w ogóle minął - porażka nie przesuwa historii dalej (patrz
   // _startWeek).
   static const int _leszyBattleWeek = 64;
-  // XP za osiągnięcie celu głównego aktu (questy poboczne mają własne, niższe
-  // nagrody zdefiniowane w kSideQuests).
-  static const int _mainQuestXpReward = 25;
+  // Rozbudowa Ratusza do poziomu 2 odblokowuje się dopiero z Aktem II (tydzień
+  // 27, patrz kStoryActs) - to też nowy cel główny tego aktu (patrz
+  // _actGoalRequirements), więc gracz nie może "przeskoczyć" tego etapu
+  // fabuły, rozbudowując Ratusz od razu w Akcie 0.
+  static const int _ratuszLevel2UnlockWeek = 27;
   static const int _soldierRecruitCostGold = 3;
   // Rekrutacja zabiera jednego mieszkańca z wioski (zostaje żołnierzem) -
   // populacja spada tak samo jak przy głodzie, tylko od razu i celowo.
@@ -156,18 +179,24 @@ class _HomeShellState extends State<HomeShell> {
   // _population to prawdziwy, trwały licznik obecnych mieszkańców (w
   // odróżnieniu od _populationLimit, który jest tylko pojemnością wynikającą
   // z budynków). Zjadają zboże - 1 zboże na każde _populationFoodDivisor
-  // mieszkańców. Przy wystarczającej ilości jedzenia i wolnym miejscu poniżej
-  // limitu populacja rośnie co tydzień; przy głodzie - maleje, a morale spada.
-  static const int _populationFoodDivisor = 4;
-  static const int _populationGrowthPerWeek = 1;
+  // mieszkańców (czyli bazowo 1 mieszkaniec = 1 zboże); brakujące zboże jest
+  // dobierane z jabłek jako zapasowe źródło jedzenia (patrz _startWeek), a
+  // głód następuje dopiero, gdy zabraknie obu. Przy wystarczającej ilości
+  // jedzenia i wolnym miejscu poniżej limitu populacja rośnie co tydzień -
+  // tempo zależy od morale wioski, patrz _effectivePopulationGrowthRate;
+  // przy głodzie maleje, a morale spada.
+  static const int _populationFoodDivisor = 1;
   static const int _populationStarvationLoss = 1;
   static const int _populationStarvationMoraleLoss = 5;
   // Odkrycia z Uczelni, które dają stałe premie niezależne od innych
   // budynków (patrz models/discovery.dart).
   static const int _discoveryStorageBonus = 150;
-  static const int _discoveryFoodDivisorBonus = 2;
+  // +1 do dzielnika (1 -> 2), czyli 2 mieszkańców na 1 zboże zamiast 1:1.
+  static const int _discoveryFoodDivisorBonus = 1;
   static const int _discoveryMilitaryBonus = 1;
-  static const int _discoveryFastGrowthBonus = 1;
+  // Mnoży tempo przyrostu (zależne od morale) razy 2, zamiast dawać stały
+  // dodatek - patrz _effectivePopulationGrowthRate.
+  static const double _discoveryFastGrowthMultiplier = 2.0;
   static const double _discoveryWeatherForecastBonus = 0.15;
   // Koszt rozbudowy (poziom 2) - jednolity dla wszystkich budynków wioski,
   // czysta inwestycja złota niezależna od surowców poziomu 1.
@@ -192,6 +221,10 @@ class _HomeShellState extends State<HomeShell> {
   bool _busy = false;
   int _week = 1;
   int _population = _basePopulation;
+  // Ułamkowa reszta z przyrostu populacji zależnego od morale - patrz
+  // _effectivePopulationGrowthRate. Trzyma się w [0, 1), odkładana między
+  // tygodniami, żeby np. stałe 0,5/tydzień faktycznie dawało +1 co dwa tygodnie.
+  double _populationGrowthProgress = 0.0;
   Set<DiscoveryId> _unlockedDiscoveries = {};
   Set<int> _resolvedActs = {};
   int _lastStarvationWeek = 0;
@@ -200,7 +233,6 @@ class _HomeShellState extends State<HomeShell> {
   bool _martaFullTrust = false;
   int _bogdanProofComplete = -1;
   bool _leszyVictorious = false;
-  int _xp = 0;
   Set<SideQuestId> _claimedSideQuests = {};
   Set<int> _readComics = {};
   bool _ratuszBuilt = false;
@@ -388,7 +420,8 @@ class _HomeShellState extends State<HomeShell> {
 
   int get _storageCap =>
       _baseStorageCap +
-      _tieredBonus(BuildingKind.magazyn, _warehouseStorageBonus) +
+      _tieredBaseAmount(BuildingKind.magazyn, _warehouseStorageBonusPerLevel) +
+      _workersFor(BuildingKind.magazyn).clamp(0, _maxWorkersPerBuilding) * _warehouseWorkerStorageBonus +
       (_hasDiscovery(DiscoveryId.storageBonus) ? _discoveryStorageBonus : 0);
 
   int _strengthFor(UnitType type) {
@@ -467,8 +500,15 @@ class _HomeShellState extends State<HomeShell> {
 
   int get _populationFoodConsumption => (_population / _effectivePopulationFoodDivisor).ceil();
 
-  int get _effectivePopulationGrowth =>
-      _populationGrowthPerWeek + (_hasDiscovery(DiscoveryId.fastGrowth) ? _discoveryFastGrowthBonus : 0);
+  // Tempo przyrostu w mieszkańcach/tydzień jest teraz ułamkowe i zależne od
+  // morale wioski: 100% morale = +1/tydzień, 50% morale = +0,5/tydzień, 0%
+  // morale = brak przyrostu. Odkrycie "Szybszy przyrost" PODWAJA to tempo
+  // (nie dodaje stałej wartości). Ułamkowa reszta jest odkładana między
+  // tygodniami - patrz _populationGrowthProgress.
+  double get _effectivePopulationGrowthRate {
+    final base = _moraleValue / 100.0;
+    return _hasDiscovery(DiscoveryId.fastGrowth) ? base * _discoveryFastGrowthMultiplier : base;
+  }
 
   int get _effectivePopulationStarvationLoss =>
       _hasDiscovery(DiscoveryId.ruralMedicine) ? 0 : _populationStarvationLoss;
@@ -568,7 +608,7 @@ class _HomeShellState extends State<HomeShell> {
       case BuildingKind.rynek:
         return l10n.homeBonusRynek(_marketGiveAmountBase, _marketReceiveAmount, _marketGiveAmountBest);
       case BuildingKind.magazyn:
-        return l10n.homeBonusMagazyn(_warehouseStorageBonus);
+        return l10n.homeBonusMagazyn(_warehouseStorageBonusPerLevel);
       case BuildingKind.kamieniarz:
         return l10n.homeBonusKamieniarz(_weeklyProductionBonus);
       case BuildingKind.koszary:
@@ -619,7 +659,8 @@ class _HomeShellState extends State<HomeShell> {
             .clamp(_marketGiveAmountBest, _marketGiveAmountBase);
         return l10n.homeUpgradeRynek(afterUpgrade, _marketReceiveAmount, _marketGiveAmountBest);
       case BuildingKind.magazyn:
-        return l10n.homeUpgradeMagazyn(_warehouseStorageBonus, _warehouseStorageBonus * 2);
+        return l10n.homeUpgradeMagazyn(
+            _warehouseStorageBonusPerLevel, _warehouseStorageBonusPerLevel * 2);
       case BuildingKind.kamieniarz:
         return l10n.homeUpgradeKamieniarz(_weeklyProductionBonus, _weeklyProductionBonus * 2);
       case BuildingKind.koszary:
@@ -731,9 +772,11 @@ class _HomeShellState extends State<HomeShell> {
           l10n.homeMarketRateBonus(_marketGiveAmount, _marketReceiveAmount, _marketGiveAmountBest),
         ];
       case BuildingKind.magazyn:
+        final base = _tieredBaseAmount(kind, _warehouseStorageBonusPerLevel);
+        final withWorkers = base +
+            _workersFor(kind).clamp(0, _maxWorkersPerBuilding) * _warehouseWorkerStorageBonus;
         return [
-          _bonusLine(l10n, l10n.homeLabelWarehouseLimit, _tieredBaseAmount(kind, _warehouseStorageBonus),
-              _tieredBonus(kind, _warehouseStorageBonus), ''),
+          _bonusLine(l10n, l10n.homeLabelWarehouseLimit, base, withWorkers, ''),
         ];
       case BuildingKind.kamieniarz:
         return [
@@ -749,24 +792,39 @@ class _HomeShellState extends State<HomeShell> {
   }
 
   int get _totalMoves => _baseMoves + _extraMoves;
-  int get _nextMoveCost => _moveBaseCost + _extraMoves * _moveCostIncrement;
+  Map<ResourceType, int> get _nextMoveCost => {
+        ResourceType.coin: _moveCoinBaseCost + _extraMoves * _moveCoinCostIncrement,
+        ResourceType.wood: _moveWoodBaseCost + _extraMoves * _moveWoodCostIncrement,
+        ResourceType.stone: _moveStoneBaseCost + _extraMoves * _moveStoneCostIncrement,
+      };
 
   Map<ResourceType, int> _costFor(AreaKind area) {
     switch (area) {
       case AreaKind.orchard:
-        return const {ResourceType.wood: 10, ResourceType.stone: 8};
+        return const {ResourceType.wood: 7, ResourceType.stone: 8};
       case AreaKind.meadow:
-        return const {ResourceType.wood: 12, ResourceType.stone: 10, ResourceType.apple: 8};
+        return const {ResourceType.wood: 9, ResourceType.stone: 10, ResourceType.apple: 8};
       case AreaKind.field:
         return const {
-          ResourceType.wood: 15,
+          ResourceType.wood: 11,
           ResourceType.stone: 12,
           ResourceType.apple: 10,
           ResourceType.grass: 8,
         };
+      // Las to teraz czwarty (a nie ostatni) teren w kolejności odblokowania
+      // (patrz AreaKind.prerequisite), więc jego drewno jest obniżone razem
+      // z pierwszymi trzema - w przeciwieństwie do Rzeki/Gór, które zostają
+      // przy pełnym koszcie jako faktycznie ostatni etap ścieżki.
+      case AreaKind.forest:
+        return const {
+          ResourceType.wood: 14,
+          ResourceType.stone: 15,
+          ResourceType.apple: 12,
+          ResourceType.grass: 10,
+          ResourceType.grain: 10,
+        };
       case AreaKind.river:
       case AreaKind.mountains:
-      case AreaKind.forest:
         return const {
           ResourceType.wood: 18,
           ResourceType.stone: 15,
@@ -781,6 +839,66 @@ class _HomeShellState extends State<HomeShell> {
   // surowców poziomu 1 - odblokowuje możliwość wyboru tego surowca jako
   // "surowca tygodnia" na planszy zbiorów.
   Map<ResourceType, int> _upgradeCostFor(AreaKind area) => const {ResourceType.coin: 20};
+
+  // Kolejność wyświetlania zgodna ze ścieżką odblokowania w
+  // SurroundingsView._path - to tylko kolejność w oknie "co można teraz
+  // zbudować" (patrz _buildableAreaEntries), bez wspólnego źródła prawdy z
+  // tamtym plikiem, stąd niewielka duplikacja tej samej listy.
+  static const _areaDisplayOrder = [
+    AreaKind.orchard,
+    AreaKind.meadow,
+    AreaKind.field,
+    AreaKind.forest,
+    AreaKind.river,
+    AreaKind.mountains,
+  ];
+
+  /// Okolice, których wymóg (poprzednik w łańcuchu, patrz AreaKind.prerequisite)
+  /// jest już spełniony, ale które nie są jeszcze zbudowane - do okna "co
+  /// można teraz zbudować" (showBuildableOverviewSheet).
+  List<BuildableOverviewEntry> _buildableAreaEntries() {
+    final entries = <BuildableOverviewEntry>[];
+    for (final area in _areaDisplayOrder) {
+      if (_areasBuilt[area] ?? false) continue;
+      final prereq = area.prerequisite;
+      if (prereq != null && !(_areasBuilt[prereq] ?? false)) continue;
+      entries.add(BuildableOverviewEntry(
+        title: area.label,
+        icon: resourceIconAsset(area.resourceType.assetPath, size: 28),
+        cost: _costFor(area),
+      ));
+    }
+    return entries;
+  }
+
+  /// Budynki wioski, których wymóg (wszystkie surowce odblokowane przez
+  /// Okolice, a dla wszystkiego poza samym Ratuszem - też zbudowany Ratusz,
+  /// patrz _allResourcesUnlocked) jest już spełniony, ale które nie są
+  /// jeszcze zbudowane.
+  List<BuildableOverviewEntry> _buildableBuildingEntries() {
+    if (!_allResourcesUnlocked) return const [];
+    final entries = <BuildableOverviewEntry>[];
+    for (final kind in BuildingKind.values) {
+      final built = switch (kind) {
+        BuildingKind.ratusz => _ratuszBuilt,
+        BuildingKind.palisade => _palisadeBuilt,
+        _ => _villageBuilt[kind] ?? false,
+      };
+      if (built) continue;
+      if (kind != BuildingKind.ratusz && !_ratuszBuilt) continue;
+      final cost = switch (kind) {
+        BuildingKind.ratusz => _ratuszCost,
+        BuildingKind.palisade => _palisadeCost,
+        _ => _villageCostFor(kind),
+      };
+      entries.add(BuildableOverviewEntry(
+        title: kind.label,
+        icon: Icon(kind.icon, color: kind.color, size: 26),
+        cost: cost,
+      ));
+    }
+    return entries;
+  }
 
   Set<ResourceType> get _unlockedTypes => {
         ...kStarterResourceTypes,
@@ -815,79 +933,100 @@ class _HomeShellState extends State<HomeShell> {
     if (!mounted) return;
     await _showPendingComics();
     if (!mounted) return;
-    await _maybeShowVillageTutorial();
+    await _maybeStartTour();
   }
 
-  /// Samouczek ekranu wioski - pokazuje się tylko raz (patrz
-  /// GameProgressStorage.markVillageTutorialSeen), po pierwszym wczytaniu
-  /// gry i ewentualnych komiksach, żeby wyjaśnić planszę wioski i zakładki
-  /// na dole, zanim gracz zacznie samodzielnie klikać.
-  Future<void> _maybeShowVillageTutorial() async {
+  bool _tourActive = false;
+  int _tourStepIndex = 0;
+  List<TutorialStep> _tourSteps = [];
+  List<int?> _tourStepTab = [];
+  final GlobalKey _navBarKey = GlobalKey();
+  final GlobalKey _tabContentKey = GlobalKey();
+  final GlobalKey _startWeekButtonKey = GlobalKey();
+
+  /// Samouczek wioski/zakładek z podświetleniem na żywo - pokazuje się tylko
+  /// raz (patrz GameProgressStorage.markTutorialSeen), po pierwszym
+  /// wczytaniu gry i ewentualnych komiksach, żeby po kolei przejść przez
+  /// każdy ekran, zanim gracz zacznie samodzielnie klikać. Odtwarzalny w
+  /// dowolnym momencie przyciskiem w Statystykach - patrz _startTour,
+  /// wywoływane stąd i z StatsView.onReplayTutorial.
+  Future<void> _maybeStartTour() async {
     final progress = await GameProgressStorage.load();
-    if (!mounted || progress.villageTutorialSeen) return;
-    await GameProgressStorage.markVillageTutorialSeen();
+    if (!mounted || progress.tutorialSeen) return;
+    await GameProgressStorage.markTutorialSeen();
     if (!mounted) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _showVillageTutorialDialog();
+      if (mounted) _startTour();
     });
   }
 
-  List<(IconData, String, String)> _villageTutorialSteps(AppLocalizations l10n) => [
-        (Icons.home_work, l10n.homeTabVillage, l10n.homeTutorialVillageDesc),
-        (Icons.terrain, l10n.homeTabSurroundings, l10n.homeTutorialSurroundingsDesc),
-        (Icons.inventory_2, l10n.homeTabResources, l10n.homeTutorialResourcesDesc),
-        (Icons.storefront, l10n.homeTabShop, l10n.homeTutorialShopDesc),
-        (Icons.bar_chart, l10n.homeTabStats, l10n.homeTutorialStatsDesc),
-        (Icons.flag, l10n.homeTabGoals, l10n.homeTutorialGoalsDesc),
-        (Icons.arrow_forward, l10n.homeTutorialArrowTitle, l10n.homeTutorialArrowDesc),
-      ];
+  // Dopasowanie po ikonie zakładki (te same stałe co w _tabs) - prościej niż
+  // osobny identyfikator na _TabSpec tylko dla samouczka.
+  String _tourTabDescription(AppLocalizations l10n, IconData icon) {
+    if (icon == Icons.home_work) return l10n.homeTutorialVillageDesc;
+    if (icon == Icons.terrain) return l10n.homeTutorialSurroundingsDesc;
+    if (icon == Icons.backpack) return l10n.homeTutorialResourcesDesc;
+    if (icon == Icons.storefront) return l10n.homeTutorialShopDesc;
+    if (icon == Icons.bar_chart) return l10n.homeTutorialStatsDesc;
+    return l10n.homeTutorialGoalsDesc;
+  }
 
-  void _showVillageTutorialDialog() {
+  /// Buduje i uruchamia samouczek od nowa, na podstawie AKTUALNIE dostępnych
+  /// zakładek (patrz _tabs - np. Sklep dochodzi dopiero po jego zbudowaniu),
+  /// więc odtworzony później pokazuje więcej ekranów niż za pierwszym razem.
+  void _startTour() {
     final l10n = AppLocalizations.of(context)!;
-    final steps = _villageTutorialSteps(l10n);
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.homeVillageTutorialTitle),
-        content: SizedBox(
-          width: 360,
-          height: 420,
-          child: ListView.separated(
-            itemCount: steps.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 16),
-            itemBuilder: (context, index) {
-              final (icon, title, description) = steps[index];
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CircleAvatar(
-                    backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
-                    child: Icon(icon, color: Theme.of(context).colorScheme.primary),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(title, style: Theme.of(context).textTheme.titleSmall),
-                        const SizedBox(height: 2),
-                        Text(description, style: Theme.of(context).textTheme.bodySmall),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
-        ),
-        actions: [
-          FilledButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(l10n.homeVillageTutorialGotIt),
-          ),
-        ],
+    final tabs = _tabs;
+    final steps = <TutorialStep>[
+      TutorialStep(
+        targetKey: _navBarKey,
+        title: l10n.homeTutorialNavBarTitle,
+        description: l10n.homeTutorialNavBarDesc,
+        padding: EdgeInsets.zero,
+        borderRadius: BorderRadius.zero,
       ),
-    );
+    ];
+    final stepTabs = <int?>[null];
+    for (var i = 0; i < tabs.length; i++) {
+      steps.add(TutorialStep(
+        targetKey: _tabContentKey,
+        title: tabs[i].label,
+        description: _tourTabDescription(l10n, tabs[i].icon),
+        padding: EdgeInsets.zero,
+        borderRadius: BorderRadius.zero,
+      ));
+      stepTabs.add(i);
+    }
+    steps.add(TutorialStep(
+      targetKey: _startWeekButtonKey,
+      title: l10n.homeTutorialArrowTitle,
+      description: l10n.homeTutorialArrowDesc,
+    ));
+    stepTabs.add(null);
+    setState(() {
+      _tourSteps = steps;
+      _tourStepTab = stepTabs;
+      _tourStepIndex = 0;
+      _tourActive = true;
+      _tab = 0;
+    });
+  }
+
+  void _tourGoTo(int index) {
+    if (index < 0) return;
+    if (index >= _tourSteps.length) {
+      _finishTour();
+      return;
+    }
+    setState(() {
+      _tourStepIndex = index;
+      final targetTab = _tourStepTab[index];
+      if (targetTab != null) _tab = targetTab;
+    });
+  }
+
+  void _finishTour() {
+    setState(() => _tourActive = false);
   }
 
   // Komiksy #10/#15/#20/#29 opisują WYNIK starcia z bossem (Grot/Marta/
@@ -946,6 +1085,7 @@ class _HomeShellState extends State<HomeShell> {
     final eventSecurityBonus = await VillageEventStorage.loadSecurityBonus();
     final eventPopulationBonus = await VillageEventStorage.loadPopulationBonus();
     final storedPopulation = await PopulationStorage.load();
+    final storedGrowthProgress = await PopulationStorage.loadGrowthProgress();
     final unlockedDiscoveries = await DiscoveryStorage.load();
     final resolvedActs = await StoryProgressStorage.loadResolvedActs();
     final lastStarvationWeek = await StoryProgressStorage.loadLastStarvationWeek();
@@ -954,7 +1094,6 @@ class _HomeShellState extends State<HomeShell> {
     final martaFullTrust = await StoryProgressStorage.loadMartaFullTrust();
     final bogdanProofComplete = await StoryProgressStorage.loadBogdanProofComplete();
     final leszyVictorious = await StoryProgressStorage.loadLeszyVictorious();
-    final xp = await ExperienceStorage.loadXp();
     final claimedSideQuests = await ExperienceStorage.loadClaimedSideQuests();
     final readComics = await ComicStorage.loadRead();
     final boardStyle = await BoardStyleStorage.load();
@@ -981,6 +1120,7 @@ class _HomeShellState extends State<HomeShell> {
       _eventSecurityBonus = eventSecurityBonus;
       _eventPopulationBonus = eventPopulationBonus;
       _population = storedPopulation ?? _basePopulation;
+      _populationGrowthProgress = storedGrowthProgress;
       _unlockedDiscoveries = unlockedDiscoveries;
       _resolvedActs = resolvedActs;
       _lastStarvationWeek = lastStarvationWeek;
@@ -989,7 +1129,6 @@ class _HomeShellState extends State<HomeShell> {
       _martaFullTrust = martaFullTrust;
       _bogdanProofComplete = bogdanProofComplete;
       _leszyVictorious = leszyVictorious;
-      _xp = xp;
       _claimedSideQuests = claimedSideQuests;
       _readComics = readComics;
       _boardStyle = boardStyle;
@@ -1376,7 +1515,13 @@ class _HomeShellState extends State<HomeShell> {
       upgradeCost: _villageUpgradeCost,
       bonusText: _villageBonusTextFor(kind),
       upgradeText: _villageUpgradeTextFor(kind),
-      showWorkers: kind != BuildingKind.szkola,
+      // Dom (tak jak Uczelnia) nie ma żadnej premii zależnej od pracowników -
+      // limit populacji z Domu rośnie tylko z jego poziomu (patrz
+      // _bonusBreakdownFor), więc panel pracowników byłby tu czysto
+      // dekoracyjny i mylący (sugerowałby efekt, którego nie ma). Dodatkowe
+      // działki pod dodatkowe domy (_onTapExtraHouse) już konsekwentnie go
+      // nie pokazują - to ujednolica oba miejsca.
+      showWorkers: kind != BuildingKind.szkola && kind != BuildingKind.dom,
       extraContentBuilder: extraContentBuilder,
     );
 
@@ -1448,6 +1593,7 @@ class _HomeShellState extends State<HomeShell> {
         upgradeCost: _villageUpgradeCost,
         showWorkers: false,
         demolishable: false,
+        upgradeRequiresRatuszLevel2: false,
         levelLabel: l10n.homeLevel0,
         upgradeSectionLabel: l10n.homeRebuildToLevel1,
         notDemolishableText: l10n.homeDecrepitHouseNotDemolishable,
@@ -1659,9 +1805,11 @@ class _HomeShellState extends State<HomeShell> {
     if (_extraMoves >= _maxExtraMoves) return;
     final l10n = AppLocalizations.of(context)!;
     final cost = _nextMoveCost;
-    if ((_stockpile[ResourceType.coin] ?? 0) < cost) return;
+    if (!_canAfford(cost)) return;
     setState(() {
-      _stockpile[ResourceType.coin] = (_stockpile[ResourceType.coin] ?? 0) - cost;
+      for (final entry in cost.entries) {
+        _stockpile[entry.key] = (_stockpile[entry.key] ?? 0) - entry.value;
+      }
       _extraMoves += 1;
     });
     await ResourceStorage.save(_stockpile);
@@ -1672,9 +1820,11 @@ class _HomeShellState extends State<HomeShell> {
   Future<void> _buyAutoMatchTier1() async {
     if (_autoMatchTier >= 1) return;
     final l10n = AppLocalizations.of(context)!;
-    if ((_stockpile[ResourceType.coin] ?? 0) < _autoMatchTier1Cost) return;
+    if (!_canAfford(_autoMatchTier1Cost)) return;
     setState(() {
-      _stockpile[ResourceType.coin] = (_stockpile[ResourceType.coin] ?? 0) - _autoMatchTier1Cost;
+      for (final entry in _autoMatchTier1Cost.entries) {
+        _stockpile[entry.key] = (_stockpile[entry.key] ?? 0) - entry.value;
+      }
       _autoMatchTier = 1;
     });
     await ResourceStorage.save(_stockpile);
@@ -1685,9 +1835,11 @@ class _HomeShellState extends State<HomeShell> {
   Future<void> _buyAutoMatchTier2() async {
     if (_autoMatchTier < 1 || _autoMatchTier >= 2) return;
     final l10n = AppLocalizations.of(context)!;
-    if ((_stockpile[ResourceType.coin] ?? 0) < _autoMatchTier2Cost) return;
+    if (!_canAfford(_autoMatchTier2Cost)) return;
     setState(() {
-      _stockpile[ResourceType.coin] = (_stockpile[ResourceType.coin] ?? 0) - _autoMatchTier2Cost;
+      for (final entry in _autoMatchTier2Cost.entries) {
+        _stockpile[entry.key] = (_stockpile[entry.key] ?? 0) - entry.value;
+      }
       _autoMatchTier = 2;
     });
     await ResourceStorage.save(_stockpile);
@@ -1742,23 +1894,6 @@ class _HomeShellState extends State<HomeShell> {
       await ResourceStorage.save(_stockpile);
       await AreaStorage.setUpgraded(area, true);
       _showSnack(l10n.homeAreaUpgradedSnack(area.label, resource.label.toLowerCase()));
-    } else if (action == 'demolish' && level1) {
-      setState(() {
-        for (final entry in cost.entries) {
-          _stockpile[entry.key] = (_stockpile[entry.key] ?? 0) + entry.value ~/ 2;
-        }
-        if (level2) {
-          for (final entry in upgradeCost.entries) {
-            _stockpile[entry.key] = (_stockpile[entry.key] ?? 0) + entry.value ~/ 2;
-          }
-        }
-        _areasBuilt[area] = false;
-        _areasUpgraded[area] = false;
-      });
-      await ResourceStorage.save(_stockpile);
-      await AreaStorage.setBuilt(area, false);
-      await AreaStorage.setUpgraded(area, false);
-      _showSnack(l10n.homeBuildingDemolishedSnack(area.label));
     }
   }
 
@@ -1820,25 +1955,11 @@ class _HomeShellState extends State<HomeShell> {
                   const SizedBox(height: 4),
                   Text(upgradeText),
                 ],
-                const SizedBox(height: 14),
-                Text(
-                  l10n.homeDemolishRefundNote,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
               ],
             ],
           ),
         ),
         actions: [
-          if (level1)
-            TextButton(
-              onPressed: () async {
-                final confirmed = await _confirmDemolish(context, title);
-                if (confirmed && context.mounted) Navigator.of(context).pop('demolish');
-              },
-              style: TextButton.styleFrom(foregroundColor: const Color(0xFFC0392B)),
-              child: Text(l10n.homeDemolish),
-            ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(level1 && level2 ? l10n.homeClose : l10n.homeCancel),
@@ -1874,6 +1995,11 @@ class _HomeShellState extends State<HomeShell> {
     bool upgradable = true,
     bool showWorkers = true,
     bool demolishable = true,
+    // false dla odbudowy zaniedbanego domu (patrz _onTapExtraHouse) - to
+    // "poziom 0 -> 1", czyli dokończenie podstawowej naprawy odziedziczonego
+    // domu, a nie prawdziwa rozbudowa do poziomu 2, więc nie powinno zależeć
+    // od rozbudowanego Ratusza tak jak reszta budynków.
+    bool upgradeRequiresRatuszLevel2 = true,
     String? levelLabel,
     String? upgradeSectionLabel,
     String? notDemolishableText,
@@ -1887,7 +2013,12 @@ class _HomeShellState extends State<HomeShell> {
     // zbudować cokolwiek innego, a jego rozbudowa (poziom 2) odblokowuje
     // rozbudowę pozostałych budynków. Nie dotyczy to samego Ratusza.
     final buildLocked = kind != BuildingKind.ratusz && !level1 && !_ratuszBuilt;
-    final upgradeLocked = kind != BuildingKind.ratusz && !_upgradedL2(BuildingKind.ratusz);
+    // Rozbudowa samego Ratusza ma własną, osobną blokadę (odblokowuje się z
+    // Aktem II, patrz _ratuszLevel2UnlockWeek) zamiast tej ogólnej - wymaganie
+    // "rozbudowany Ratusz" byłoby bez sensu dla samego Ratusza.
+    final upgradeLocked = kind == BuildingKind.ratusz
+        ? _week < _ratuszLevel2UnlockWeek
+        : upgradeRequiresRatuszLevel2 && !_upgradedL2(BuildingKind.ratusz);
     final canAffordBuild = !buildLocked && _canAfford(cost);
     final canAffordUpgrade = !upgradeLocked && _canAfford(upgradeCost);
     final dialogTitle = !level1
@@ -1945,7 +2076,9 @@ class _HomeShellState extends State<HomeShell> {
                     const SizedBox(height: 6),
                     if (upgradeLocked) ...[
                       Text(
-                        l10n.homeRequiresUpgradedRatusz,
+                        kind == BuildingKind.ratusz
+                            ? l10n.homeRatuszLevel2LockedRequirement
+                            : l10n.homeRequiresUpgradedRatusz,
                         style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFC0392B)),
                       ),
                     ] else ...[
@@ -1960,10 +2093,16 @@ class _HomeShellState extends State<HomeShell> {
                     Text(upgradeText),
                   ],
                   const SizedBox(height: 14),
-                  Text(
-                    demolishable ? l10n.homeDemolishRefundNote : effectiveNotDemolishableText,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
+                  if (demolishable) ...[
+                    Text(l10n.homeDemolishRefund50Title, style: Theme.of(context).textTheme.labelLarge),
+                    const SizedBox(height: 6),
+                    for (final entry in cost.entries)
+                      _RefundRow(type: entry.key, refund: entry.value ~/ 2),
+                    if (level2)
+                      for (final entry in upgradeCost.entries)
+                        _RefundRow(type: entry.key, refund: entry.value ~/ 2),
+                  ] else
+                    Text(effectiveNotDemolishableText, style: Theme.of(context).textTheme.bodySmall),
                 ],
                 if (level1 && showWorkers) ...[
                   const SizedBox(height: 14),
@@ -2236,6 +2375,15 @@ class _HomeShellState extends State<HomeShell> {
     }
   }
 
+  /// Nagroda surowcowa za osiągnięcie celu głównego aktu - rośnie z numerem
+  /// aktu, żeby nadążać za skalą kosztów budowy w danym momencie gry (patrz
+  /// analogiczna, tematyczna skala w kSideQuests).
+  Map<ResourceType, int> _actGoalReward(int actNumber) => {
+        ResourceType.wood: 20 + actNumber * 4,
+        ResourceType.stone: 20 + actNumber * 4,
+        ResourceType.coin: 10 + actNumber * 4,
+      };
+
   /// Czy cel główny danego aktu jest obecnie spełniony - sprawdzane w
   /// ostatnim tygodniu aktu, żeby zdecydować o karze za porażkę. Wyprowadzone
   /// z _actGoalRequirements, żeby lista pokazywana w zakładce Cele i
@@ -2286,8 +2434,14 @@ class _HomeShellState extends State<HomeShell> {
         return [_battleRequirement(l10n, l10n.homeGoalBattleGrot, _bossBattleStagesCleared, 2)];
       case 2:
         // Rozstrzygane przez starcie z Martą (tydzień 39, MartaBattleScreen) -
-        // 2 lub 3 z 3 ukończonych etapów liczą się jako sukces.
-        return [_battleRequirement(l10n, l10n.homeGoalBattleMarta, _martaBattleStagesCleared, 2)];
+        // 2 lub 3 z 3 ukończonych etapów liczą się jako sukces. Rozbudowa
+        // Ratusza do poziomu 2 odblokowuje się dopiero teraz (patrz
+        // _ratuszLevel2UnlockWeek) - to drugi, niezależny cel tego aktu.
+        return [
+          _battleRequirement(l10n, l10n.homeGoalBattleMarta, _martaBattleStagesCleared, 2),
+          GoalRequirement(
+              label: l10n.homeGoalRatuszUpgraded, met: _upgradedL2(BuildingKind.ratusz)),
+        ];
       case 3:
         // Rozstrzygane przez starcie z Bogdanem (tydzień 52,
         // BogdanBattleScreen) - trzeba zebrać cały Dowód.
@@ -2612,6 +2766,7 @@ class _HomeShellState extends State<HomeShell> {
       'eventSecurityBonus': _eventSecurityBonus,
       'eventPopulationBonus': _eventPopulationBonus,
       'population': _population,
+      'populationGrowthProgress': _populationGrowthProgress,
       'unlockedDiscoveries': _unlockedDiscoveries.map((d) => d.name).toList(),
       'resolvedActs': _resolvedActs.toList(),
       'lastStarvationWeek': _lastStarvationWeek,
@@ -2620,7 +2775,6 @@ class _HomeShellState extends State<HomeShell> {
       'martaFullTrust': _martaFullTrust,
       'bogdanProofComplete': _bogdanProofComplete,
       'leszyVictorious': _leszyVictorious,
-      'xp': _xp,
       'claimedSideQuests': _claimedSideQuests.map((q) => q.name).toList(),
       'readComics': _readComics.toList(),
     };
@@ -2700,6 +2854,10 @@ class _HomeShellState extends State<HomeShell> {
     await VillageEventStorage.savePopulationBonus(snapshot['eventPopulationBonus'] as int);
 
     await PopulationStorage.save(snapshot['population'] as int);
+    // Klucz może brakować w checkpointach zapisanych przed wprowadzeniem
+    // ułamkowego przyrostu - domyślnie 0.
+    await PopulationStorage.saveGrowthProgress(
+        (snapshot['populationGrowthProgress'] as num?)?.toDouble() ?? 0.0);
 
     final unlockedDiscoveries = asList('unlockedDiscoveries').cast<String>().map(DiscoveryId.values.byName).toSet();
     for (final id in DiscoveryId.values) {
@@ -2714,7 +2872,6 @@ class _HomeShellState extends State<HomeShell> {
     await StoryProgressStorage.saveBogdanProofCompleteValue(snapshot['bogdanProofComplete'] as int);
     await StoryProgressStorage.saveLeszyVictorious(snapshot['leszyVictorious'] as bool);
 
-    await ExperienceStorage.saveXp(snapshot['xp'] as int);
     // Pomija nierozpoznane nazwy - stary checkpoint może odwoływać się do
     // questa usuniętego z gry w międzyczasie (patrz models/side_quest.dart).
     final validSideQuestNames = SideQuestId.values.map((id) => id.name).toSet();
@@ -2925,6 +3082,8 @@ class _HomeShellState extends State<HomeShell> {
                   minComboForJoker: _hasDiscovery(DiscoveryId.earlyJoker) ? 4 : 5,
                   minComboForBomb: _hasDiscovery(DiscoveryId.earlyBomb) ? 5 : 6,
                   boardStyle: _boardStyle,
+                  areaEntries: _buildableAreaEntries(),
+                  buildingEntries: _buildableBuildingEntries(),
                 ),
               ),
             ) ??
@@ -2998,8 +3157,18 @@ class _HomeShellState extends State<HomeShell> {
         if (haveGrain >= populationFoodNeeded) {
           stockpile[ResourceType.grain] = haveGrain - populationFoodNeeded;
         } else {
+          // Brakujące zboże jest dobierane z jabłek jako zapasowe źródło
+          // jedzenia (dokładnie ten brakujący kawałek, nie cała potrzeba) -
+          // głód następuje dopiero, gdy i jabłek nie starcza.
+          final grainShortfall = populationFoodNeeded - haveGrain;
           stockpile[ResourceType.grain] = 0;
-          starving = true;
+          final haveApple = stockpile[ResourceType.apple] ?? 0;
+          if (haveApple >= grainShortfall) {
+            stockpile[ResourceType.apple] = haveApple - grainShortfall;
+          } else {
+            stockpile[ResourceType.apple] = 0;
+            starving = true;
+          }
         }
       }
       if (starving) {
@@ -3012,11 +3181,15 @@ class _HomeShellState extends State<HomeShell> {
         await VillageEventStorage.saveMoraleBonus(_eventMoraleBonus);
         await StoryProgressStorage.saveLastStarvationWeek(_lastStarvationWeek);
       } else if (_population < _populationLimit) {
-        final grown = (_population + _effectivePopulationGrowth).clamp(0, _populationLimit);
-        if (grown != _population) {
-          setState(() => _population = grown);
-          await PopulationStorage.save(_population);
-        }
+        final newProgress = _populationGrowthProgress + _effectivePopulationGrowthRate;
+        final wholeGrowth = newProgress.floor();
+        final grown = (_population + wholeGrowth).clamp(0, _populationLimit);
+        setState(() {
+          _population = grown;
+          _populationGrowthProgress = newProgress - wholeGrowth;
+        });
+        await PopulationStorage.save(_population);
+        await PopulationStorage.saveGrowthProgress(_populationGrowthProgress);
       }
       await ResourceStorage.save(stockpile);
       if (!mounted) return;
@@ -3040,11 +3213,17 @@ class _HomeShellState extends State<HomeShell> {
         !_resolvedActs.contains(endingAct.actNumber)) {
       final met = _actGoalMet(endingAct.actNumber);
       if (met) {
-        setState(() => _xp += _mainQuestXpReward);
-        await ExperienceStorage.saveXp(_xp);
+        final reward = _actGoalReward(endingAct.actNumber);
+        setState(() {
+          for (final entry in reward.entries) {
+            _stockpile[entry.key] = ((_stockpile[entry.key] ?? 0) + entry.value).clamp(0, _storageCap);
+          }
+        });
+        await ResourceStorage.save(_stockpile);
+        final rewardText =
+            reward.entries.map((e) => '+${e.value} ${e.key.label.toLowerCase()}').join(', ');
         _showSnack(
-          l10n.homeActGoalReachedSnack(
-              endingAct.actNumber, endingAct.localizedActName, _mainQuestXpReward),
+          l10n.homeActGoalReachedSnack(endingAct.actNumber, endingAct.localizedActName, rewardText),
         );
         setState(() => _resolvedActs = {..._resolvedActs, endingAct.actNumber});
         await StoryProgressStorage.saveResolvedActs(_resolvedActs);
@@ -3103,7 +3282,6 @@ class _HomeShellState extends State<HomeShell> {
       await Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => EndingScreen(
-            xp: _xp,
             population: _population,
             populationLimit: _populationLimit,
             morale: _moraleValue,
@@ -3123,7 +3301,7 @@ class _HomeShellState extends State<HomeShell> {
   }
 
   // Sprawdza warunki wszystkich jeszcze nieodebranych questów pobocznych
-  // względem bieżącego stanu gry i przyznaje XP za te już spełnione.
+  // względem bieżącego stanu gry i przyznaje surowce za te już spełnione.
   // Wywoływane co tydzień (koniec _startWeek) oraz przy każdym wejściu w
   // zakładkę "Cele", żeby quest zaliczał się od razu, a nie dopiero po
   // zmianie tygodnia.
@@ -3133,12 +3311,16 @@ class _HomeShellState extends State<HomeShell> {
       if (_claimedSideQuests.contains(quest.id)) continue;
       if (!_sideQuestMet(quest.id)) continue;
       setState(() {
-        _xp += quest.xpReward;
+        for (final entry in quest.resourceReward.entries) {
+          _stockpile[entry.key] = ((_stockpile[entry.key] ?? 0) + entry.value).clamp(0, _storageCap);
+        }
         _claimedSideQuests = {..._claimedSideQuests, quest.id};
       });
-      await ExperienceStorage.saveXp(_xp);
+      await ResourceStorage.save(_stockpile);
       await ExperienceStorage.saveClaimedSideQuests(_claimedSideQuests);
-      _showSnack(l10n.homeSideQuestCompletedSnack(quest.localizedTitle, quest.xpReward));
+      final rewardText =
+          quest.resourceReward.entries.map((e) => '+${e.value} ${e.key.label.toLowerCase()}').join(', ');
+      _showSnack(l10n.homeSideQuestCompletedSnack(quest.localizedTitle, rewardText));
     }
   }
 
@@ -3173,7 +3355,7 @@ class _HomeShellState extends State<HomeShell> {
           ),
         ),
         _TabSpec(
-          icon: Icons.inventory_2,
+          icon: Icons.backpack,
           label: l10n.homeTabResources,
           builder: () => ResourcesView(
             stockpile: _stockpile,
@@ -3194,7 +3376,7 @@ class _HomeShellState extends State<HomeShell> {
               baseMoves: _baseMoves,
               extraMoves: _extraMoves,
               maxTotalMoves: _maxTotalMoves,
-              goldAvailable: _stockpile[ResourceType.coin] ?? 0,
+              stockpile: _stockpile,
               nextCost: _nextMoveCost,
               onBuy: _buyMove,
               autoMatchTier: _autoMatchTier,
@@ -3202,6 +3384,13 @@ class _HomeShellState extends State<HomeShell> {
               autoMatchTier2Cost: _autoMatchTier2Cost,
               onBuyAutoMatchTier1: _buyAutoMatchTier1,
               onBuyAutoMatchTier2: _buyAutoMatchTier2,
+              sklepLevel2Unlocked: _upgradedL2(BuildingKind.sklep),
+              sklepLevel2Bonus: _sklepMovesCapBonus,
+              sklepWorkers: _workersFor(BuildingKind.sklep).clamp(0, _maxWorkersPerBuilding),
+              maxWorkersPerBuilding: _maxWorkersPerBuilding,
+              discovery1Unlocked: _hasDiscovery(DiscoveryId.moves1),
+              discovery2Unlocked: _hasDiscovery(DiscoveryId.moves2),
+              discoveryMovesBonus: _szkolaMovesBonus,
             ),
           ),
         _TabSpec(
@@ -3222,11 +3411,12 @@ class _HomeShellState extends State<HomeShell> {
                 .where((c) => !_readComics.contains(c.number) && _isComicRevealed(c.number))
                 .length,
             onOpenComics: _openComics,
-            xp: _xp,
             boardStyle: _boardStyle,
             onBoardStyleChanged: _setBoardStyle,
             resourceIconStyle: _resourceIconStyle,
             onResourceIconStyleChanged: _setResourceIconStyle,
+            onOpenDebug: _openDebug,
+            onReplayTutorial: _startTour,
           ),
         ),
         _TabSpec(
@@ -3239,20 +3429,6 @@ class _HomeShellState extends State<HomeShell> {
             claimedSideQuests: _claimedSideQuests,
             sideQuestProgress: _sideQuestProgress,
             resolvedActs: _resolvedActs,
-          ),
-        ),
-        _TabSpec(
-          icon: Icons.bug_report,
-          label: l10n.homeTabDebug,
-          builder: () => DebugView(
-            currentWeek: _week,
-            onJumpToWeek: _debugJumpToWeek,
-            onAddResource: _debugAddResource,
-            onAddAllResources: _debugAddAllResources,
-            onFightGrot: _debugFightGrot,
-            onFightMarta: _debugFightMarta,
-            onFightBogdan: _debugFightBogdan,
-            onFightLeszy: _debugFightLeszy,
           ),
         ),
       ];
@@ -3269,6 +3445,27 @@ class _HomeShellState extends State<HomeShell> {
             readComics: _readComics,
             onRead: _markComicRead,
             hiddenComicNumbers: _hiddenComicNumbers,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _openDebug() {
+    final l10n = AppLocalizations.of(context)!;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => Scaffold(
+          appBar: AppBar(title: Text(l10n.debugTitle)),
+          body: DebugView(
+            currentWeek: _week,
+            onJumpToWeek: _debugJumpToWeek,
+            onAddResource: _debugAddResource,
+            onAddAllResources: _debugAddAllResources,
+            onFightGrot: _debugFightGrot,
+            onFightMarta: _debugFightMarta,
+            onFightBogdan: _debugFightBogdan,
+            onFightLeszy: _debugFightLeszy,
           ),
         ),
       ),
@@ -3315,49 +3512,63 @@ class _HomeShellState extends State<HomeShell> {
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: _onBackPressed,
-      child: Scaffold(
-      body: SafeArea(
-        bottom: false,
-        child: tabs[safeTab].builder(),
-      ),
-      bottomNavigationBar: SafeArea(
-        top: false,
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(8, 6, 8, 6),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            border: Border(top: BorderSide(color: Theme.of(context).colorScheme.outlineVariant)),
-          ),
-          child: Row(
-            children: [
-              for (var i = 0; i < tabs.length; i++)
-                Expanded(
-                  child: _NavButton(
-                    icon: tabs[i].icon,
-                    label: tabs[i].label,
-                    selected: safeTab == i,
-                    onTap: () {
-                      setState(() => _tab = i);
-                      if (tabs[i].icon == Icons.flag) {
-                        _checkSideQuests();
-                      }
-                    },
-                    badgeCount: tabs[i].badgeCount,
-                  ),
+      child: Stack(
+        children: [
+          Scaffold(
+            body: SafeArea(
+              bottom: false,
+              child: KeyedSubtree(key: _tabContentKey, child: tabs[safeTab].builder()),
+            ),
+            bottomNavigationBar: SafeArea(
+              top: false,
+              child: Container(
+                key: _navBarKey,
+                padding: const EdgeInsets.fromLTRB(8, 6, 8, 6),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  border: Border(top: BorderSide(color: Theme.of(context).colorScheme.outlineVariant)),
                 ),
-              SizedBox(
-                width: 78,
-                height: 48,
-                child: FilledButton(
-                  onPressed: _busy ? null : _startWeek,
-                  style: FilledButton.styleFrom(padding: EdgeInsets.zero),
-                  child: Text('→ $_week'),
+                child: Row(
+                  children: [
+                    for (var i = 0; i < tabs.length; i++)
+                      Expanded(
+                        child: _NavButton(
+                          icon: tabs[i].icon,
+                          label: tabs[i].label,
+                          selected: safeTab == i,
+                          onTap: () {
+                            setState(() => _tab = i);
+                            if (tabs[i].icon == Icons.flag) {
+                              _checkSideQuests();
+                            }
+                          },
+                          badgeCount: tabs[i].badgeCount,
+                        ),
+                      ),
+                    SizedBox(
+                      key: _startWeekButtonKey,
+                      width: 78,
+                      height: 48,
+                      child: FilledButton(
+                        onPressed: _busy ? null : _startWeek,
+                        style: FilledButton.styleFrom(padding: EdgeInsets.zero),
+                        child: Text('→ $_week'),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+          if (_tourActive)
+            TutorialOverlay(
+              steps: _tourSteps,
+              stepIndex: _tourStepIndex,
+              onNext: () => _tourGoTo(_tourStepIndex + 1),
+              onBack: _tourStepIndex > 0 ? () => _tourGoTo(_tourStepIndex - 1) : null,
+              onSkip: _finishTour,
+            ),
+        ],
       ),
     );
   }
@@ -3421,32 +3632,31 @@ class _NavButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = selected
-        ? Theme.of(context).colorScheme.primary
-        : Theme.of(context).colorScheme.onSurfaceVariant;
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Badge(
+    final scheme = Theme.of(context).colorScheme;
+    final color = selected ? scheme.onSecondaryContainer : scheme.onSurfaceVariant;
+    // Bez tekstu pod ikoną (patrz komentarz przy _tabs) zaznaczona zakładka
+    // musi się odróżniać samym wyglądem ikony - stąd owalne tło w kolorze
+    // akcentu, podobnie jak w standardowym Material 3 NavigationBar.
+    return Tooltip(
+      message: label,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+            decoration: BoxDecoration(
+              color: selected ? scheme.secondaryContainer : Colors.transparent,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Badge(
               isLabelVisible: badgeCount > 0,
               label: Text('$badgeCount'),
-              child: Icon(icon, color: color),
+              child: Icon(icon, color: color, size: 26),
             ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: TextStyle(
-                color: color,
-                fontSize: 12,
-                fontWeight: selected ? FontWeight.bold : FontWeight.normal,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

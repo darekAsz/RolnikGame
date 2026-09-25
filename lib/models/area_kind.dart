@@ -82,7 +82,7 @@ extension AreaKindStyle on AreaKind {
   bool get isStarterResource => kStarterResourceTypes.contains(resourceType);
 
   /// Cała okolica to jedna ścieżka rozwoju: Sad -> Łąka -> Pole odblokowują
-  /// po kolei jabłko/trawę/zboże, a Rzeka -> Góry -> Las to ostatni etap,
+  /// po kolei jabłko/trawę/zboże, a Las -> Rzeka -> Góry to ostatni etap,
   /// który te trzy surowce zużywa jako koszt ulepszenia.
   AreaKind? get prerequisite {
     switch (this) {
@@ -90,12 +90,12 @@ extension AreaKindStyle on AreaKind {
         return AreaKind.orchard;
       case AreaKind.field:
         return AreaKind.meadow;
-      case AreaKind.river:
+      case AreaKind.forest:
         return AreaKind.field;
+      case AreaKind.river:
+        return AreaKind.forest;
       case AreaKind.mountains:
         return AreaKind.river;
-      case AreaKind.forest:
-        return AreaKind.mountains;
       case AreaKind.orchard:
         return null;
     }
