@@ -4,12 +4,13 @@ import '../l10n/gen/app_localizations.dart';
 import '../models/tutorial_step.dart';
 
 /// Nakładka samouczka z podświetleniem "na żywo" - przyciemnia cały ekran
-/// poza wskazanym widgetem (patrz TutorialStep.targetKey) i pokazuje obok
-/// niego kartę z tytułem/opisem oraz nawigacją Wstecz/Dalej/Pomiń. Element
-/// jest lokalizowany przez GlobalKey, więc musi być w danej chwili
-/// zamontowany w drzewie widgetów - przy zmianie zakładki (patrz
-/// HomeShell._tourAdvanceTo) trzeba poczekać klatkę, zanim nowy cel stanie
-/// się mierzalny, stąd wbudowany mechanizm ponawiania pomiaru.
+/// poza wskazanym widgetem (patrz TutorialStep.targetKey, opcjonalnie też
+/// secondaryTargetKey - patrz niżej) i pokazuje obok niego kartę z
+/// tytułem/opisem oraz nawigacją Wstecz/Dalej/Pomiń. Element jest
+/// lokalizowany przez GlobalKey, więc musi być w danej chwili zamontowany w
+/// drzewie widgetów - przy zmianie zakładki (patrz HomeShell._tourAdvanceTo)
+/// trzeba poczekać klatkę, zanim nowy cel stanie się mierzalny, stąd
+/// wbudowany mechanizm ponawiania pomiaru.
 class TutorialOverlay extends StatefulWidget {
   final List<TutorialStep> steps;
   final int stepIndex;
@@ -32,6 +33,7 @@ class TutorialOverlay extends StatefulWidget {
 
 class _TutorialOverlayState extends State<TutorialOverlay> {
   Rect? _targetRect;
+  Rect? _secondaryRect;
   int _measureAttempt = 0;
 
   @override
@@ -45,6 +47,7 @@ class _TutorialOverlayState extends State<TutorialOverlay> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.stepIndex != widget.stepIndex) {
       _targetRect = null;
+      _secondaryRect = null;
       _measureAttempt = 0;
       _scheduleMeasure();
     }
@@ -54,14 +57,29 @@ class _TutorialOverlayState extends State<TutorialOverlay> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _measure());
   }
 
+  Rect? _measureKey(GlobalKey key, EdgeInsets padding) {
+    final renderObject = key.currentContext?.findRenderObject();
+    if (renderObject is RenderBox && renderObject.hasSize) {
+      final topLeft = renderObject.localToGlobal(Offset.zero);
+      return padding.inflateRect(topLeft & renderObject.size);
+    }
+    return null;
+  }
+
   void _measure() {
     if (!mounted) return;
     final step = widget.steps[widget.stepIndex];
-    final renderObject = step.targetKey.currentContext?.findRenderObject();
-    if (renderObject is RenderBox && renderObject.hasSize) {
-      final topLeft = renderObject.localToGlobal(Offset.zero);
-      final rect = step.padding.inflateRect(topLeft & renderObject.size);
-      setState(() => _targetRect = rect);
+    final rect = _measureKey(step.targetKey, step.padding);
+    final secondaryKey = step.secondaryTargetKey;
+    final secondaryRect =
+        secondaryKey == null ? null : _measureKey(secondaryKey, step.secondaryPadding);
+    // Jeśli jest drugi cel, czekamy aż OBA będą mierzalne, żeby nie mignęła
+    // karta z tylko jednym podświetleniem na pojedynczej klatce.
+    if (rect != null && (secondaryKey == null || secondaryRect != null)) {
+      setState(() {
+        _targetRect = rect;
+        _secondaryRect = secondaryRect;
+      });
       return;
     }
     // Cel jeszcze nie zbudowany (np. tuż po przełączeniu zakładki) - spróbuj
@@ -89,6 +107,8 @@ class _TutorialOverlayState extends State<TutorialOverlay> {
               painter: _SpotlightPainter(
                 rect: rect,
                 borderRadius: step.borderRadius,
+                secondaryRect: _secondaryRect,
+                secondaryBorderRadius: step.secondaryBorderRadius,
               ),
             ),
           ),
@@ -114,32 +134,49 @@ class _TutorialOverlayState extends State<TutorialOverlay> {
 class _SpotlightPainter extends CustomPainter {
   final Rect? rect;
   final BorderRadius borderRadius;
+  final Rect? secondaryRect;
+  final BorderRadius secondaryBorderRadius;
 
-  const _SpotlightPainter({required this.rect, required this.borderRadius});
+  const _SpotlightPainter({
+    required this.rect,
+    required this.borderRadius,
+    this.secondaryRect,
+    required this.secondaryBorderRadius,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
     final scrimPaint = Paint()..color = const Color(0xCC120C06);
     canvas.saveLayer(Offset.zero & size, Paint());
     canvas.drawRect(Offset.zero & size, scrimPaint);
+    final holePaint = Paint()..blendMode = BlendMode.clear;
     final target = rect;
     if (target != null) {
-      final holePaint = Paint()..blendMode = BlendMode.clear;
       canvas.drawRRect(borderRadius.toRRect(target), holePaint);
     }
+    final secondary = secondaryRect;
+    if (secondary != null) {
+      canvas.drawRRect(secondaryBorderRadius.toRRect(secondary), holePaint);
+    }
     canvas.restore();
+    final borderPaint = Paint()
+      ..color = const Color(0xFFD9A066)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3;
     if (target != null) {
-      final borderPaint = Paint()
-        ..color = const Color(0xFFD9A066)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 3;
       canvas.drawRRect(borderRadius.toRRect(target), borderPaint);
+    }
+    if (secondary != null) {
+      canvas.drawRRect(secondaryBorderRadius.toRRect(secondary), borderPaint);
     }
   }
 
   @override
   bool shouldRepaint(covariant _SpotlightPainter oldDelegate) =>
-      oldDelegate.rect != rect || oldDelegate.borderRadius != borderRadius;
+      oldDelegate.rect != rect ||
+      oldDelegate.borderRadius != borderRadius ||
+      oldDelegate.secondaryRect != secondaryRect ||
+      oldDelegate.secondaryBorderRadius != secondaryBorderRadius;
 }
 
 class _TutorialCard extends StatelessWidget {
@@ -171,6 +208,12 @@ class _TutorialCard extends StatelessWidget {
   Widget build(BuildContext context) {
     const cardWidth = 300.0;
     const margin = 16.0;
+    // Gdy karta musi się przykleić do góry/dołu ekranu (patrz "overlay"
+    // niżej), zostawiamy dodatkowy zapas na dole - tyle, żeby nie zasłaniać
+    // dolnego paska nawigacji (i podświetlonej na nim ikonki zakładki, patrz
+    // TutorialStep.secondaryTargetKey), zamiast przyklejać kartę tuż przy
+    // samej krawędzi ekranu.
+    const bottomReserve = 96.0;
     final spaceBelow = screenSize.height - rect.bottom;
     final spaceAbove = rect.top;
     final preferBelow = spaceBelow >= spaceAbove;
@@ -191,7 +234,7 @@ class _TutorialCard extends StatelessWidget {
         ? (preferBelow ? null : margin)
         : (preferBelow ? rect.bottom + 12 : null);
     final double? bottom = overlay
-        ? (preferBelow ? margin : null)
+        ? (preferBelow ? bottomReserve : null)
         : (preferBelow ? null : (screenSize.height - rect.top + 12));
 
     return Positioned(
@@ -205,7 +248,7 @@ class _TutorialCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         child: ConstrainedBox(
           constraints: BoxConstraints(
-            maxHeight: screenSize.height - 2 * margin,
+            maxHeight: screenSize.height - margin - bottomReserve,
           ),
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(16),

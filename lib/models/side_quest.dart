@@ -73,8 +73,8 @@ const List<SideQuest> kSideQuests = [
     id: SideQuestId.milczenieJadwigi,
     actNumber: 1,
     title: 'Milczenie Jadwigi',
-    description: 'Zbuduj Kaplicę i zacznij wypytywać Jadwigę o przeszłość dziadka.',
-    resourceReward: {ResourceType.stone: 20, ResourceType.coin: 10},
+    description: 'Rozbuduj Kaplicę do poziomu 2 i zacznij wypytywać Jadwigę o przeszłość dziadka.',
+    resourceReward: {ResourceType.coin: 40, ResourceType.stone: 25, ResourceType.wood: 25},
   ),
   SideQuest(
     id: SideQuestId.wdowaPoNajemniku,

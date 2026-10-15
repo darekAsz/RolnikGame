@@ -494,6 +494,12 @@ abstract class AppLocalizations {
   /// **'Otwiera listę wszystkiego, co możesz teraz zbudować, razem z kosztem i tym, czego jeszcze brakuje w magazynie.'**
   String get harvestScreenTutorialBuildOverviewDescription;
 
+  /// No description provided for @harvestScreenTutorialShuffleDescription.
+  ///
+  /// In pl, this message translates to:
+  /// **'Losuje układ planszy od nowa za 1 ruch - przydaje się, gdy nie widzisz już żadnego dobrego połączenia.'**
+  String get harvestScreenTutorialShuffleDescription;
+
   /// No description provided for @harvestScreenRoundEndTitle.
   ///
   /// In pl, this message translates to:
@@ -3085,14 +3091,8 @@ abstract class AppLocalizations {
   /// No description provided for @homeWorkerBonusExplanation.
   ///
   /// In pl, this message translates to:
-  /// **'Każdy przydzielony mieszkaniec zwiększa premię budynku o +50% (maks. {max} = {multiplier} premia).'**
-  String homeWorkerBonusExplanation(int max, String multiplier);
-
-  /// No description provided for @homeWorkerMultiplierDouble.
-  ///
-  /// In pl, this message translates to:
-  /// **'podwójna'**
-  String get homeWorkerMultiplierDouble;
+  /// **'Każdy przydzielony mieszkaniec zwiększa premię budynku - dokładną wartość widać w sekcji \"Premia ogólna\" powyżej. Limit: {max} na budynek.'**
+  String homeWorkerBonusExplanation(int max);
 
   /// No description provided for @homeAvailableResidents.
   ///
@@ -3187,29 +3187,17 @@ abstract class AppLocalizations {
   /// **'Ratusz zbudowany'**
   String get homeGoalRatuszBuilt;
 
+  /// No description provided for @homeGoalKaplicaBuilt.
+  ///
+  /// In pl, this message translates to:
+  /// **'Kaplica zbudowana'**
+  String get homeGoalKaplicaBuilt;
+
   /// No description provided for @homeGoalRatuszUpgraded.
   ///
   /// In pl, this message translates to:
   /// **'Ratusz rozbudowany do poziomu 2'**
   String get homeGoalRatuszUpgraded;
-
-  /// No description provided for @homeGoalOrchardDeveloped.
-  ///
-  /// In pl, this message translates to:
-  /// **'Sad rozwinięty'**
-  String get homeGoalOrchardDeveloped;
-
-  /// No description provided for @homeGoalMeadowDeveloped.
-  ///
-  /// In pl, this message translates to:
-  /// **'Łąka rozwinięta'**
-  String get homeGoalMeadowDeveloped;
-
-  /// No description provided for @homeGoalFieldDeveloped.
-  ///
-  /// In pl, this message translates to:
-  /// **'Pole rozwinięte'**
-  String get homeGoalFieldDeveloped;
 
   /// No description provided for @homeGoalBattleGrot.
   ///

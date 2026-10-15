@@ -240,6 +240,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Opens a list of everything you can build right now, along with its cost and what you\'re still missing from storage.';
 
   @override
+  String get harvestScreenTutorialShuffleDescription =>
+      'Reshuffles the whole board for 1 move - handy when you can\'t see any good match left.';
+
+  @override
   String get harvestScreenRoundEndTitle => '⏳ Out of moves';
 
   @override
@@ -1913,12 +1917,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Requires the \"Worker Management\" discovery at the Academy.';
 
   @override
-  String homeWorkerBonusExplanation(int max, String multiplier) {
-    return 'Each assigned resident increases the building\'s bonus by +50% (max $max = $multiplier bonus).';
+  String homeWorkerBonusExplanation(int max) {
+    return 'Each assigned resident increases the building\'s bonus - the exact amount is shown in the \"General bonus\" section above. Limit: $max per building.';
   }
-
-  @override
-  String get homeWorkerMultiplierDouble => 'double';
 
   @override
   String homeAvailableResidents(int n) {
@@ -1981,16 +1982,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeGoalRatuszBuilt => 'Town Hall built';
 
   @override
+  String get homeGoalKaplicaBuilt => 'Chapel built';
+
+  @override
   String get homeGoalRatuszUpgraded => 'Town Hall upgraded to level 2';
-
-  @override
-  String get homeGoalOrchardDeveloped => 'Orchard developed';
-
-  @override
-  String get homeGoalMeadowDeveloped => 'Meadow developed';
-
-  @override
-  String get homeGoalFieldDeveloped => 'Field developed';
 
   @override
   String get homeGoalBattleGrot => 'Battle with Grot';

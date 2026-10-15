@@ -21,7 +21,7 @@ const Map<SideQuestId, SideQuestTranslation> kSideQuestsEn = {
   ),
   SideQuestId.milczenieJadwigi: SideQuestTranslation(
     "Jadwiga's Silence",
-    "Build the Chapel and start asking Jadwiga about your grandfather's past.",
+    "Upgrade the Chapel to level 2 and start asking Jadwiga about your grandfather's past.",
   ),
   SideQuestId.wdowaPoNajemniku: SideQuestTranslation(
     "The Mercenary's Widow",

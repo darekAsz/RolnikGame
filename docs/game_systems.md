@@ -122,27 +122,29 @@ Ratusz, Palisada, Sklep, Karczma, Dom, Kuźnia, Spichlerz, Piekarnia, Tartak, St
 
 ### 4.2. Koszty budowy (poziom 1)
 
+*Kilka budynków ma dodatkowo trzeci surowiec poza drewnem/kamieniem(/złotem), dobrany tematycznie (np. Kuźnia - woda do hartowania, Spichlerz - jabłka, Koszary - zapasy jedzenia). Budynki, których jedynym surowcem rzemiosła jest już wprost drewno albo kamień (Tartak, Kamieniarz, Studnia, Magazyn) oraz najprostszy Dom zostają przy samym drewnie/kamieniu.*
+
 | Budynek | Koszt |
 |---|---|
 | Sklep | 12 drewna, 8 kamienia, 8 złota |
-| Karczma | 15 drewna, 10 kamienia |
+| Karczma | 15 drewna, 10 kamienia, 10 zboża |
 | Dom | 10 drewna, 6 kamienia |
-| Kuźnia | 15 drewna, 12 kamienia |
-| Spichlerz | 15 drewna, 10 kamienia |
-| Piekarnia | 15 drewna, 10 kamienia |
+| Kuźnia | 15 drewna, 12 kamienia, 8 wody |
+| Spichlerz | 15 drewna, 10 kamienia, 10 jabłek |
+| Piekarnia | 15 drewna, 10 kamienia, 8 wody |
 | Tartak | 12 drewna, 10 kamienia |
 | Studnia | 12 drewna, 10 kamienia |
-| Browar | 12 drewna, 8 kamienia, 6 złota |
-| Kaplica | 15 drewna, 10 kamienia, 8 złota |
+| Browar | 12 drewna, 8 kamienia, 6 złota, 10 zboża |
+| Kaplica | 5 trawy, 5 zboża, 5 drewna, 5 kamienia, 5 wody, 5 złota, 5 jabłek (po trochu wszystkich 7 surowców - symbolicznie, cała wioska się składa) |
 | Uczelnia | 18 drewna, 12 kamienia, 10 złota |
-| Rynek | 18 drewna, 12 kamienia, 10 złota |
+| Rynek | 18 drewna, 12 kamienia, 10 złota, 10 jabłek |
 | Magazyn | 20 drewna, 15 kamienia |
 | Kamieniarz | 12 drewna, 8 kamienia |
-| Koszary | 20 drewna, 15 kamienia, 12 złota |
+| Koszary | 20 drewna, 15 kamienia, 12 złota, 10 jabłek |
 | **Ratusz** | 15 trawy, 15 zboża, 20 drewna, 15 kamienia, 15 wody, 10 złota, 15 jabłek (celowo duży — pierwszy wydatek z każdego z 7 surowców) |
 | **Palisada** | 20 drewna, 15 kamienia |
 
-**Koszt rozbudowy (poziom 2) jest identyczny dla wszystkich 17 budynków: 25 złota** — czysta inwestycja złota, niezależna od kosztu poziomu 1.
+**Koszt rozbudowy (poziom 2) jest identyczny dla 16 z 17 budynków: 40 złota, 15 drewna, 15 kamienia** — więcej niż sama gotówka, niezależnie od kosztu poziomu 1. Wyjątkiem jest **Kaplica**, której rozbudowa jest nieco droższa i wymaga wszystkich 7 surowców: 75 złota, 20 drewna, 20 kamienia, 20 wody, 20 zboża, 20 jabłek, 20 trawy — odblokowuje quest poboczny „Milczenie Jadwigi”.
 
 **Zburzenie** zwraca 50% kosztu poziomu 1 (i poziomu 2, jeśli rozbudowany). Ratusza nie da się zburzyć.
 
@@ -155,27 +157,27 @@ Ratusz, Palisada, Sklep, Karczma, Dom, Kuźnia, Spichlerz, Piekarnia, Tartak, St
 
 ### 4.4. Efekty budynków (poziom 1 → poziom 2)
 
-| Budynek | Poziom 1 | Poziom 2 |
-|---|---|---|
-| **Ratusz** | +2 każdego odblokowanego surowca/tydzień; +1 do złota zebranego na planszy | +4 każdego surowca/tydzień |
-| **Palisada** | +1 limit populacji, +20 bezpieczeństwa | +2 limit populacji (łącznie), +40 bezpieczeństwa (łącznie) |
-| **Sklep** | odblokowuje zakładkę Sklep | +2 do limitu dokupowanych ruchów |
-| **Karczma** | +2 limit populacji | +4 limit populacji (łącznie) |
-| **Dom** | +3 limit populacji | +6 limit populacji (łącznie) |
-| **Kuźnia** | +2 złota/tydzień; odblokowuje rekrutację w Koszarach | +4 złota/tydzień |
-| **Spichlerz** | +3 jabłka/tydzień; -5% ryzyka zepsucia | produkcja BEZ podwojenia (nadal +3); -10% ryzyka (łącznie) |
-| **Piekarnia** | +3 zboża/tydzień | +6 zboża/tydzień |
-| **Tartak** | +3 drewna/tydzień | +6 drewna/tydzień |
-| **Studnia** | +3 wody/tydzień; -3% ryzyka zepsucia | produkcja BEZ podwojenia (nadal +3); -6% ryzyka (łącznie) |
-| **Browar** | +10 morale | +20 morale (łącznie) |
-| **Kaplica** | -5% ryzyka zepsucia; +5 morale | -10% ryzyka (łącznie, efektywnie zeruje bazowe 10%); +10 morale (łącznie) |
-| **Uczelnia** | odblokowuje panel odkryć (wymagające poziomu 1) | odblokowuje odkrycia wymagające poziomu 2 |
-| **Rynek** | wymiana: 8 oddane → 1 otrzymane (surowy start) | wymiana: 6 oddane → 1 otrzymane (jedno z 3 niezależnych ulepszeń) — patrz sekcja 8 |
-| **Magazyn** | +50 do limitu magazynu każdego surowca | +100 (łącznie) |
-| **Kamieniarz** | +3 kamienia/tydzień | +6 kamienia/tydzień |
-| **Koszary** | +5 bezpieczeństwa; odblokowuje rekrutację (wymaga zbudowanej Kuźni) | +10 bezpieczeństwa (łącznie); **podwaja siłę każdego żołnierza** |
+| Budynek | Poziom 1 | Poziom 2 | Za pracownika (maks. 2) |
+|---|---|---|---|
+| **Ratusz** | +2 każdego odblokowanego surowca/tydzień; +1 do złota zebranego na planszy | +4 każdego surowca/tydzień | +1 surowca/tydzień (flat) |
+| **Palisada** | +1 limit populacji, +10 bezpieczeństwa | +2 limit populacji (łącznie), +20 bezpieczeństwa (łącznie) | +1 populacji, +5 bezpieczeństwa (flat) |
+| **Sklep** | odblokowuje zakładkę Sklep | +2 do limitu dokupowanych ruchów | +1 do limitu dokupywanych ruchów (flat) |
+| **Karczma** | +2 limit populacji | +4 limit populacji (łącznie) | +1 populacji (flat) |
+| **Dom** | +2 limit populacji | +4 limit populacji (łącznie) | **brak pracowników** |
+| **Kuźnia** | +2 złota/tydzień; odblokowuje rekrutację w Koszarach | +4 złota/tydzień | +1 złota/tydzień (flat) |
+| **Spichlerz** | +3 jabłka/tydzień; -5% ryzyka zepsucia | produkcja BEZ podwojenia (nadal +3); -10% ryzyka (łącznie) | +50% do produkcji jabłek i redukcji ryzyka (mnożnik, bez zmian) |
+| **Piekarnia** | +2 zboża/tydzień | +4 zboża/tydzień (łącznie) | +1 zboża/tydzień (flat) |
+| **Tartak** | +2 drewna/tydzień | +4 drewna/tydzień (łącznie) | +1 drewna/tydzień (flat) |
+| **Studnia** | +3 wody/tydzień; -3% ryzyka zepsucia | produkcja BEZ podwojenia (nadal +3); -6% ryzyka (łącznie) | +50% do produkcji wody i redukcji ryzyka (mnożnik, bez zmian) |
+| **Browar** | +10 morale | +20 morale (łącznie) | +5 morale (flat) |
+| **Kaplica** | -5% ryzyka zepsucia; +5 morale | -10% ryzyka (łącznie); +10 morale (łącznie) | -5% ryzyka, +5 morale (flat, tyle samo co jeden poziom) |
+| **Uczelnia** | odblokowuje panel odkryć (wymagające poziomu 1) | odblokowuje odkrycia wymagające poziomu 2 | brak pracowników |
+| **Rynek** | wymiana: 8 oddane → 1 otrzymane (surowy start) | wymiana: 6 oddane → 1 otrzymane (jedno z 3 niezależnych ulepszeń) — patrz sekcja 8 | -1 do kursu wymiany (flat) |
+| **Magazyn** | +50 do limitu magazynu każdego surowca | +100 (łącznie) | +25 do limitu magazynu (flat) |
+| **Kamieniarz** | +2 kamienia/tydzień | +4 kamienia/tydzień (łącznie) | +1 kamienia/tydzień (flat) |
+| **Koszary** | +5 bezpieczeństwa; odblokowuje rekrutację (wymaga zbudowanej Kuźni) | +10 bezpieczeństwa (łącznie); **podwaja siłę każdego żołnierza** | +50% do bezpieczeństwa i siły żołnierzy (mnożnik, bez zmian) |
 
-*Wszystkie powyższe wartości produkcyjne/bonusowe skalują się dodatkowo przez system pracowników (patrz 4.5).*
+*Większość budynków ma teraz PŁASKI bonus za pracownika (patrz kolumna wyżej i 4.5) - tylko Spichlerz, Studnia i Koszary zostały przy starym mnożniku ×1,5/×2.*
 
 **Rekrutacja w Koszarach** — 3 typy żołnierzy, rosnąca progresja koszt/siła (każdy kolejny typ wyraźnie lepszy, nie tylko inny): koszt złota (`_soldierRecruitCostGold` = 3) jest wspólny dla wszystkich typów, tylko surowiec dodatkowy i siła bazowa się różnią.
 
@@ -190,15 +192,16 @@ Koszary poziom 2 podwaja siłę KAŻDEGO żołnierza (patrz tabela wyżej); Kowa
 ### 4.5. Pracownicy
 
 - Limit pracowników na budynek: **0** domyślnie → **1** po odkryciu „Zarządzanie pracownikami I” → **2** po „Zarządzanie pracownikami II” (oba w Uczelni).
-- Każdy przydzielony pracownik daje **+50% do premii budynku**, maks. 2 pracowników = podwojona premia.
 - Przydzielenie pracownika zużywa jednostkę **limitu populacji** (wspólna pula na całą wioskę), nie samą liczbę mieszkańców.
-- Wyjątki od reguły +50%/pracownika - płaski, addytywny bonus zamiast mnożnika: **Sklep** (+1 do limitu dokupywanych ruchów/pracownika), **Rynek** (-1 do kursu wymiany/pracownika) i **Magazyn** (+25 do limitu magazynu/pracownika, patrz niżej).
+- **Większość budynków ma płaski, addytywny bonus za pracownika** (patrz kolumna "Za pracownika" w tabeli 4.4) - konkretna kwota, niezależna od poziomu budynku: **Ratusz** (+1 surowca), **Palisada** (+1 populacji, +5 bezpieczeństwa), **Sklep** (+1 do limitu ruchów), **Karczma** (+1 populacji), **Kuźnia** (+1 złota), **Piekarnia** (+1 zboża), **Tartak** (+1 drewna), **Kamieniarz** (+1 kamienia), **Browar** (+5 morale), **Kaplica** (-5% ryzyka, +5 morale), **Rynek** (-1 do kursu wymiany), **Magazyn** (+25 do limitu magazynu).
+- **Wyjątki - stary mnożnik +50%/pracownika** (maks. 2 pracowników = podwojona premia): **Spichlerz**, **Studnia**, **Koszary**.
+- **Dom nie ma przydziału pracowników w ogóle** - premia zależy wyłącznie od poziomu (to samo dotyczy 5 dodatkowych domów, patrz 4.6).
 
 ### 4.6. Dodatkowe domy
 
 - **5 niezależnych działek**, osobnych od standardowego budynku „Dom”, rozsianych po wiosce z dala od ścieżek.
-- Fabularny twist: na starcie gry 2 z nich stoją już zbudowane, ale **zaniedbane (poziom 0)** — wciąż mieszkają w nich ludzie, ale nie dają bonusu do populacji, dopóki nie zostaną „odbudowane" do poziomu 1 (koszt jak rozbudowa: 25 złota). To pierwszy, wcześniejszy krok, zanim dom stanie się w pełni aktywny. **Nie da się ich zburzyć** w tym stanie (nie ma czego zwracać, a mieszkańcy zostają) — burzenie jest możliwe dopiero po odbudowie, jak przy każdym innym Domu.
-- Każdy aktywny dodatkowy dom daje **+3 do limitu populacji**, tak jak standardowy budynek „Dom” - i tak jak on, **można go rozbudować do poziomu 2** za kolejne 25 złota, podwajając premię do +6 (bez skalowania pracownikami — nie ma tu przydziału pracowników).
+- Fabularny twist: na starcie gry 2 z nich stoją już zbudowane, ale **zaniedbane (poziom 0)** — wciąż mieszkają w nich ludzie, ale nie dają bonusu do populacji, dopóki nie zostaną „odbudowane" do poziomu 1 (koszt jak rozbudowa: 40 złota, 15 drewna, 15 kamienia). To pierwszy, wcześniejszy krok, zanim dom stanie się w pełni aktywny. **Nie da się ich zburzyć** w tym stanie (nie ma czego zwracać, a mieszkańcy zostają) — burzenie jest możliwe dopiero po odbudowie, jak przy każdym innym Domu.
+- Każdy aktywny dodatkowy dom daje **+2 do limitu populacji**, tak jak standardowy budynek „Dom” - i tak jak on, **można go rozbudować do poziomu 2** za ten sam koszt rozbudowy, podwajając premię do +4 (bez pracowników — nie ma tu przydziału).
 
 ---
 
@@ -212,7 +215,7 @@ Koszary poziom 2 podwaja siłę KAŻDEGO żołnierza (patrz tabela wyżej); Kowa
 | **Limit magazynu** (na surowiec) | 100 | + Magazyn (50/100 wg poziomu, NIE skal. pracownikami) + Magazyn: +25/pracownika (flat, maks. 2 = +50) + odkrycie „Rachunkowość” (+150 flat) |
 | **Ryzyko zepsucia** (bazowo 10%) | — | − Kaplica (5%/10%) − Studnia (3%/6%) − Spichlerz (3%/6%), suma przycięta do [0%, 10%] |
 
-**Populacja i głód**: zużycie zboża = `ceil(populacja / 1)`, czyli 1 zboże/mieszkaniec (dzielnik +1 z odkryciem „Agronomia zapasowa”, czyli 2 mieszkańców/1 zboże). Brakujące zboże jest dobierane z jabłek jako zapasowe źródło jedzenia (dokładnie brakująca ilość, nie cała potrzeba) - głód następuje dopiero, gdy i jabłek nie starcza: populacja -1 (0 z odkryciem „Medycyna wiejska”), morale -5. Jeśli jedzenia wystarcza i populacja &lt; limit → wzrost zależny od morale wioski: `morale/100` mieszkańca/tydzień (np. 50% morale = +0,5/tydzień), **×2 z odkryciem „Szybszy przyrost”**. Ułamkowa reszta odkłada się między tygodniami (patrz `HomeShell._populationGrowthProgress`), więc np. stałe 0,5/tydzień faktycznie daje +1 co dwa tygodnie, nie jest tracone przy zaokrąglaniu.
+**Populacja i głód**: zużycie zboża = `ceil(populacja / 1)`, czyli 1 zboże/mieszkaniec (dzielnik +1 z odkryciem „Agronomia zapasowa”, czyli 2 mieszkańców/1 zboże). Mieszkańcy jedzą **wyłącznie zboże** - jabłka są zarezerwowane dla żołnierzy i nie służą jako zapasowe źródło jedzenia. Brak zboża oznacza głód wprost: populacja -1 (0 z odkryciem „Medycyna wiejska”), morale -5. Jeśli jedzenia wystarcza i populacja &lt; limit → wzrost zależny od morale wioski: `morale/100` mieszkańca/tydzień (np. 50% morale = +0,5/tydzień), **×2 z odkryciem „Szybszy przyrost”**. Ułamkowa reszta odkłada się między tygodniami (patrz `HomeShell._populationGrowthProgress`), więc np. stałe 0,5/tydzień faktycznie daje +1 co dwa tygodnie, nie jest tracone przy zaokrąglaniu.
 
 ---
 
@@ -283,13 +286,14 @@ Ta premia +1 działa też w starciach z bossami, wszędzie tam, gdzie dany surow
 
 | Akt | Nazwa | Tygodnie | Cel (żeby przejść dalej) |
 |---|---|---|---|
-| 0 | Zanim odejdziesz | 1-13 | Ratusz + Sad/Łąka/Pole zbudowane + określone zapasy każdego z 7 surowców |
+| 0 | Zanim odejdziesz | 1-13 | Ratusz zbudowany + (od tygodnia 7) Kaplica zbudowana |
 | I | Ostrzeżenie | 14-26 | pokonać min. 2/3 etapów starcia z **Grotem** |
 | II | Krew rodziny | 27-39 | min. 2/3 etapów starcia z **Martą** + rozbudowany Ratusz (poziom 2) |
 | III | Twarzą w twarz | 40-52 | pełny Dowód w starciu z **Bogdanem** |
 | IV | Głodny Cień | 53-59 | siła armii ≥ 20 i bezpieczeństwo ≥ 50 (gotowość na starcie z **Leszym**, w środku Aktu V) |
 | V | Powrót Wiosny | 60-65 | zwyciężyć **Leszego** (tydzień 64) + ukończyć questy „Ślady w popiele” i „Rozmowa z Jadwigą” (patrz 12 — śledzone od Aktu II/III, ale wymagane dopiero jako część celu Aktu V) |
 
+- Akt 0 nie wypisuje osobno „Sad/Łąka/Pole zbudowane” - i tak są wymuszone wcześniej, bo bez nich nie da się zbudować Ratusza (patrz `_allResourcesUnlocked`, 4.3).
 - Niespełnienie celu na ostatnim tygodniu aktu → **ekran porażki aktu** → przywrócenie dowolnego wcześniejszego checkpointu albo nowa gra.
 - Każdy ukończony cel aktu: paczka surowców do magazynu, rosnąca z numerem aktu - `20 + akt×4` drewna, `20 + akt×4` kamienia, `10 + akt×4` złota (Akt 0: 20/20/10 → Akt V: 40/40/30).
 
@@ -381,7 +385,7 @@ Wyjątek: „Ślady w popiele” i „Rozmowa z Jadwigą” są śledzone i moż
 |---|---|---|---|
 | Ostatnia lekcja | 0 (od tyg. 7) | +15 drewna, +15 kamienia | Ratusz poziom 2 |
 | Dobry sąsiad | 0 | +10 zboża, +10 jabłka, +5 złota | Karczma zbudowana |
-| Milczenie Jadwigi | 1 | +20 kamienia, +10 złota | Kaplica zbudowana |
+| Milczenie Jadwigi | 1 | +40 złota, +25 kamienia, +25 drewna | Kaplica rozbudowana (poziom 2) |
 | Wdowa po najemniku | 1 | +20 drewna, +15 kamienia, +10 złota | min. 2/3 etapów Grota + Karczma |
 | Ostatni list | 2 | +20 złota, +10 trawy | odkrycie „Kartografia” |
 | Marta incognito | 2 | +20 jabłka, +15 trawy, +10 złota | morale ≥ 70 |

@@ -71,6 +71,7 @@ class _HarvestScreenState extends State<HarvestScreen> {
   final _gridKey = GlobalKey<HarvestGridState>();
   final _boardKey = GlobalKey();
   final _movesLabelKey = GlobalKey();
+  final _shuffleButtonKey = GlobalKey();
   final _buildOverviewButtonKey = GlobalKey();
 
   bool _tourActive = false;
@@ -142,6 +143,11 @@ class _HarvestScreenState extends State<HarvestScreen> {
           targetKey: _movesLabelKey,
           title: l10n.harvestScreenTutorialStep4Title,
           description: l10n.harvestScreenTutorialStep4Description,
+        ),
+        TutorialStep(
+          targetKey: _shuffleButtonKey,
+          title: l10n.harvestScreenShuffleTooltip,
+          description: l10n.harvestScreenTutorialShuffleDescription,
         ),
         TutorialStep(
           targetKey: _buildOverviewButtonKey,
@@ -357,6 +363,7 @@ class _HarvestScreenState extends State<HarvestScreen> {
               tooltip: l10n.buildOverviewTooltip,
             ),
             IconButton(
+              key: _shuffleButtonKey,
               onPressed: _movesLeft > 0 ? _confirmManualShuffle : null,
               icon: const Icon(Icons.shuffle),
               tooltip: l10n.harvestScreenShuffleTooltip,

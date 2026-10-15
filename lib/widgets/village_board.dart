@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
+import '../models/season.dart';
 import '../services/app_locale.dart';
 
 enum BuildingKind {
@@ -200,6 +201,38 @@ class _DecrepitHouseImageCache {
   }
 }
 
+/// Tła ekranu wioski dla każdej pory roku (render z Blendera bez budynków,
+/// patrz tools/blender/village_bg.py) - budynki, palisada i działki są dalej
+/// rysowane na nich.
+const kVillageBackgroundAssets = {
+  Season.spring: 'assets/boards/wioska_tlo_wiosna.webp',
+  Season.summer: 'assets/boards/wioska_tlo_lato.webp',
+  Season.autumn: 'assets/boards/wioska_tlo_jesien.webp',
+  Season.winter: 'assets/boards/wioska_tlo_zima.webp',
+};
+
+class _VillageBackgroundCache {
+  /// Fragment układu ref (700x1100), który pokrywa obraz - z zapasem poza
+  /// murem, żeby tło wypełniało też wyższe/szersze ekrany.
+  static const Rect refRect = Rect.fromLTRB(-80, -260, 780, 1360);
+
+  static final Map<Season, ui.Image> _cache = {};
+  static final Set<Season> _loading = {};
+
+  static ui.Image? get(Season season) => _cache[season];
+
+  static Future<void> preload(Season season) async {
+    if (_cache.containsKey(season) || _loading.contains(season)) return;
+    _loading.add(season);
+    final data = await rootBundle.load(kVillageBackgroundAssets[season]!);
+    final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
+    final frame = await codec.getNextFrame();
+    _cache[season] = frame.image;
+    _loading.remove(season);
+    BuildingImageCache.epoch++;
+  }
+}
+
 extension BuildingKindStyle on BuildingKind {
   String get label {
     if (AppLocale.instance.isEnglish) {
@@ -360,6 +393,12 @@ extension BuildingKindStyle on BuildingKind {
 class VillageBoard extends StatefulWidget {
   final bool ratuszBuilt;
   final bool palisadeBuilt;
+  // Czy wszystkie 7 surowców jest już odblokowanych (patrz
+  // HomeShell._allResourcesUnlocked) - od tego zależy odblokowanie Ratusza,
+  // Palisady i dodatkowych działek pod domy. Pozostałe budynki dodatkowo
+  // wymagają zbudowanego Ratusza (patrz ratuszBuilt powyżej) - oba warunki
+  // sterują tym, czy działka "+" jest rysowana na szaro jako zablokowana.
+  final bool allResourcesUnlocked;
   final Map<BuildingKind, bool> builtMap;
   final List<bool> extraHousesBuilt;
   final List<bool> extraHousesActive;
@@ -370,11 +409,14 @@ class VillageBoard extends StatefulWidget {
   final void Function(BuildingKind kind) onTapBuilding;
   final void Function(int index) onTapExtraHouse;
   final VoidCallback onTapEmptyPlot;
+  // Pora roku bieżącego tygodnia - wybiera obraz tła (patrz kVillageBackgroundAssets).
+  final Season season;
 
   const VillageBoard({
     super.key,
     required this.ratuszBuilt,
     required this.palisadeBuilt,
+    required this.allResourcesUnlocked,
     required this.builtMap,
     required this.extraHousesBuilt,
     this.extraHousesActive = const [],
@@ -385,6 +427,7 @@ class VillageBoard extends StatefulWidget {
     required this.onTapBuilding,
     required this.onTapExtraHouse,
     required this.onTapEmptyPlot,
+    this.season = Season.spring,
   });
 
   @override
@@ -399,6 +442,19 @@ class _VillageBoardState extends State<VillageBoard> {
       if (mounted) setState(() {});
     });
     _DecrepitHouseImageCache.preload().then((_) {
+      if (mounted) setState(() {});
+    });
+    _preloadBackground();
+  }
+
+  @override
+  void didUpdateWidget(covariant VillageBoard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.season != widget.season) _preloadBackground();
+  }
+
+  void _preloadBackground() {
+    _VillageBackgroundCache.preload(widget.season).then((_) {
       if (mounted) setState(() {});
     });
   }
@@ -456,11 +512,13 @@ class _VillageBoardState extends State<VillageBoard> {
             painter: _VillagePainter(
               ratuszBuilt: widget.ratuszBuilt,
               palisadeBuilt: widget.palisadeBuilt,
+              allResourcesUnlocked: widget.allResourcesUnlocked,
               builtMap: widget.builtMap,
               extraHousesBuilt: widget.extraHousesBuilt,
               extraHousesActive: widget.extraHousesActive,
               workers: widget.workers,
               upgradedMap: widget.upgradedMap,
+              season: widget.season,
               imageEpoch: BuildingImageCache.epoch,
             ),
           ),
@@ -491,24 +549,27 @@ class _VillageLayout {
     Offset(150, 500), // sklep
     Offset(570, 230), // karczma
     Offset(580, 700), // rynek
-    Offset(230, 970), // magazyn
-    Offset(180, 210), // kuznia
+    // Magazyn/Kamieniarz/Koszary podniesione - podpis pod budynkiem nie może
+    // wchodzić na pale palisady (sięgają ~34 jednostki nad wallBottom).
+    Offset(225, 915), // magazyn
+    Offset(170, 215), // kuznia
     Offset(440, 500), // browar
     Offset(140, 660), // kaplica
     Offset(110, 830), // szkola
-    Offset(560, 900), // koszary
+    Offset(580, 860), // koszary
   ];
 
   // Mniejsze działki pod domy, rozrzucone dodatkowo wzdłuż ścieżek.
   static const List<Offset> smallPlotRefs = [
-    // X=350 pokrywa się z centerX/topGate - dom musi siedzieć wyraźnie niżej
-    // niż wallTop (110), inaczej zasłania etykietę "Palisada" przy bramie.
-    Offset(350, 250), // dom
+    // Dom, Piekarnia i Studnia stoją obok głównej drogi (nie na niej) - do
+    // każdego prowadzi krótka kamienna ścieżka narysowana na tle wioski
+    // (tools/blender/village_bg.py, BRANCH_DEFS - współrzędne muszą się zgadzać).
+    Offset(290, 225), // dom
     Offset(460, 170), // spichlerz - przesunięty w lewo, żeby nie nachodzić na karczmę (570, 230)
-    Offset(320, 630), // piekarnia
+    Offset(405, 635), // piekarnia
     Offset(490, 370), // tartak
-    Offset(340, 790), // studnia
-    Offset(480, 970), // kamieniarz
+    Offset(245, 775), // studnia
+    Offset(450, 915), // kamieniarz
   ];
 
   // Dodatkowe, mniejsze działki pod zwykłe domy (odrębna pula od "Dom" -
@@ -518,7 +579,7 @@ class _VillageLayout {
     Offset(610, 560),
     Offset(615, 760),
     Offset(90, 355),
-    Offset(270, 300),
+    Offset(255, 330),
   ];
 
   final double s;
@@ -601,8 +662,29 @@ void _isoRoof(
   _fillPoly(canvas, [backTop, apex, rightTop], back);
 }
 
+// Toon-owy styl (gruby ciemny kontur + płaskie cieniowanie + błyszczący pasek)
+// dopasowany do renderów budynków (patrz assets/buildings/*.webp), zamiast
+// dawnego cienkiego gradientu, który wyraźnie odstawał jakością od reszty.
 void _drawLog(Canvas canvas, Offset base, double height, double s) {
   final w = 7 * s;
+  final outline = Paint()
+    ..color = const Color(0xFF2A1A08)
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = 1.6 * s
+    ..strokeJoin = StrokeJoin.round;
+
+  // Boczna (cieniowana) krawędź pala - daje poczucie bryły zamiast płaskiej sylwetki.
+  final sideW = w * 0.4;
+  final sidePath = Path()
+    ..moveTo(base.dx + w / 2, base.dy - height + 1 * s)
+    ..lineTo(base.dx + w / 2 + sideW, base.dy - height - 2 * s)
+    ..lineTo(base.dx + w / 2 + sideW, base.dy + 3 * s)
+    ..lineTo(base.dx + w / 2, base.dy + 5 * s)
+    ..close();
+  canvas.drawPath(sidePath, Paint()..color = const Color(0xFF6B4A22));
+  canvas.drawPath(sidePath, outline);
+
+  // Przednia ścianka pala - płaskie cieniowanie toon zamiast gradientu.
   final path = Path()
     ..moveTo(base.dx - w / 2, base.dy + 5 * s)
     ..lineTo(base.dx - w / 2, base.dy - height)
@@ -610,19 +692,25 @@ void _drawLog(Canvas canvas, Offset base, double height, double s) {
     ..lineTo(base.dx + w / 2, base.dy - height)
     ..lineTo(base.dx + w / 2, base.dy + 5 * s)
     ..close();
-  final rect = Rect.fromLTRB(base.dx - w / 2, base.dy - height - 6 * s, base.dx + w / 2, base.dy + 5 * s);
-  final paint = Paint()
-    ..shader = const LinearGradient(
-      colors: [Color(0xFF6B4118), Color(0xFF9C6B36), Color(0xFF5C3A1B)],
-      stops: [0.0, 0.5, 1.0],
-    ).createShader(rect);
-  canvas.drawPath(path, paint);
+  canvas.drawPath(path, Paint()..color = const Color(0xFFC98B3A));
+  canvas.drawPath(path, outline);
+
+  // Błyszczący pasek, jak na dachówkach budynków.
+  final highlight = Path()
+    ..moveTo(base.dx - w * 0.18, base.dy - height * 0.82)
+    ..quadraticBezierTo(
+      base.dx - w * 0.03,
+      base.dy - height * 0.55,
+      base.dx - w * 0.18,
+      base.dy - height * 0.3,
+    );
   canvas.drawPath(
-    path,
+    highlight,
     Paint()
-      ..color = Colors.black.withValues(alpha: 0.25)
+      ..color = Colors.white.withValues(alpha: 0.4)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 0.7,
+      ..strokeWidth = w * 0.16
+      ..strokeCap = StrokeCap.round,
   );
 }
 
@@ -650,19 +738,28 @@ void _drawEmptyPlot(
   Offset p,
   double s, {
   bool highlighted = false,
+  // Budynek, którego warunek odblokowania (np. zbudowany Ratusz) nie jest
+  // jeszcze spełniony - rysowany na szaro zamiast zwykłych barw "do
+  // zbudowania", żeby od razu, bez dotykania działki, było widać że nie jest
+  // teraz dostępny.
+  bool locked = false,
   Color? fillColor,
   Color? borderColor,
   String? label,
   double sizeFactor = 1.0,
 }) {
-  final fill = fillColor ?? (highlighted ? const Color(0xFFDCEBFA) : const Color(0xFFEDE0C0));
-  final border = borderColor ?? (highlighted ? const Color(0xFF3A8DDE) : const Color(0xFFB9A46B));
+  final fill = locked
+      ? const Color(0xFFD8D4C8)
+      : fillColor ?? (highlighted ? const Color(0xFFDCEBFA) : const Color(0xFFEDE0C0));
+  final border = locked
+      ? const Color(0xFF9B9688)
+      : borderColor ?? (highlighted ? const Color(0xFF3A8DDE) : const Color(0xFFB9A46B));
   final rx = (highlighted ? 40.0 : 27.0) * s * sizeFactor;
   final ry = (highlighted ? 21.0 : 15.0) * s * sizeFactor;
 
   canvas.drawOval(
     Rect.fromCenter(center: p, width: rx * 2, height: ry * 2),
-    Paint()..color = fill.withValues(alpha: 0.92),
+    Paint()..color = fill.withValues(alpha: locked ? 0.75 : 0.92),
   );
   _dashedOval(canvas, p, rx, ry, border, highlighted ? 3.2 * s : 2.2 * s);
 
@@ -670,7 +767,7 @@ void _drawEmptyPlot(
     text: TextSpan(
       text: '+',
       style: TextStyle(
-        color: highlighted ? const Color(0xFF1F6BB8) : const Color(0xFF8B7B4E),
+        color: locked ? const Color(0xFF86806E) : (highlighted ? const Color(0xFF1F6BB8) : const Color(0xFF8B7B4E)),
         fontWeight: FontWeight.bold,
         fontSize: (highlighted ? 28 : 18) * s,
       ),
@@ -683,7 +780,11 @@ void _drawEmptyPlot(
     final tp = TextPainter(
       text: TextSpan(
         text: label,
-        style: TextStyle(color: const Color(0xFF1F4E7A), fontWeight: FontWeight.bold, fontSize: 13 * s),
+        style: TextStyle(
+          color: locked ? const Color(0xFF6B6657) : const Color(0xFF1F4E7A),
+          fontWeight: FontWeight.bold,
+          fontSize: 13 * s,
+        ),
       ),
       textDirection: TextDirection.ltr,
     )..layout();
@@ -900,21 +1001,25 @@ void _drawPalisadeSwatch(Canvas canvas, Offset center, double s) {
 class _VillagePainter extends CustomPainter {
   final bool ratuszBuilt;
   final bool palisadeBuilt;
+  final bool allResourcesUnlocked;
   final Map<BuildingKind, bool> builtMap;
   final List<bool> extraHousesBuilt;
   final List<bool> extraHousesActive;
   final Map<BuildingKind, int> workers;
   final Map<BuildingKind, bool> upgradedMap;
+  final Season season;
   final int imageEpoch;
 
   _VillagePainter({
     required this.ratuszBuilt,
     required this.palisadeBuilt,
+    required this.allResourcesUnlocked,
     required this.builtMap,
     required this.extraHousesBuilt,
     this.extraHousesActive = const [],
     this.workers = const {},
     this.upgradedMap = const {},
+    required this.season,
     required this.imageEpoch,
   });
 
@@ -923,6 +1028,164 @@ class _VillagePainter extends CustomPainter {
     final layout = _VillageLayout(size);
     final s = layout.s;
     Offset p(double refX, double refY) => layout.p(refX, refY);
+
+    final wallRect = layout.wallRect;
+    final background = _VillageBackgroundCache.get(season);
+    if (background != null) {
+      _paintBackgroundImage(canvas, size, layout, background);
+    } else {
+      _paintProceduralTerrain(canvas, size, layout);
+    }
+
+    // ---- corner towers ----
+    for (final corner in [
+      Offset(wallRect.left, wallRect.top),
+      Offset(wallRect.right, wallRect.top),
+      Offset(wallRect.left, wallRect.bottom),
+      Offset(wallRect.right, wallRect.bottom),
+    ]) {
+      canvas.drawCircle(corner, 16 * s, Paint()..color = const Color(0xFF6B4118));
+      canvas.drawCircle(corner, 11 * s, Paint()..color = const Color(0xFF8B5A2B));
+    }
+
+    // ---- outer palisade (or its build marker) ----
+    if (palisadeBuilt) {
+      final rrect = RRect.fromRectAndRadius(wallRect, Radius.circular(_VillageLayout.cornerRadius * s));
+      final wallPath = Path()..addRRect(rrect);
+      final metric = wallPath.computeMetrics().first;
+      final topGate = layout.topGate, bottomGate = layout.bottomGate;
+      final gateHalf = 46 * s;
+      for (double d = 0; d < metric.length; d += 11 * s) {
+        final tangent = metric.getTangentForOffset(d);
+        if (tangent == null) continue;
+        final pos = tangent.position;
+        if ((pos - topGate).distance < gateHalf || (pos - bottomGate).distance < gateHalf) continue;
+        _drawLog(canvas, pos, 34 * s, s);
+      }
+      _drawBuildingLabel(canvas, topGate, s, BuildingKind.palisade.label, workers: workers[BuildingKind.palisade] ?? 0);
+    } else {
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(wallRect, Radius.circular(_VillageLayout.cornerRadius * s)),
+        Paint()
+          ..color = const Color(0xFF8B5A2B).withValues(alpha: 0.35)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 3 * s,
+      );
+      _drawEmptyPlot(
+        canvas,
+        layout.topGate,
+        s,
+        highlighted: true,
+        locked: !allResourcesUnlocked,
+        sizeFactor: 0.8,
+        label: AppLocale.instance.isEnglish ? 'Build the Palisade' : 'Zbuduj Palisadę',
+      );
+    }
+
+    // ---- standardowe działki (przy końcach odgałęzień ścieżki) ----
+    for (var i = 0; i < kStandardBuildingKinds.length; i++) {
+      final ref = _VillageLayout.standardPlotRefs[i];
+      final kind = kStandardBuildingKinds[i];
+      final pos = p(ref.dx, ref.dy);
+      if (builtMap[kind] ?? false) {
+        _drawBuiltBuilding(
+          canvas,
+          pos,
+          s,
+          kind,
+          workers: workers[kind] ?? 0,
+          upgraded: upgradedMap[kind] ?? false,
+        );
+      } else {
+        _drawEmptyPlot(canvas, pos, s, locked: !ratuszBuilt, label: kind.label);
+      }
+    }
+    // ---- działki budynków produkcyjnych/domu - ten sam duży rozmiar co powyżej ----
+    for (var i = 0; i < kSmallBuildingKinds.length; i++) {
+      final ref = _VillageLayout.smallPlotRefs[i];
+      final kind = kSmallBuildingKinds[i];
+      final pos = p(ref.dx, ref.dy);
+      if (builtMap[kind] ?? false) {
+        _drawBuiltBuilding(
+          canvas,
+          pos,
+          s,
+          kind,
+          workers: workers[kind] ?? 0,
+          upgraded: upgradedMap[kind] ?? false,
+        );
+      } else {
+        _drawEmptyPlot(canvas, pos, s, locked: !ratuszBuilt, label: kind.label);
+      }
+    }
+    // ---- dodatkowe działki pod zwykłe domy - każda budowalna niezależnie ----
+    for (var i = 0; i < _VillageLayout.extraSmallPlotRefs.length; i++) {
+      final ref = _VillageLayout.extraSmallPlotRefs[i];
+      final pos = p(ref.dx, ref.dy);
+      if (i < extraHousesBuilt.length && extraHousesBuilt[i]) {
+        // Zaniedbany (ale wciąż zamieszkany) wygląd, dopóki gracz nie
+        // odbuduje tego konkretnego domu - patrz HomeShell._onTapExtraHouse.
+        final decrepit = i < extraHousesActive.length && !extraHousesActive[i];
+        final decrepitImage = decrepit ? _DecrepitHouseImageCache.image : null;
+        if (decrepitImage != null) {
+          _drawBuildingImage(canvas, decrepitImage, pos, s, sizeFactor: 0.75);
+          _drawBuildingLabel(canvas, pos, s, BuildingKind.dom.label, sizeFactor: 0.75);
+        } else {
+          _drawBuiltBuilding(canvas, pos, s, BuildingKind.dom, sizeFactor: 0.75);
+        }
+      } else {
+        _drawEmptyPlot(canvas, pos, s, sizeFactor: 0.55, locked: !allResourcesUnlocked, label: BuildingKind.dom.label);
+      }
+    }
+
+    // ---- Ratusz slot (na trasie głównej ścieżki) ----
+    if (ratuszBuilt) {
+      final ratuszUpgraded = upgradedMap[BuildingKind.ratusz] ?? false;
+      final ratuszImage = BuildingImageCache.get(BuildingKind.ratusz, upgraded: ratuszUpgraded);
+      if (ratuszImage != null) {
+        _drawBuildingImage(canvas, ratuszImage, layout.ratuszCenter, s,
+            sizeFactor: kBuildingImageScale[BuildingKind.ratusz] ?? 1.0);
+      } else {
+        _drawRatusz(canvas, layout.ratuszCenter, s);
+      }
+      _drawBuildingLabel(canvas, layout.ratuszCenter, s, BuildingKind.ratusz.label, workers: workers[BuildingKind.ratusz] ?? 0);
+    } else {
+      // Zanim Ratusz zostanie zbudowany, na jego miejscu stoi zwyczajny,
+      // odziedziczony dom - nic nie daje, ale to na tej samej działce gracz
+      // "buduje" prawdziwy Ratusz (patrz HomeShell._onTapRatusz). Podpis mimo
+      // to od razu pokazuje "Ratusz", żeby gracz wiedział, co tu docelowo stanie.
+      _drawBuiltBuilding(
+        canvas,
+        layout.ratuszCenter,
+        s,
+        BuildingKind.dom,
+        sizeFactor: 0.9,
+        labelOverride: BuildingKind.ratusz.label,
+      );
+    }
+  }
+
+  /// Wyrenderowane w Blenderze tło (teren, drogi, fosa, las, pola) - obraz
+  /// pokrywa prostokąt [_VillageBackgroundCache.refRect] w układzie ref, więc
+  /// drogi i placyki pod budynkami trafiają dokładnie w działki z [_VillageLayout].
+  void _paintBackgroundImage(Canvas canvas, Size size, _VillageLayout layout, ui.Image image) {
+    canvas.drawRect(Offset.zero & size, Paint()..color = const Color(0xFF4E8F35));
+    const ref = _VillageBackgroundCache.refRect;
+    final topLeft = layout.p(ref.left, ref.top);
+    final bottomRight = layout.p(ref.right, ref.bottom);
+    canvas.drawImageRect(
+      image,
+      Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
+      Rect.fromPoints(topLeft, bottomRight),
+      Paint()..filterQuality = FilterQuality.medium,
+    );
+  }
+
+  /// Proceduralny teren - zapas na czas ładowania obrazu tła.
+  void _paintProceduralTerrain(Canvas canvas, Size size, _VillageLayout layout) {
+    final s = layout.s;
+    Offset p(double refX, double refY) => layout.p(refX, refY);
+    final wallRect = layout.wallRect;
 
     // ---- terrain ----
     canvas.drawRect(Offset.zero & size, Paint()..color = const Color(0xFF5FA83D));
@@ -935,7 +1198,6 @@ class _VillagePainter extends CustomPainter {
       Paint()..color = const Color(0xFF71B84A),
     );
 
-    final wallRect = layout.wallRect;
     final moatRect = wallRect.inflate(22 * s);
 
     // trees along the outside of the wall perimeter
@@ -1009,142 +1271,18 @@ class _VillagePainter extends CustomPainter {
     ]);
     // Nowa ścieżka na dole po prawej z jedną dużą działką.
     branch([const Offset(320, 875), const Offset(410, 890), const Offset(490, 895), const Offset(560, 900)]);
-
-    // ---- corner towers ----
-    for (final corner in [
-      Offset(wallRect.left, wallRect.top),
-      Offset(wallRect.right, wallRect.top),
-      Offset(wallRect.left, wallRect.bottom),
-      Offset(wallRect.right, wallRect.bottom),
-    ]) {
-      canvas.drawCircle(corner, 16 * s, Paint()..color = const Color(0xFF6B4118));
-      canvas.drawCircle(corner, 11 * s, Paint()..color = const Color(0xFF8B5A2B));
-    }
-
-    // ---- outer palisade (or its build marker) ----
-    if (palisadeBuilt) {
-      final rrect = RRect.fromRectAndRadius(wallRect, Radius.circular(_VillageLayout.cornerRadius * s));
-      final wallPath = Path()..addRRect(rrect);
-      final metric = wallPath.computeMetrics().first;
-      final topGate = layout.topGate, bottomGate = layout.bottomGate;
-      final gateHalf = 46 * s;
-      for (double d = 0; d < metric.length; d += 11 * s) {
-        final tangent = metric.getTangentForOffset(d);
-        if (tangent == null) continue;
-        final pos = tangent.position;
-        if ((pos - topGate).distance < gateHalf || (pos - bottomGate).distance < gateHalf) continue;
-        _drawLog(canvas, pos, 34 * s, s);
-      }
-      _drawBuildingLabel(canvas, topGate, s, BuildingKind.palisade.label, workers: workers[BuildingKind.palisade] ?? 0);
-    } else {
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(wallRect, Radius.circular(_VillageLayout.cornerRadius * s)),
-        Paint()
-          ..color = const Color(0xFF8B5A2B).withValues(alpha: 0.35)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 3 * s,
-      );
-      _drawEmptyPlot(
-        canvas,
-        layout.topGate,
-        s,
-        highlighted: true,
-        sizeFactor: 0.8,
-        label: AppLocale.instance.isEnglish ? 'Build the Palisade' : 'Zbuduj Palisadę',
-      );
-    }
-
-    // ---- standardowe działki (przy końcach odgałęzień ścieżki) ----
-    for (var i = 0; i < kStandardBuildingKinds.length; i++) {
-      final ref = _VillageLayout.standardPlotRefs[i];
-      final kind = kStandardBuildingKinds[i];
-      final pos = p(ref.dx, ref.dy);
-      if (builtMap[kind] ?? false) {
-        _drawBuiltBuilding(
-          canvas,
-          pos,
-          s,
-          kind,
-          workers: workers[kind] ?? 0,
-          upgraded: upgradedMap[kind] ?? false,
-        );
-      } else {
-        _drawEmptyPlot(canvas, pos, s, label: kind.label);
-      }
-    }
-    // ---- działki budynków produkcyjnych/domu - ten sam duży rozmiar co powyżej ----
-    for (var i = 0; i < kSmallBuildingKinds.length; i++) {
-      final ref = _VillageLayout.smallPlotRefs[i];
-      final kind = kSmallBuildingKinds[i];
-      final pos = p(ref.dx, ref.dy);
-      if (builtMap[kind] ?? false) {
-        _drawBuiltBuilding(
-          canvas,
-          pos,
-          s,
-          kind,
-          workers: workers[kind] ?? 0,
-          upgraded: upgradedMap[kind] ?? false,
-        );
-      } else {
-        _drawEmptyPlot(canvas, pos, s, label: kind.label);
-      }
-    }
-    // ---- dodatkowe działki pod zwykłe domy - każda budowalna niezależnie ----
-    for (var i = 0; i < _VillageLayout.extraSmallPlotRefs.length; i++) {
-      final ref = _VillageLayout.extraSmallPlotRefs[i];
-      final pos = p(ref.dx, ref.dy);
-      if (i < extraHousesBuilt.length && extraHousesBuilt[i]) {
-        // Zaniedbany (ale wciąż zamieszkany) wygląd, dopóki gracz nie
-        // odbuduje tego konkretnego domu - patrz HomeShell._onTapExtraHouse.
-        final decrepit = i < extraHousesActive.length && !extraHousesActive[i];
-        final decrepitImage = decrepit ? _DecrepitHouseImageCache.image : null;
-        if (decrepitImage != null) {
-          _drawBuildingImage(canvas, decrepitImage, pos, s, sizeFactor: 0.75);
-          _drawBuildingLabel(canvas, pos, s, BuildingKind.dom.label, sizeFactor: 0.75);
-        } else {
-          _drawBuiltBuilding(canvas, pos, s, BuildingKind.dom, sizeFactor: 0.75);
-        }
-      } else {
-        _drawEmptyPlot(canvas, pos, s, sizeFactor: 0.55, label: BuildingKind.dom.label);
-      }
-    }
-
-    // ---- Ratusz slot (na trasie głównej ścieżki) ----
-    if (ratuszBuilt) {
-      final ratuszUpgraded = upgradedMap[BuildingKind.ratusz] ?? false;
-      final ratuszImage = BuildingImageCache.get(BuildingKind.ratusz, upgraded: ratuszUpgraded);
-      if (ratuszImage != null) {
-        _drawBuildingImage(canvas, ratuszImage, layout.ratuszCenter, s,
-            sizeFactor: kBuildingImageScale[BuildingKind.ratusz] ?? 1.0);
-      } else {
-        _drawRatusz(canvas, layout.ratuszCenter, s);
-      }
-      _drawBuildingLabel(canvas, layout.ratuszCenter, s, BuildingKind.ratusz.label, workers: workers[BuildingKind.ratusz] ?? 0);
-    } else {
-      // Zanim Ratusz zostanie zbudowany, na jego miejscu stoi zwyczajny,
-      // odziedziczony dom - nic nie daje, ale to na tej samej działce gracz
-      // "buduje" prawdziwy Ratusz (patrz HomeShell._onTapRatusz). Podpis mimo
-      // to od razu pokazuje "Ratusz", żeby gracz wiedział, co tu docelowo stanie.
-      _drawBuiltBuilding(
-        canvas,
-        layout.ratuszCenter,
-        s,
-        BuildingKind.dom,
-        sizeFactor: 0.9,
-        labelOverride: BuildingKind.ratusz.label,
-      );
-    }
   }
 
   @override
   bool shouldRepaint(covariant _VillagePainter oldDelegate) =>
       oldDelegate.ratuszBuilt != ratuszBuilt ||
       oldDelegate.palisadeBuilt != palisadeBuilt ||
+      oldDelegate.allResourcesUnlocked != allResourcesUnlocked ||
       oldDelegate.builtMap != builtMap ||
       oldDelegate.extraHousesBuilt != extraHousesBuilt ||
       oldDelegate.extraHousesActive != extraHousesActive ||
       oldDelegate.workers != workers ||
+      oldDelegate.season != season ||
       oldDelegate.imageEpoch != imageEpoch;
 }
 

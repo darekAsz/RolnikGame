@@ -81,6 +81,7 @@ class _HomeShellState extends State<HomeShell> {
     ResourceType.stone: 15,
   };
   static const int _ratuszWeeklyBonus = 2;
+  static const int _ratuszWorkerBonus = 1;
   static const int _baseMovesConst = 10;
   // Maks. liczba dokupionych na stałe ruchów: +2 z samym Sklepem (poziom 1),
   // +4 więcej (razem +6) po rozbudowie do poziomu 2 - świadomie rosnący
@@ -109,14 +110,21 @@ class _HomeShellState extends State<HomeShell> {
     ResourceType.stone: 30,
   };
   static const int _basePopulation = 5;
-  static const int _housePopulationBonus = 3;
+  // Dom NIE ma przydziału pracowników (patrz showWorkers w
+  // _onTapVillageBuilding) - premia zależy wyłącznie od poziomu. Ten sam
+  // stały bonus dają też aktywne dodatkowe domy (patrz _populationLimit).
+  static const int _housePopulationBonus = 2;
   static const int _palisadePopulationBonus = 1;
+  static const int _palisadeWorkerPopulationBonus = 1;
   static const int _karczmaPopulationBonus = 2;
+  static const int _karczmaWorkerPopulationBonus = 1;
   static const int _baseSecurity = 0;
-  static const int _palisadeSecurityBonus = 20;
+  static const int _palisadeSecurityBonus = 10;
+  static const int _palisadeWorkerSecurityBonus = 5;
   static const int _koszarySecurityBonusPerLevel = 5;
   static const int _baseMorale = 50;
   static const int _breweryMoraleBonus = 10;
+  static const int _browarWorkerMoraleBonus = 5;
   static const int _kaplicaMoraleBonus = 5;
   static const int _baseStorageCap = 100;
   // Za poziom Magazynu (nie mnożone przez pracowników, w odróżnieniu od
@@ -125,8 +133,18 @@ class _HomeShellState extends State<HomeShell> {
   // jak limit dokupywanych ruchów w Sklepie czy zniżka na Rynku.
   static const int _warehouseStorageBonusPerLevel = 50;
   static const int _warehouseWorkerStorageBonus = 25;
+  // Spichlerz i Studnia dalej dzielą ten sam bonus (bez zmian - workerzy
+  // dalej skalują je zwykłym mnożnikiem ×1,5/×2). Piekarnia/Tartak/Kamieniarz
+  // mają teraz własne, niższe bazy + płaski bonus za pracownika (patrz niżej).
   static const int _weeklyProductionBonus = 3;
+  static const int _piekarniaWeeklyGrainBonus = 2;
+  static const int _piekarniaWorkerGrainBonus = 1;
+  static const int _tartakWeeklyWoodBonus = 2;
+  static const int _tartakWorkerWoodBonus = 1;
+  static const int _kamieniarzWeeklyStoneBonus = 2;
+  static const int _kamieniarzWorkerStoneBonus = 1;
   static const int _kuzniaWeeklyGoldBonus = 2;
+  static const int _kuzniaWorkerGoldBonus = 1;
   static const int _szkolaMovesBonus = 1;
   // Kaplica zmniejsza ogólną szansę zepsucia (patrz kSpoiledChance), Studnia
   // dodatkowo zmniejsza ryzyko pożaru, a Spichlerz - ryzyko głodu; wszystkie
@@ -178,13 +196,15 @@ class _HomeShellState extends State<HomeShell> {
   static const int _foodPerSoldierWeekly = 1;
   // _population to prawdziwy, trwały licznik obecnych mieszkańców (w
   // odróżnieniu od _populationLimit, który jest tylko pojemnością wynikającą
-  // z budynków). Zjadają zboże - 1 zboże na każde _populationFoodDivisor
-  // mieszkańców (czyli bazowo 1 mieszkaniec = 1 zboże); brakujące zboże jest
-  // dobierane z jabłek jako zapasowe źródło jedzenia (patrz _startWeek), a
-  // głód następuje dopiero, gdy zabraknie obu. Przy wystarczającej ilości
-  // jedzenia i wolnym miejscu poniżej limitu populacja rośnie co tydzień -
-  // tempo zależy od morale wioski, patrz _effectivePopulationGrowthRate;
-  // przy głodzie maleje, a morale spada.
+  // z budynków). Zjadają WYŁĄCZNIE zboże - 1 zboże na każde
+  // _populationFoodDivisor mieszkańców (czyli bazowo 1 mieszkaniec = 1
+  // zboże); jabłka są zarezerwowane dla żołnierzy (patrz
+  // _foodPerSoldierWeekly) i nie służą jako zapasowe źródło jedzenia dla
+  // zwykłych mieszkańców - brak zboża oznacza głód wprost (patrz
+  // _startWeek). Przy wystarczającej ilości jedzenia i wolnym miejscu
+  // poniżej limitu populacja rośnie co tydzień - tempo zależy od morale
+  // wioski, patrz _effectivePopulationGrowthRate; przy głodzie maleje, a
+  // morale spada.
   static const int _populationFoodDivisor = 1;
   static const int _populationStarvationLoss = 1;
   static const int _populationStarvationMoraleLoss = 5;
@@ -198,9 +218,29 @@ class _HomeShellState extends State<HomeShell> {
   // dodatek - patrz _effectivePopulationGrowthRate.
   static const double _discoveryFastGrowthMultiplier = 2.0;
   static const double _discoveryWeatherForecastBonus = 0.15;
-  // Koszt rozbudowy (poziom 2) - jednolity dla wszystkich budynków wioski,
-  // czysta inwestycja złota niezależna od surowców poziomu 1.
-  static const Map<ResourceType, int> _villageUpgradeCost = {ResourceType.coin: 25};
+  // Koszt rozbudowy (poziom 2) - jednolity dla wszystkich budynków wioski
+  // (w tym Ratusza), niezależny od kosztu poziomu 1. Więcej niż samo złoto -
+  // realna, wielosurowcowa inwestycja, nie tylko podatek w gotówce.
+  static const Map<ResourceType, int> _villageUpgradeCost = {
+    ResourceType.coin: 40,
+    ResourceType.wood: 15,
+    ResourceType.stone: 15,
+  };
+  // Rozbudowa Kaplicy do poziomu 2 jest wyjątkiem od powyższego jednolitego
+  // kosztu - to ona odblokowuje quest poboczny "Milczenie Jadwigi" (patrz
+  // _sideQuestMet), więc celowo wymaga nieco większej, wielosurowcowej
+  // inwestycji niż zwykła rozbudowa - ale bez przesady.
+  static const Map<ResourceType, int> _kaplicaUpgradeCost = {
+    ResourceType.coin: 75,
+    ResourceType.wood: 20,
+    ResourceType.stone: 20,
+    ResourceType.water: 20,
+    ResourceType.grain: 20,
+    ResourceType.apple: 20,
+    ResourceType.grass: 20,
+  };
+  Map<ResourceType, int> _villageUpgradeCostFor(BuildingKind kind) =>
+      kind == BuildingKind.kaplica ? _kaplicaUpgradeCost : _villageUpgradeCost;
   static const Map<BuildingKind, ResourceType> _productionBuildings = {
     BuildingKind.spichlerz: ResourceType.apple,
     BuildingKind.piekarnia: ResourceType.grain,
@@ -344,6 +384,19 @@ class _HomeShellState extends State<HomeShell> {
   double _tieredFraction(BuildingKind kind, double perLevel) =>
       _tieredBaseFraction(kind, perLevel) * _workerMultiplier(kind);
 
+  /// Wariant _tieredBonus z PŁASKIM bonusem za pracownika (+perWorker za
+  /// każdego) zamiast mnożnika ×1,5/×2 - używane tam, gdzie premia
+  /// pracownika ma być stałą kwotą niezależną od premii budynku (patrz
+  /// Ratusz/Palisada/Karczma/Kuźnia/Piekarnia/Tartak/Kamieniarz/Browar,
+  /// a wcześniej już Sklep/Rynek/Magazyn).
+  int _tieredFlatBonus(BuildingKind kind, int perLevel, int perWorker) =>
+      _tieredBaseAmount(kind, perLevel) +
+      _workersFor(kind).clamp(0, _maxWorkersPerBuilding) * perWorker;
+
+  double _tieredFlatFraction(BuildingKind kind, double perLevel, double perWorker) =>
+      _tieredBaseFraction(kind, perLevel) +
+      _workersFor(kind).clamp(0, _maxWorkersPerBuilding) * perWorker;
+
   Future<void> _setWorkers(BuildingKind kind, int count) async {
     final clamped = count.clamp(0, _maxWorkersPerBuilding);
     final current = _workersFor(kind);
@@ -389,9 +442,13 @@ class _HomeShellState extends State<HomeShell> {
 
   int get _populationLimit {
     var total = _basePopulation;
-    total += _tieredBonus(BuildingKind.dom, _housePopulationBonus);
-    total += _tieredBonus(BuildingKind.karczma, _karczmaPopulationBonus);
-    total += _tieredBonus(BuildingKind.palisade, _palisadePopulationBonus);
+    // Dom bez pracowników (patrz _housePopulationBonus) - Karczma/Palisada
+    // z płaskim bonusem za pracownika zamiast mnożnika.
+    total += _tieredBaseAmount(BuildingKind.dom, _housePopulationBonus);
+    total += _tieredFlatBonus(
+        BuildingKind.karczma, _karczmaPopulationBonus, _karczmaWorkerPopulationBonus);
+    total += _tieredFlatBonus(
+        BuildingKind.palisade, _palisadePopulationBonus, _palisadeWorkerPopulationBonus);
     for (var i = 0; i < kExtraHouseCount; i++) {
       if (!_extraHousesBuilt[i] || !_extraHousesActive[i]) continue;
       total += _extraHousesUpgraded[i] ? _housePopulationBonus * 2 : _housePopulationBonus;
@@ -402,7 +459,8 @@ class _HomeShellState extends State<HomeShell> {
 
   double get _spoiledChance {
     var reduction = 0.0;
-    reduction += _tieredFraction(BuildingKind.kaplica, _kaplicaRiskReductionPerLevel);
+    reduction += _tieredFlatFraction(
+        BuildingKind.kaplica, _kaplicaRiskReductionPerLevel, _kaplicaRiskReductionPerLevel);
     reduction += _tieredFraction(BuildingKind.studnia, _fireRiskReductionPerLevel);
     reduction += _tieredFraction(BuildingKind.spichlerz, _hungerRiskReductionPerLevel);
     return (kSpoiledChance - reduction).clamp(0.0, kSpoiledChance);
@@ -410,8 +468,8 @@ class _HomeShellState extends State<HomeShell> {
 
   double get _moraleValue {
     var total = _baseMorale.toDouble();
-    total += _tieredBonus(BuildingKind.browar, _breweryMoraleBonus);
-    total += _tieredBonus(BuildingKind.kaplica, _kaplicaMoraleBonus);
+    total += _tieredFlatBonus(BuildingKind.browar, _breweryMoraleBonus, _browarWorkerMoraleBonus);
+    total += _tieredFlatBonus(BuildingKind.kaplica, _kaplicaMoraleBonus, _kaplicaMoraleBonus);
     total += _eventMoraleBonus;
     // Bezpieczeństwo dokłada się do morale ułamkowo (np. 40 bezpieczeństwa = +0,4 morale).
     total += _securityValue / 100;
@@ -436,7 +494,8 @@ class _HomeShellState extends State<HomeShell> {
 
   int get _securityValue {
     var total = _baseSecurity;
-    total += _tieredBonus(BuildingKind.palisade, _palisadeSecurityBonus);
+    total += _tieredFlatBonus(
+        BuildingKind.palisade, _palisadeSecurityBonus, _palisadeWorkerSecurityBonus);
     total += _tieredBonus(BuildingKind.koszary, _koszarySecurityBonusPerLevel);
     total += _eventSecurityBonus;
     return total.clamp(0, 1 << 30);
@@ -446,15 +505,38 @@ class _HomeShellState extends State<HomeShell> {
   bool get _marketUnlocked => _villageBuilt[BuildingKind.rynek] ?? false;
 
   int get _ratuszWeeklyBonusValue =>
-      _scaled(_ratuszWeeklyBonus * (_upgradedL2(BuildingKind.ratusz) ? 2 : 1), BuildingKind.ratusz);
+      _tieredFlatBonus(BuildingKind.ratusz, _ratuszWeeklyBonus, _ratuszWorkerBonus);
 
+  // Kuźnia/Piekarnia/Tartak/Kamieniarz mają własne, niższe bazy (2/4 zamiast
+  // wspólnych 3/6) - Spichlerz i Studnia dalej dzielą _weeklyProductionBonus.
   int _productionBaseAmountFor(BuildingKind kind) {
-    var amount = kind == BuildingKind.kuznia ? _kuzniaWeeklyGoldBonus : _weeklyProductionBonus;
+    final perLevel = switch (kind) {
+      BuildingKind.kuznia => _kuzniaWeeklyGoldBonus,
+      BuildingKind.piekarnia => _piekarniaWeeklyGrainBonus,
+      BuildingKind.tartak => _tartakWeeklyWoodBonus,
+      BuildingKind.kamieniarz => _kamieniarzWeeklyStoneBonus,
+      _ => _weeklyProductionBonus,
+    };
+    var amount = perLevel;
     if (_upgradedL2(kind) && !_productionDoublingExempt.contains(kind)) amount *= 2;
     return amount;
   }
 
-  int _productionAmountFor(BuildingKind kind) => _scaled(_productionBaseAmountFor(kind), kind);
+  // Kuźnia/Piekarnia/Tartak/Kamieniarz: płaski bonus za pracownika (+1 do
+  // produkcji za każdego) zamiast mnożnika ×1,5/×2. Spichlerz/Studnia
+  // zostają przy starym mnożniku.
+  int _productionAmountFor(BuildingKind kind) {
+    final perWorker = switch (kind) {
+      BuildingKind.kuznia => _kuzniaWorkerGoldBonus,
+      BuildingKind.piekarnia => _piekarniaWorkerGrainBonus,
+      BuildingKind.tartak => _tartakWorkerWoodBonus,
+      BuildingKind.kamieniarz => _kamieniarzWorkerStoneBonus,
+      _ => null,
+    };
+    if (perWorker == null) return _scaled(_productionBaseAmountFor(kind), kind);
+    return _productionBaseAmountFor(kind) +
+        _workersFor(kind).clamp(0, _maxWorkersPerBuilding) * perWorker;
+  }
 
   /// Projekcja produkcji tygodniowej wg surowca na podstawie obecnego stanu
   /// budynków - używana zarówno przez _startWeek, jak i podsumowanie w
@@ -543,38 +625,75 @@ class _HomeShellState extends State<HomeShell> {
     return result;
   }
 
+  // Kilka budynków dostaje dodatkowo trzeci surowiec poza drewnem/kamieniem
+  // (i ewentualnie złotem) - dobrany tematycznie, żeby budowa czuła się jak
+  // realna inwestycja, nie tylko "drewno + kamień" w kółko. Budynki, których
+  // JEDYNYM surowcem produkcji/rzemiosła jest już wprost drewno albo kamień
+  // (Tartak, Kamieniarz, Studnia, Magazyn) oraz najprostszy Dom zostają bez
+  // zmian - nie ma tu żadnego naturalnego trzeciego składnika.
   Map<ResourceType, int> _villageCostFor(BuildingKind kind) {
     switch (kind) {
       case BuildingKind.sklep:
         return const {ResourceType.wood: 12, ResourceType.stone: 8, ResourceType.coin: 8};
       case BuildingKind.karczma:
-        return const {ResourceType.wood: 15, ResourceType.stone: 10};
+        return const {ResourceType.wood: 15, ResourceType.stone: 10, ResourceType.grain: 10};
       case BuildingKind.dom:
         return const {ResourceType.wood: 10, ResourceType.stone: 6};
       case BuildingKind.kuznia:
-        return const {ResourceType.wood: 15, ResourceType.stone: 12};
+        // Hartowanie metalu wymaga wody.
+        return const {ResourceType.wood: 15, ResourceType.stone: 12, ResourceType.water: 8};
       case BuildingKind.spichlerz:
-        return const {ResourceType.wood: 15, ResourceType.stone: 10};
+        return const {ResourceType.wood: 15, ResourceType.stone: 10, ResourceType.apple: 10};
       case BuildingKind.piekarnia:
-        return const {ResourceType.wood: 15, ResourceType.stone: 10};
+        // Zaczyn na chleb wymaga wody.
+        return const {ResourceType.wood: 15, ResourceType.stone: 10, ResourceType.water: 8};
       case BuildingKind.tartak:
         return const {ResourceType.wood: 12, ResourceType.stone: 10};
       case BuildingKind.studnia:
         return const {ResourceType.wood: 12, ResourceType.stone: 10};
       case BuildingKind.browar:
-        return const {ResourceType.wood: 12, ResourceType.stone: 8, ResourceType.coin: 6};
+        return const {
+          ResourceType.wood: 12,
+          ResourceType.stone: 8,
+          ResourceType.coin: 6,
+          ResourceType.grain: 10,
+        };
       case BuildingKind.kaplica:
-        return const {ResourceType.wood: 15, ResourceType.stone: 10, ResourceType.coin: 8};
+        // Symbolicznie po trochu każdego surowca - cała wioska składa się na
+        // Kaplicę przed pogrzebem Antoniego (patrz cel Aktu 0 od tygodnia 7),
+        // nie tylko na drewno/kamień jak większość budynków. Niższy niż
+        // dawniej koszt pojedynczego surowca, mimo że surowców jest więcej.
+        return const {
+          ResourceType.grass: 5,
+          ResourceType.grain: 5,
+          ResourceType.wood: 5,
+          ResourceType.stone: 5,
+          ResourceType.water: 5,
+          ResourceType.coin: 5,
+          ResourceType.apple: 5,
+        };
       case BuildingKind.szkola:
         return const {ResourceType.wood: 18, ResourceType.stone: 12, ResourceType.coin: 10};
       case BuildingKind.rynek:
-        return const {ResourceType.wood: 18, ResourceType.stone: 12, ResourceType.coin: 10};
+        // Towar do wystawienia na pierwszy handel.
+        return const {
+          ResourceType.wood: 18,
+          ResourceType.stone: 12,
+          ResourceType.coin: 10,
+          ResourceType.apple: 10,
+        };
       case BuildingKind.magazyn:
         return const {ResourceType.wood: 20, ResourceType.stone: 15};
       case BuildingKind.kamieniarz:
         return const {ResourceType.wood: 12, ResourceType.stone: 8};
       case BuildingKind.koszary:
-        return const {ResourceType.wood: 20, ResourceType.stone: 15, ResourceType.coin: 12};
+        // Zapasy jedzenia dla pierwszej załogi.
+        return const {
+          ResourceType.wood: 20,
+          ResourceType.stone: 15,
+          ResourceType.coin: 12,
+          ResourceType.apple: 10,
+        };
       default:
         return const {};
     }
@@ -594,9 +713,9 @@ class _HomeShellState extends State<HomeShell> {
       case BuildingKind.spichlerz:
         return l10n.homeBonusSpichlerz(_weeklyProductionBonus, _pct(_hungerRiskReductionPerLevel));
       case BuildingKind.piekarnia:
-        return l10n.homeBonusPiekarnia(_weeklyProductionBonus);
+        return l10n.homeBonusPiekarnia(_piekarniaWeeklyGrainBonus);
       case BuildingKind.tartak:
-        return l10n.homeBonusTartak(_weeklyProductionBonus);
+        return l10n.homeBonusTartak(_tartakWeeklyWoodBonus);
       case BuildingKind.studnia:
         return l10n.homeBonusStudnia(_weeklyProductionBonus, _pct(_fireRiskReductionPerLevel));
       case BuildingKind.browar:
@@ -610,7 +729,7 @@ class _HomeShellState extends State<HomeShell> {
       case BuildingKind.magazyn:
         return l10n.homeBonusMagazyn(_warehouseStorageBonusPerLevel);
       case BuildingKind.kamieniarz:
-        return l10n.homeBonusKamieniarz(_weeklyProductionBonus);
+        return l10n.homeBonusKamieniarz(_kamieniarzWeeklyStoneBonus);
       case BuildingKind.koszary:
         return l10n.homeBonusKoszary(_koszarySecurityBonusPerLevel, _foodPerSoldierWeekly);
       default:
@@ -642,9 +761,10 @@ class _HomeShellState extends State<HomeShell> {
         return l10n.homeUpgradeSpichlerz(
             _pct(_hungerRiskReductionPerLevel), _pct(_hungerRiskReductionPerLevel * 2));
       case BuildingKind.piekarnia:
-        return l10n.homeUpgradePiekarnia(_weeklyProductionBonus, _weeklyProductionBonus * 2);
+        return l10n.homeUpgradePiekarnia(
+            _piekarniaWeeklyGrainBonus, _piekarniaWeeklyGrainBonus * 2);
       case BuildingKind.tartak:
-        return l10n.homeUpgradeTartak(_weeklyProductionBonus, _weeklyProductionBonus * 2);
+        return l10n.homeUpgradeTartak(_tartakWeeklyWoodBonus, _tartakWeeklyWoodBonus * 2);
       case BuildingKind.studnia:
         return l10n.homeUpgradeStudnia(
             _pct(_fireRiskReductionPerLevel), _pct(_fireRiskReductionPerLevel * 2));
@@ -662,7 +782,8 @@ class _HomeShellState extends State<HomeShell> {
         return l10n.homeUpgradeMagazyn(
             _warehouseStorageBonusPerLevel, _warehouseStorageBonusPerLevel * 2);
       case BuildingKind.kamieniarz:
-        return l10n.homeUpgradeKamieniarz(_weeklyProductionBonus, _weeklyProductionBonus * 2);
+        return l10n.homeUpgradeKamieniarz(
+            _kamieniarzWeeklyStoneBonus, _kamieniarzWeeklyStoneBonus * 2);
       case BuildingKind.koszary:
         return l10n.homeUpgradeKoszary(_koszarySecurityBonusPerLevel, _koszarySecurityBonusPerLevel * 2);
     }
@@ -689,14 +810,22 @@ class _HomeShellState extends State<HomeShell> {
     final l10n = AppLocalizations.of(context)!;
     switch (kind) {
       case BuildingKind.ratusz:
-        final base = _ratuszWeeklyBonus * (_upgradedL2(kind) ? 2 : 1);
+        final base = _tieredBaseAmount(kind, _ratuszWeeklyBonus);
         return [_bonusLine(l10n, l10n.homeLabelResourceProduction, base, _ratuszWeeklyBonusValue, '/tydz.')];
       case BuildingKind.palisade:
         return [
-          _bonusLine(l10n, l10n.homeLabelPopulationLimit, _tieredBaseAmount(kind, _palisadePopulationBonus),
-              _tieredBonus(kind, _palisadePopulationBonus), ''),
-          _bonusLine(l10n, l10n.homeLabelSecurity, _tieredBaseAmount(kind, _palisadeSecurityBonus),
-              _tieredBonus(kind, _palisadeSecurityBonus), ''),
+          _bonusLine(
+              l10n,
+              l10n.homeLabelPopulationLimit,
+              _tieredBaseAmount(kind, _palisadePopulationBonus),
+              _tieredFlatBonus(kind, _palisadePopulationBonus, _palisadeWorkerPopulationBonus),
+              ''),
+          _bonusLine(
+              l10n,
+              l10n.homeLabelSecurity,
+              _tieredBaseAmount(kind, _palisadeSecurityBonus),
+              _tieredFlatBonus(kind, _palisadeSecurityBonus, _palisadeWorkerSecurityBonus),
+              ''),
         ];
       case BuildingKind.sklep:
         if (!_upgradedL2(kind)) {
@@ -708,8 +837,12 @@ class _HomeShellState extends State<HomeShell> {
         ];
       case BuildingKind.karczma:
         return [
-          _bonusLine(l10n, l10n.homeLabelPopulationLimit, _tieredBaseAmount(kind, _karczmaPopulationBonus),
-              _tieredBonus(kind, _karczmaPopulationBonus), ''),
+          _bonusLine(
+              l10n,
+              l10n.homeLabelPopulationLimit,
+              _tieredBaseAmount(kind, _karczmaPopulationBonus),
+              _tieredFlatBonus(kind, _karczmaPopulationBonus, _karczmaWorkerPopulationBonus),
+              ''),
         ];
       case BuildingKind.dom:
         return [
@@ -748,16 +881,27 @@ class _HomeShellState extends State<HomeShell> {
         ];
       case BuildingKind.browar:
         return [
-          _bonusLine(l10n, l10n.homeLabelVillageMorale, _tieredBaseAmount(kind, _breweryMoraleBonus),
-              _tieredBonus(kind, _breweryMoraleBonus), ''),
+          _bonusLine(
+              l10n,
+              l10n.homeLabelVillageMorale,
+              _tieredBaseAmount(kind, _breweryMoraleBonus),
+              _tieredFlatBonus(kind, _breweryMoraleBonus, _browarWorkerMoraleBonus),
+              ''),
         ];
       case BuildingKind.kaplica:
         return [
-          _bonusPercentLine(l10n, l10n.homeLabelSpoilRiskReduction,
+          _bonusPercentLine(
+              l10n,
+              l10n.homeLabelSpoilRiskReduction,
               _tieredBaseFraction(kind, _kaplicaRiskReductionPerLevel),
-              _tieredFraction(kind, _kaplicaRiskReductionPerLevel)),
-          _bonusLine(l10n, l10n.homeLabelVillageMorale, _tieredBaseAmount(kind, _kaplicaMoraleBonus),
-              _tieredBonus(kind, _kaplicaMoraleBonus), ''),
+              _tieredFlatFraction(
+                  kind, _kaplicaRiskReductionPerLevel, _kaplicaRiskReductionPerLevel)),
+          _bonusLine(
+              l10n,
+              l10n.homeLabelVillageMorale,
+              _tieredBaseAmount(kind, _kaplicaMoraleBonus),
+              _tieredFlatBonus(kind, _kaplicaMoraleBonus, _kaplicaMoraleBonus),
+              ''),
         ];
       case BuildingKind.szkola:
         // Uczelnia nie ma standardowej premii budynku - jej efekt to dostęp
@@ -943,6 +1087,10 @@ class _HomeShellState extends State<HomeShell> {
   final GlobalKey _navBarKey = GlobalKey();
   final GlobalKey _tabContentKey = GlobalKey();
   final GlobalKey _startWeekButtonKey = GlobalKey();
+  // Jedna na możliwą pozycję zakładki (nigdy więcej niż w _tabs) - żeby przy
+  // treści danej zakładki dało się RÓWNOCZEŚNIE podświetlić też jej ikonkę
+  // na dolnym pasku (patrz TutorialStep.secondaryTargetKey w _startTour).
+  final List<GlobalKey> _navButtonKeys = List.generate(6, (_) => GlobalKey());
 
   /// Samouczek wioski/zakładek z podświetleniem na żywo - pokazuje się tylko
   /// raz (patrz GameProgressStorage.markTutorialSeen), po pierwszym
@@ -994,6 +1142,7 @@ class _HomeShellState extends State<HomeShell> {
         description: _tourTabDescription(l10n, tabs[i].icon),
         padding: EdgeInsets.zero,
         borderRadius: BorderRadius.zero,
+        secondaryTargetKey: _navButtonKeys[i],
       ));
       stepTabs.add(i);
     }
@@ -1500,6 +1649,7 @@ class _HomeShellState extends State<HomeShell> {
     }
     final level2 = _upgradedL2(kind);
     final cost = _villageCostFor(kind);
+    final upgradeCost = _villageUpgradeCostFor(kind);
     Widget Function(BuildContext, StateSetter)? extraContentBuilder;
     if (builtNow && kind == BuildingKind.koszary) {
       extraContentBuilder = _koszaryRecruitPanel;
@@ -1512,7 +1662,7 @@ class _HomeShellState extends State<HomeShell> {
       level1: builtNow,
       level2: level2,
       cost: cost,
-      upgradeCost: _villageUpgradeCost,
+      upgradeCost: upgradeCost,
       bonusText: _villageBonusTextFor(kind),
       upgradeText: _villageUpgradeTextFor(kind),
       // Dom (tak jak Uczelnia) nie ma żadnej premii zależnej od pracowników -
@@ -1536,7 +1686,7 @@ class _HomeShellState extends State<HomeShell> {
       await VillageBuildingStorage.setBuilt(kind, true);
     } else if (action == 'upgrade' && builtNow && !level2) {
       setState(() {
-        for (final entry in _villageUpgradeCost.entries) {
+        for (final entry in upgradeCost.entries) {
           _stockpile[entry.key] = (_stockpile[entry.key] ?? 0) - entry.value;
         }
         _villageUpgraded[kind] = true;
@@ -1550,7 +1700,7 @@ class _HomeShellState extends State<HomeShell> {
           _stockpile[entry.key] = (_stockpile[entry.key] ?? 0) + entry.value ~/ 2;
         }
         if (level2) {
-          for (final entry in _villageUpgradeCost.entries) {
+          for (final entry in upgradeCost.entries) {
             _stockpile[entry.key] = (_stockpile[entry.key] ?? 0) + entry.value ~/ 2;
           }
         }
@@ -2123,8 +2273,7 @@ class _HomeShellState extends State<HomeShell> {
                     ),
                   ] else ...[
                     Text(
-                      l10n.homeWorkerBonusExplanation(_maxWorkersPerBuilding,
-                          _maxWorkersPerBuilding == 2 ? l10n.homeWorkerMultiplierDouble : '+50%'),
+                      l10n.homeWorkerBonusExplanation(_maxWorkersPerBuilding),
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                     const SizedBox(height: 6),
@@ -2390,11 +2539,6 @@ class _HomeShellState extends State<HomeShell> {
   /// faktyczny warunek rozstrzygający akt nigdy się nie rozjechały.
   bool _actGoalMet(int actNumber) => _actGoalRequirements(actNumber).every((r) => r.met);
 
-  GoalRequirement _resourceRequirement(ResourceType type, int target) {
-    final have = _stockpile[type] ?? 0;
-    return GoalRequirement(label: type.label, met: have >= target, progress: '$have/$target');
-  }
-
   /// Wynik starcia z bossem jako pojedyncze wymaganie z postępem - -1 znaczy
   /// "jeszcze nie stoczono", więc to NIE to samo co "0 etapów ukończonych".
   GoalRequirement _battleRequirement(
@@ -2415,18 +2559,17 @@ class _HomeShellState extends State<HomeShell> {
     final l10n = AppLocalizations.of(context)!;
     switch (actNumber) {
       case 0:
+        // Budowa Ratusza wymaga i tak odblokowania wszystkich 7 surowców
+        // (Sad/Łąka/Pole, patrz _allResourcesUnlocked), więc nie trzeba tego
+        // osobno wypisywać jako celu - jest już wymuszone przez sam Ratusz.
+        // Kaplica pojawia się na liście dopiero od tygodnia 7 (śmierć
+        // Antoniego, patrz StoryMilestone.fromWeek) - dopasowana fabularnie
+        // do zorganizowania pogrzebu.
         return [
           GoalRequirement(label: l10n.homeGoalRatuszBuilt, met: _ratuszBuilt),
-          GoalRequirement(label: l10n.homeGoalOrchardDeveloped, met: _areasBuilt[AreaKind.orchard] ?? false),
-          GoalRequirement(label: l10n.homeGoalMeadowDeveloped, met: _areasBuilt[AreaKind.meadow] ?? false),
-          GoalRequirement(label: l10n.homeGoalFieldDeveloped, met: _areasBuilt[AreaKind.field] ?? false),
-          _resourceRequirement(ResourceType.wood, 30),
-          _resourceRequirement(ResourceType.stone, 20),
-          _resourceRequirement(ResourceType.coin, 15),
-          _resourceRequirement(ResourceType.water, 15),
-          _resourceRequirement(ResourceType.grain, 15),
-          _resourceRequirement(ResourceType.apple, 15),
-          _resourceRequirement(ResourceType.grass, 15),
+          if (_week >= 7)
+            GoalRequirement(
+                label: l10n.homeGoalKaplicaBuilt, met: _villageBuilt[BuildingKind.kaplica] ?? false),
         ];
       case 1:
         // Rozstrzygane przez starcie z Grotem (tydzień 26, BossBattleScreen) -
@@ -2493,7 +2636,7 @@ class _HomeShellState extends State<HomeShell> {
       case SideQuestId.dobrySasiad:
         return _villageBuilt[BuildingKind.karczma] ?? false;
       case SideQuestId.milczenieJadwigi:
-        return _villageBuilt[BuildingKind.kaplica] ?? false;
+        return _upgradedL2(BuildingKind.kaplica);
       case SideQuestId.wdowaPoNajemniku:
         return _bossBattleStagesCleared >= 2 && (_villageBuilt[BuildingKind.karczma] ?? false);
       case SideQuestId.ostatniList:
@@ -3157,18 +3300,10 @@ class _HomeShellState extends State<HomeShell> {
         if (haveGrain >= populationFoodNeeded) {
           stockpile[ResourceType.grain] = haveGrain - populationFoodNeeded;
         } else {
-          // Brakujące zboże jest dobierane z jabłek jako zapasowe źródło
-          // jedzenia (dokładnie ten brakujący kawałek, nie cała potrzeba) -
-          // głód następuje dopiero, gdy i jabłek nie starcza.
-          final grainShortfall = populationFoodNeeded - haveGrain;
+          // Mieszkańcy jedzą wyłącznie zboże - brak zboża to głód wprost,
+          // bez sięgania po jabłka (te są zarezerwowane dla żołnierzy).
           stockpile[ResourceType.grain] = 0;
-          final haveApple = stockpile[ResourceType.apple] ?? 0;
-          if (haveApple >= grainShortfall) {
-            stockpile[ResourceType.apple] = haveApple - grainShortfall;
-          } else {
-            stockpile[ResourceType.apple] = 0;
-            starving = true;
-          }
+          starving = true;
         }
       }
       if (starving) {
@@ -3333,6 +3468,7 @@ class _HomeShellState extends State<HomeShell> {
           builder: () => VillageView(
             ratuszBuilt: _ratuszBuilt,
             palisadeBuilt: _palisadeBuilt,
+            allResourcesUnlocked: _allResourcesUnlocked,
             builtMap: _villageBuilt,
             extraHousesBuilt: _extraHousesBuilt,
             extraHousesActive: _extraHousesActive,
@@ -3343,6 +3479,7 @@ class _HomeShellState extends State<HomeShell> {
             onTapBuilding: _onTapVillageBuilding,
             onTapExtraHouse: _onTapExtraHouse,
             onTapEmptyPlot: _onTapEmptyPlot,
+            season: seasonForWeek(_week),
           ),
         ),
         _TabSpec(
@@ -3533,6 +3670,7 @@ class _HomeShellState extends State<HomeShell> {
                     for (var i = 0; i < tabs.length; i++)
                       Expanded(
                         child: _NavButton(
+                          key: _navButtonKeys[i],
                           icon: tabs[i].icon,
                           label: tabs[i].label,
                           selected: safeTab == i,
@@ -3623,6 +3761,7 @@ class _NavButton extends StatelessWidget {
   final int badgeCount;
 
   const _NavButton({
+    super.key,
     required this.icon,
     required this.label,
     required this.selected,

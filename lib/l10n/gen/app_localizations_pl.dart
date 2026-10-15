@@ -240,6 +240,10 @@ class AppLocalizationsPl extends AppLocalizations {
       'Otwiera listę wszystkiego, co możesz teraz zbudować, razem z kosztem i tym, czego jeszcze brakuje w magazynie.';
 
   @override
+  String get harvestScreenTutorialShuffleDescription =>
+      'Losuje układ planszy od nowa za 1 ruch - przydaje się, gdy nie widzisz już żadnego dobrego połączenia.';
+
+  @override
   String get harvestScreenRoundEndTitle => '⏳ Koniec ruchów';
 
   @override
@@ -1915,12 +1919,9 @@ class AppLocalizationsPl extends AppLocalizations {
       'Wymaga odkrycia \"Zarządzanie pracownikami\" w Uczelni.';
 
   @override
-  String homeWorkerBonusExplanation(int max, String multiplier) {
-    return 'Każdy przydzielony mieszkaniec zwiększa premię budynku o +50% (maks. $max = $multiplier premia).';
+  String homeWorkerBonusExplanation(int max) {
+    return 'Każdy przydzielony mieszkaniec zwiększa premię budynku - dokładną wartość widać w sekcji \"Premia ogólna\" powyżej. Limit: $max na budynek.';
   }
-
-  @override
-  String get homeWorkerMultiplierDouble => 'podwójna';
 
   @override
   String homeAvailableResidents(int n) {
@@ -1983,16 +1984,10 @@ class AppLocalizationsPl extends AppLocalizations {
   String get homeGoalRatuszBuilt => 'Ratusz zbudowany';
 
   @override
+  String get homeGoalKaplicaBuilt => 'Kaplica zbudowana';
+
+  @override
   String get homeGoalRatuszUpgraded => 'Ratusz rozbudowany do poziomu 2';
-
-  @override
-  String get homeGoalOrchardDeveloped => 'Sad rozwinięty';
-
-  @override
-  String get homeGoalMeadowDeveloped => 'Łąka rozwinięta';
-
-  @override
-  String get homeGoalFieldDeveloped => 'Pole rozwinięte';
 
   @override
   String get homeGoalBattleGrot => 'Starcie z Grotem';

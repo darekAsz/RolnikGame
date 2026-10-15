@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../models/season.dart';
 import '../widgets/village_board.dart';
 
 /// Sam widok planszy wioski - bez paska surowców, bez AppBar, żeby zajmować
@@ -7,6 +8,7 @@ import '../widgets/village_board.dart';
 class VillageView extends StatelessWidget {
   final bool ratuszBuilt;
   final bool palisadeBuilt;
+  final bool allResourcesUnlocked;
   final Map<BuildingKind, bool> builtMap;
   final List<bool> extraHousesBuilt;
   final List<bool> extraHousesActive;
@@ -17,11 +19,13 @@ class VillageView extends StatelessWidget {
   final void Function(BuildingKind kind) onTapBuilding;
   final void Function(int index) onTapExtraHouse;
   final VoidCallback onTapEmptyPlot;
+  final Season season;
 
   const VillageView({
     super.key,
     required this.ratuszBuilt,
     required this.palisadeBuilt,
+    required this.allResourcesUnlocked,
     required this.builtMap,
     required this.extraHousesBuilt,
     this.extraHousesActive = const [],
@@ -32,6 +36,7 @@ class VillageView extends StatelessWidget {
     required this.onTapBuilding,
     required this.onTapExtraHouse,
     required this.onTapEmptyPlot,
+    this.season = Season.spring,
   });
 
   @override
@@ -39,6 +44,7 @@ class VillageView extends StatelessWidget {
     return VillageBoard(
       ratuszBuilt: ratuszBuilt,
       palisadeBuilt: palisadeBuilt,
+      allResourcesUnlocked: allResourcesUnlocked,
       builtMap: builtMap,
       extraHousesBuilt: extraHousesBuilt,
       extraHousesActive: extraHousesActive,
@@ -49,6 +55,7 @@ class VillageView extends StatelessWidget {
       onTapBuilding: onTapBuilding,
       onTapExtraHouse: onTapExtraHouse,
       onTapEmptyPlot: onTapEmptyPlot,
+      season: season,
     );
   }
 }
